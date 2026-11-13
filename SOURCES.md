@@ -9,6 +9,13 @@ in which it is first used. Content owner: A2.
 | Source | Used for | URL | License / terms |
 | --- | --- | --- | --- |
 | NAIF generic SPICE kernels: `naif0012.tls`, `de440.bsp`, `moon_pa_de440_200625.bpc`, `moon_de440_250416.tf` | Ephemerides and the MOON_ME frame (CI downloads them; tests check exact sizes) | https://naif.jpl.nasa.gov/pub/naif/generic_kernels | NASA/JPL NAIF, public |
+| LOLA polar gridded data records, PDS data set `LRO-L-LOLA-4-GDR-V1.0` (LRO LOLA Team, NASA GSFC): `LDEM_80S_40M`, `LDEM_75S_120M`, `LDEM_60S_120M` (all V2.0) and their labels | Terrain near the south pole; the three labels are test fixtures | https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/ | NASA PDS, public |
+| LOLA archive projection catalogues `DSMAP_POLAR.CAT` and `DSMAP.CAT` | Polar stereographic and simple cylindrical pixel formulas | https://imbrium.mit.edu/CATALOG/ | NASA PDS, public |
+| SLDEM2015, 512 ppd tiles (`SLDEM2015_512_*_FLOAT.IMG`) and their labels. Barker, M. K., Mazarico, E., Neumann, G. A., Zuber, M. T., Haruyama, J., Smith, D. E. (2016), "A new lunar digital elevation model from the Lunar Orbiter Laser Altimeter and SELENE Terrain Camera", *Icarus* 273, 346-355, doi:10.1016/j.icarus.2015.07.039 | Terrain between 60° S and 60° N (per-site crops); three labels are test fixtures | https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/ | NASA PDS / PGDA, public; cite the paper |
+| LOLA illumination products 2016 (`AVGVISIB_*`, `LPSR_*`): labels only so far. Mazarico, E., Neumann, G. A., Smith, D. E., Zuber, M. T., Torrence, M. H. (2011), "Illumination conditions of the lunar polar regions using LOLA topography", *Icarus* 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030 | Label-parsing test fixtures (the data come later, for validation) | https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/ | NASA, public ("EXTRAS", not supported by PDS); cite the paper |
+| Gazetteer of Planetary Nomenclature (IAU / USGS), feature 5450, Shackleton | Crater centre for the DEM orientation test | https://planetarynames.wr.usgs.gov/Feature/5450 | Public |
+| Zuber, M. T., et al. (2012), "Constraints on the volatile distribution within Shackleton crater at the lunar south pole", *Nature* 486, 378-381, doi:10.1038/nature11216 | Published depth of Shackleton (4.1 km) for the DEM reading test | https://ntrs.nasa.gov/api/citations/20120013758/downloads/20120013758.pdf | Cited, not redistributed |
+| LROC, "JAXA SLIM Landing" (lander at 13.3160° S, 25.2510° E, -912 m elevation) | Known height for the SLDEM2015 reading test | https://lroc.im-ldi.com/images/1358 | Cited, not redistributed |
 
 ## Software libraries
 
