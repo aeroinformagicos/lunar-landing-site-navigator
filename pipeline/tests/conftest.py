@@ -49,6 +49,19 @@ def kernels_dir() -> Path:
     return data_dir() / "kernels"
 
 
+@pytest.fixture(scope="session")
+def require_data(llsn_data_dir):
+    """Return ``path(relative)``: the file inside the data directory, or skip the test if it is missing."""
+
+    def path(relative: str) -> Path:
+        full = llsn_data_dir / relative
+        if not full.is_file():
+            pytest.skip(f"data file not found: {relative}; run make data-fetch")
+        return full
+
+    return path
+
+
 def pytest_runtest_setup(item):
     if item.get_closest_marker("kernels") is None or kernels_present():
         return

@@ -22,3 +22,5 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]
+# E741: `l` (line) and `s` (sample) are the pixel names of the PDS labels and of the specification.
+ignore = ["E741"]
