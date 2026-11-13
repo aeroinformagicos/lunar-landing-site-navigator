@@ -1,0 +1,16 @@
+{
+  "name": "lunar-landing-site-navigator",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "setup": "node ops/tasks.mjs setup",
+    "setup-gpu": "node ops/tasks.mjs setup-gpu",
+    "test": "node ops/tasks.mjs test",
+    "test-all": "node ops/tasks.mjs test-all",
+    "check": "node ops/tasks.mjs check",
+    "dev": "node ops/tasks.mjs dev",
+    "build": "node ops/tasks.mjs build",
+    "deploy": "node ops/tasks.mjs deploy",
+    "info": "node ops/tasks.mjs info"
+  }
+}

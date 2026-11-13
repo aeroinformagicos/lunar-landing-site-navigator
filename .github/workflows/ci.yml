@@ -1,0 +1,99 @@
+# AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
+# CI (docs/spec/02_arquitectura.md §6.1). Runs on every PR and on every push to main;
+# on main it also deploys web/dist to Cloudflare Pages (project aeroinformagicos-llsn).
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  LLSN_DATA_DIR: ${{ github.workspace }}/data
+  LLSN_REQUIRE_KERNELS: "1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- SPICE kernels (03_datos_y_fuentes.md §10.1, rows 1-4), cached ---
+      - name: Cache SPICE kernels
+        id: kcache
+        uses: actions/cache@v4
+        with:
+          path: data/kernels
+          key: spice-kernels-naif0012-de440-moonpa200625-moonfk250416
+      - name: Download SPICE kernels
+        if: steps.kcache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p data/kernels
+          N=https://naif.jpl.nasa.gov/pub/naif/generic_kernels
+          curl -L --fail --retry 3 -o data/kernels/naif0012.tls             $N/lsk/naif0012.tls
+          curl -L --fail --retry 3 -o data/kernels/de440.bsp                $N/spk/planets/de440.bsp
+          curl -L --fail --retry 3 -o data/kernels/moon_pa_de440_200625.bpc $N/pck/moon_pa_de440_200625.bpc
+          curl -L --fail --retry 3 -o data/kernels/moon_de440_250416.tf     $N/fk/satellites/moon_de440_250416.tf
+      - name: Check kernel sizes
+        run: |
+          check() { s=$(wc -c < "data/kernels/$1"); [ "$s" = "$2" ] || { echo "$1: $s bytes, expected $2"; exit 1; }; }
+          check naif0012.tls 5257
+          check de440.bsp 119799808
+          check moon_pa_de440_200625.bpc 12863488
+          check moon_de440_250416.tf 19478
+
+      # --- Python pipeline ---
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+      - name: Install Python dependencies
+        run: pip install -r pipeline/requirements.txt
+      - name: Ruff
+        run: python -m ruff check pipeline
+      - name: Pytest (fast + kernels)
+        run: python -m pytest -c pipeline/pyproject.toml -m "not data and not slow"
+
+      # --- Web ---
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: npm ci
+        working-directory: web
+        run: npm ci
+      - name: Type check
+        working-directory: web
+        run: npx tsc --noEmit -p tsconfig.json
+      - name: Vitest
+        working-directory: web
+        run: npx vitest run
+      - name: Build
+        working-directory: web
+        run: npx vite build
+
+      # --- Contract (schemas arrive with T-02) ---
+      - name: Validate contract
+        run: |
+          if [ -d contract/schemas ]; then python -m pipeline.cli check-contract;
+          else echo "contract/schemas not present yet (T-02): skipped"; fi
+
+      # --- Deploy (main only) ---
+      - name: Deploy to Cloudflare Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        working-directory: web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets not set: deploy skipped"
+            exit 0
+          fi
+          npx wrangler pages deploy dist --project-name aeroinformagicos-llsn --branch main

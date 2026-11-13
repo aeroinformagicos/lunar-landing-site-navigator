@@ -1,0 +1,22 @@
+{
+  "attribution": {
+    "commit": "AI-assisted: Claude Code",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(py:*)",
+      "Bash(python:*)",
+      "Bash(.venv/Scripts/python:*)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ]
+  }
+}

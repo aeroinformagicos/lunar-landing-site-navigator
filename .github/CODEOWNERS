@@ -1,0 +1,6 @@
+# AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
+# Mandatory reviewers (docs/spec/02_arquitectura.md §6.3).
+# PENDIENTE (I3): sustituir los marcadores por los usuarios de GitHub reales y descomentar.
+# Un usuario inexistente hace que GitHub marque el fichero como erróneo.
+# tests/golden/   @A1-github-user
+# contract/       @I3-github-user
