@@ -89,6 +89,8 @@ fuente (CLAUDE.md §2).
 | Paso del deslizador del cursor | 600 (flechas); 86.400 (PageUp/PageDown); 3.600 (botones y `[` `]`) | s | `10_interfaz.md` §4, §12 | `web/src/state/selectors.ts`, `ui/controls/TimeControls.tsx` |
 | Panorama: vista, umbral de recentrado, zoom y rejillas | 40° × 20°; 8°; 4° × 2°; 5° y 0,5° | ° | `10_interfaz.md` §6.1 | `web/src/ui/panorama/geometry.ts` |
 | Tira de 360°: rango de elevación | −15 a +15 | ° | D-74 | `web/src/ui/panorama/geometry.ts` (`STRIP_MIN_EL`, `STRIP_MAX_EL`) |
+| Enlace compartible: versión, prefijo del fragmento e intervalo mínimo entre escrituras | 1; `#s=`; 500 | —; —; ms | `10_interfaz.md` §10 («como mucho dos veces por segundo») | `web/src/state/url.ts` (`URL_VERSION`, `HASH_PREFIX`, `URL_WRITE_INTERVAL_MS`) |
+| Rango admitido de `maxNightHours` en un enlace | 0 – 400 | h | `07_visibilidad.md` §8.1 («editable: 0–400») | `web/src/state/url.ts` (`MAX_NIGHT_HOURS_RANGE`) |
 
 ## Valores medidos
 
