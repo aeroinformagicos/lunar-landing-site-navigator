@@ -495,6 +495,35 @@ Cifras medidas:
 | `regions` sin comprimir | 32 + 368 · 10.252 = 3.772.768 B |
 | Leer y compactar un trozo del cubo | ~6 ms → ~12 s para los 1.974 trozos (estimado con un trozo sintético) |
 
+### T-36 · Pruebas lentas y de catálogo: A6, A7, B6 y B4 (2026-11-14)
+
+Constantes nuevas (`pipeline/tests/test_a6_shackleton.py`, `test_a7_nasa_points.py`, `test_b6_cube_vs_site.py`,
+`test_b4_eclipse_catalog.py`). Las tolerancias se leen de `tests/golden/tolerances.json`.
+
+| Nombre | Valor | Fuente |
+| --- | --- | --- |
+| `SHACKLETON`, `RADIUS_M` (A6) | (−89,67°, 129,78°); 15 km | `08` §11; `11` §4, A6 |
+| `PUBLISHED_LIGHT_D`, `PUBLISHED_NIGHT_D`, `FACTOR` (A6) | 240 días; 1,5 días; factor 3 | Mazarico et al. (2011), citado en `08` §11 y `11` §4 |
+| `N_STEPS` (A6) | 43.824 pasos horarios (2026–2030) | `08` §5.1 (`MONTH_STEPS_TOTAL`) |
+| `SEED`, `N_POINTS`, `R_MAX_M` (A7) | 42; 20; 150 km | `08` §8.3; `11` §4, A7 |
+| `LAW`, `OBSERVER_HEIGHT_M` (A7) | `full`; 2 m | `06` §1 (ley por defecto); `11` §4, A7 |
+| `SEED`, `N_CELLS` (B6) | 7; 10 | `11` §5, B6 |
+| `SHARE_WITHIN`, `ALL_FACTOR` (B6) | 99 % de los acimuts dentro de `B6_el_deg`; todos dentro de 2 × `B6_el_deg` (0,02°) | `11` §5, B6 |
+| `SITE`, `T_FROM`, `T_TO` (B4) | (0°, 0°); 2025-01-01 a 2031-01-01 | `11` §5, B4 |
+| `MATCH_S`, `N_TOTAL`, `MAX_INTERVALS` (B4) | ± 3 h; 6; 14 | `11` §5, B4 |
+| `SCREEN_MARGIN_DEG`, `SEARCH_PAD_S` (B4) | 1°; 2 h | D-113 a (el Sol se mueve ~0,51°/h frente a la Tierra: 360° en el mes sinódico de 29,53 días, `11` §2.4) |
+
+Cifras medidas (B4 corre en `make test`; A6, A7 y B6 son `slow` y no se han ejecutado con los datos reales en
+la sesión):
+
+| Medida | Valor | Esperado |
+| --- | --- | --- |
+| B4: intervalos detectados en (0°, 0°), 2025–2030 | 13, todos junto a un máximo del catálogo | ≤ 14, cada uno junto a un máximo (± 3 h) |
+| B4: intervalos con fase total | 7: los 6 eclipses totales del catálogo y el parcial de 2026-08-28 (magnitud umbral 0,930: el punto (0°, 0°) cae en la umbra) | Los 6 totales con fase total |
+| B4: eclipse del catálogo sin intervalo | 2027-07-18 (penumbral, −1,068) | Puede faltar (`11` §5) |
+| B4: duración de la prueba | < 1 s | — |
+| Ensayo de A6, A7 y B6 con cubo, relieve y mapas de la NASA sintéticos (solo en la sesión) | B6 pasa (0,005° y 0,20 puntos: solo la cuantización); A6 registra `manual`; A7 corre y falla contra mapas sintéticos; B6 en 6 s con ley `fast` y 10 celdas | Las tres recorren todo el camino |
+
 ## T-05 · Valores de referencia de Horizons (A1, A2)
 
 | Constante | Valor | Fuente |
