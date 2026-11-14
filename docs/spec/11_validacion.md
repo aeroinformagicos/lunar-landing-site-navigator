@@ -8,7 +8,7 @@ Cada caso tiene entrada exacta, resultado esperado, tolerancia y una fuente que 
 | --- | --- | --- | --- | --- |
 | Unitarias y sintéticas | (sin marca) | Nada | `make test`, integración continua | A4, A9, vectores, formatos |
 | De referencia con SPICE | `kernels` | `data/kernels/` | `make test`, integración continua (núcleos en caché) | A1, A2, A8, A10, B3, B4, marcos |
-| Con relieve | `data` | DEM descargados | `make test-all`, portátil de I1 | A3, A5 (apoyo), lectura de DEM |
+| Con relieve | `data` | DEM descargados | `make test-all`, portátil de I1 | A5 (apoyo), A10 con relieve, lectura de DEM (A3 retirado, D-95) |
 | Lentas | `slow` | Cubo o muchas máscaras | De noche | A6, A7, B6, B7 |
 | Web | Vitest | Nada | `make test` | Núcleo en TypeScript, vectores |
 | Extremo a extremo | Playwright | Web construida | `make test-all`, antes de cada hito | B1, B2, B9 (parte) |
@@ -122,7 +122,7 @@ Contenido inicial de `events_published.csv` (lo crea T-05):
 | B3 | `totality_start` | 2025-03-14T06:18:00Z | Ídem | «approximately 2 hours and 16 minutes of totality, starting at 1:18 am CST» |
 | B3 | `totality_end` | 2025-03-14T08:34:00Z | Ídem | 1:18 am + 2 h 16 min |
 | B3 | `eclipse_end` | 2025-03-14T09:52:00Z | Ídem | «through 4:52 am CST» |
-| A3 | `last_data` | 2025-03-16T23:15:00Z | Firefly, nota de fin de misión | «the final data received around 6:15 pm CDT on March 16» |
+| A3 (retirado, D-95; las filas se conservan) | `last_data` | 2025-03-16T23:15:00Z | Firefly, nota de fin de misión | «the final data received around 6:15 pm CDT on March 16» |
 | A3 | `sunset_latest` | 2025-03-16T18:15:00Z | Ídem | «operated for 5 hours into the lunar night» |
 
 Las horas se pasan a UTC sumando 5 h. Firefly escribe «CST» en la nota del día 13, pero sus notas del día 14 dan las horas en CDT («around 12:30 am CDT», «around 2:30 am CDT during the totality») y con UTC−6 el eclipse no cuadraría con las efemérides por una hora: se toma UTC−5. Confirmación final: A1.
@@ -133,7 +133,7 @@ Las horas se pasan a UTC sumando 5 h. Firefly escribe «CST» en la nota del dí
 | --- | --- | --- | --- | --- | --- | --- |
 | A1 | Acimut y elevación de Sol y Tierra con `azel_spice` y con la tabla, en los 8 sitios y 8 instantes del §2.3, altura 0 | Valores de `horizons_azel.csv` | 0,02° (acimut ponderado por cos de la elevación) | JPL Horizons | Automática, `kernels`: `test_a1_horizons.py`. El informe da además el error máximo; esperado < 0,001° | T-04, T-05 |
 | A2 | Salida y puesta del centro del Sol en marzo de 2025 en `apollo-11`, `blue-ghost-1` y `change-3`; Luna lisa, observador a 0 m (`find_crossings` con máscara `flat:0`) | Cruces por 0° de `horizons_sun_series.csv` | 5 min | JPL Horizons | Automática, `kernels`: `test_a2_riseset.py`; esperado < 15 s | T-05, T-10 |
-| A3 | `blue-ghost-1` (18,562° N, 61,810° E), 2025-03-16, máscara SLDEM2015, observador a 2 m: instante del `sunset` (centro) | Entre 18:00 y 18:15 UTC (Firefly: últimos datos hacia las 23:15 UTC, «5 hours into the lunar night»). Condición equivalente: horizonte de ~0,9° en el acimut 269,7° (a las 18:15 el Sol está a 0,925°). Con Luna lisa: 20:10:39 UTC (centro, 0 m) | 30 min → pasa si el `sunset` cae entre 17:30 y 18:45 UTC | Firefly Aerospace | Automática, `data`: `test_a3_blueghost_sunset.py`. El informe da también el instante en que el disco desaparece del todo (fracción 0) y el horizonte en 269,7° | T-09, T-22 |
+| A3 — **retirado (D-95)** | `blue-ghost-1` (18,562° N, 61,810° E), 2025-03-16, máscara SLDEM2015, observador a 2 m: instante del `sunset` (centro) | Entre 18:00 y 18:15 UTC (Firefly: últimos datos hacia las 23:15 UTC, «5 hours into the lunar night»). Condición equivalente: horizonte de ~0,9° en el acimut 269,7° (a las 18:15 el Sol está a 0,925°). Con Luna lisa: 20:10:39 UTC (centro, 0 m) | 30 min → pasa si el `sunset` cae entre 17:30 y 18:45 UTC | Firefly Aerospace | Automática, `data`: `test_a3_blueghost_sunset.py`. El informe da también el instante en que el disco desaparece del todo (fracción 0) y el horizonte en 269,7°. **Retirado por D-95**: mal planteado, no suspendido (Firefly no publica hora de puesta; la ventana era una deducción nuestra; la sensibilidad al relieve, ± 45 min, supera cualquier tolerancia útil). Ya no hay prueba automática; en el informe figura como `skipped` con el motivo y las cifras. Investigación: `docs/handoff/A3-investigacion.md` | T-09, T-22 |
 | A4 | Esfera lisa con observador a 2 m, 100 m y 1.000 m; monte de 3 km a 50 km con observador a 0 m | −0,087°, −0,615°, −1,943°; 2,606° (cuentas en `06_horizonte.md` §10.1 y §10.2) | 0,005° | Cálculo a mano de A1 con R = 1.737,4 km | Automática: `test_horizon_synthetic.py` | T-08 |
 | A5 | Tres acimuts (0°, 120°, 240°) de `region-malapert-massif`: perfil del DEM sacado en QGIS y ángulo máximo calculado en hoja de cálculo con la fórmula de `06` §4.3 | El valor de `el_deg` de nuestra máscara en esos acimuts | 0,1° | Cálculo manual de A1 y A2 (mismo DEM: comprueba el algoritmo, no el relieve) | Manual, con apoyo de `profile-csv`; A1 anota los tres valores | T-09 |
 | A6 | Mejor celda de la malla a menos de 15 km del centro de Shackleton (−89,67°, 129,78°), 2026–2030, 2 m | Racha de luz continua del orden de 240 días y noche más larga del orden de 1,5 días | Mismo orden (factor 3) | Mazarico et al. (2011); coordenadas y altura del punto original: PENDIENTE DE VERIFICAR (A1) | Lenta + veredicto manual: `test_a6_shackleton.py` calcula y anota | T-36 |
@@ -143,9 +143,9 @@ Las horas se pasan a UTC sumando 5 h. Firefly escribe «CST» en la nota del dí
 | A10 (secundario) | `im-2-planned` (84,78° S, 29,13° E), marzo de 2025, Luna lisa y con relieve | Luna lisa: salida del centro el 04/03 a las 09:14 UTC; el 06/03 a las 17:30 UTC el Sol está a 2,46° (valores de Horizons, `05` §8.3). Con relieve: más bajo o más tarde | Un día | Horizons (el plan da «hacia las 09:10» y «~2,5°»). No va a la página de validación. No se afirma que la nave esperase al amanecer | Automática, `kernels` (lisa) y `data` (relieve): `test_a10_im2.py` | T-22 |
 | A11 | Par de la demo (`04_catalogo_sitios.md` §5) | Resultados opuestos por una causa visible en el DEM | Cualitativa | Perfil manual de A1 en QGIS | Manual; A1 firma en `docs/decisions.md` | T-31 |
 
-A5 usa el mismo DEM que nuestro código. La comprobación independiente del relieve polar son A6, A7, B7 y B11; la del relieve fuera del polo, A3.
+A5 usa el mismo DEM que nuestro código. La comprobación independiente del relieve polar son A6, A7, B7 y B11. **El relieve fuera del polo queda sin contrastar con un hecho observado** desde que A3 se retiró (D-95).
 
-Si A3 no pasa: no se fuerza. Se revisa, por este orden, (1) la lectura del recorte (costuras, orientación), (2) qué llama Firefly «puesta» (centro, borde o fin de energía en los paneles: PENDIENTE DE VERIFICAR, A1) comparando también con el instante de fracción 0 y con el de fracción 0,5, y (3) la altura del observador. Se enseña la diferencia con su explicación.
+A3 se retiró por D-95 tras seguir el orden de revisión previsto (lectura del recorte, qué llama Firefly «puesta», altura del observador): el recorte se lee bien, Firefly no da hora de puesta y la altura del observador o un píxel de posición mueven la puesta decenas de minutos. Detalle y cifras: `docs/handoff/A3-investigacion.md`.
 
 ## 5. Punto B: el producto final
 
@@ -204,7 +204,7 @@ Por qué la prueba no exige detectar todos: en un eclipse parcial o penumbral so
 
 Si faltan los núcleos, las pruebas `kernels` se saltan con un aviso visible (`SKIPPED: SPICE kernels not found; run make data-fetch`), y `make test` termina con aviso, no con error. En la integración continua, que los tiene en caché, saltarlas es un fallo: el flujo define `LLSN_REQUIRE_KERNELS=1` y `conftest.py` convierte el salto en error (`02_arquitectura.md` §6.1).
 
-`make test-all` añade: pruebas `data` (lectura de DEM, A3, A10 con relieve, máscaras reales: 2–5 min), `slow` (cuando hay cubo) y Playwright (2–4 min).
+`make test-all` añade: pruebas `data` (lectura de DEM, A10 con relieve, máscaras reales: 2–5 min), `slow` (cuando hay cubo) y Playwright (2–4 min).
 
 ### 7.1 Del resultado de las pruebas al informe
 
@@ -215,7 +215,7 @@ Cada prueba ligada a un caso usa el accesorio `record_case(case_id, status, expe
 **Punto A (sábado, 16:30–17:30; firma a las 17:15).** A1 comprueba, sobre la versión desplegada y el informe:
 
 1. A1, A2, A4, A8, A9 y las pruebas de marcos en verde.
-2. A3 calculado (en verde, o con diferencia explicada y decisión anotada).
+2. ~~A3 calculado (en verde, o con diferencia explicada y decisión anotada).~~ A3 retirado por D-95: no se firma.
 3. A5 hecho a mano (tres valores anotados).
 4. Revisión de sentido físico de 10 min: en tres sitios, la dirección de la Tierra, la duración del día y el signo de los acimuts son los esperados.
 5. A10 calculado (no se publica).

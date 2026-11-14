@@ -156,7 +156,7 @@ En cada petición de integración y en cada integración en `main`:
 4. Validación de esquemas de `contract/examples/data/` y `web/public/data/`.
 5. En `main`: despliegue de previsualización (§6.2) y `make report`.
 
-Las pruebas `data` y `slow` (A3, A6, A7, B6, B7) corren en el portátil de I1 o en la nube, de noche, y sus resultados (`data/out/test_results/*.json`) se incorporan al informe con `make report`.
+Las pruebas `data` y `slow` (A6, A7, B6, B7 y A10 con relieve; A3 retirado por D-95) corren en el portátil de I1 o en la nube, de noche, y sus resultados (`data/out/test_results/*.json`) se incorporan al informe con `make report`.
 
 ### 6.2 Alojamiento (D-19)
 

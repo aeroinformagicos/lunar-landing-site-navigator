@@ -38,6 +38,22 @@ Set `LLSN_DATA_DIR` to the folder that holds `kernels/`, `raw/lola/`, `raw/sldem
 | `tests/golden/` | Reference values from independent sources (JPL Horizons, published events) |
 | `docs/` | Team documentation (in Spanish): specification, tasks, decisions |
 
+## Validation and limitations
+
+The validation page of the app (`#/validation`) is generated from the automated test report. It opens
+with three checks against independent sources: Sun and Earth positions against JPL Horizons, the
+total solar eclipse seen by Blue Ghost Mission 1 on 14 March 2025 against Firefly Aerospace's
+published times, and our south pole maps against NASA's illumination and Earth visibility maps.
+
+- **Rise and set times:** rise and set times are only as accurate as the terrain map. Where the
+  horizon is set by low relief close to the site, a few metres of error in the map shift them by
+  tens of minutes at mid-latitudes and by hours near the poles, where the Sun skims the horizon.
+- **Terrain away from the poles is not checked against an observed event.** We tried to compare the
+  sunset at the Blue Ghost Mission 1 site with Firefly's mission report, but Firefly published no
+  sunset time, only when the last data arrived, and the result there depends on relief smaller than
+  the 59 m terrain map can resolve. That check was retired. Near the south pole, our maps are
+  compared with NASA's (computed overnight; the result appears on the validation page).
+
 ## Data sources
 
 See [SOURCES.md](SOURCES.md).
