@@ -2,6 +2,8 @@
 
 Web estática de una sola pantalla. Textos de interfaz en inglés (fichero `web/src/i18n/en.json`); todo lo que aparece `así` en este documento es texto exacto. Dueño: I2; textos y guion: A3.
 
+> **Desde T-63 la interfaz predeterminada es la v2** (`15_interfaz_v2.md`): manda sobre este documento en disposición, colores, tipografía y estilo, y añade el conmutador 3D/2D (`16_vista_3d.md`). La funcionalidad, los estados, los textos exactos y la accesibilidad de este documento siguen valiendo. Lo que aquí se describe como disposición (§1 principio 2, §2 colores, §3) es la **v1**, que sigue disponible con `?ui=v1` como red de seguridad.
+
 ## 1. Principios (del plan, obligatorios)
 
 1. Tres modos con un selector siempre visible: **Explore** (por defecto), **Plan**, **Learn**.
