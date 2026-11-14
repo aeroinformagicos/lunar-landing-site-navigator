@@ -1236,3 +1236,94 @@ input[aria-invalid='true'] {
     bottom: 120px;
   }
 }
+
+/* ---- Map (10 §6.4, F11) ---- */
+.map__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: 6px;
+}
+
+.map__controls select {
+  min-height: 32px;
+  padding: 2px 6px;
+}
+
+.map__box {
+  position: relative;
+}
+
+.map__canvas {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  border-radius: var(--radius);
+}
+
+.map__legend,
+.map__scale {
+  position: absolute;
+  bottom: 8px;
+  background: rgb(11 14 20 / 85%);
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  font-size: 12px;
+  max-width: 46%;
+}
+
+.map__legend {
+  left: 8px;
+}
+
+.map__scale {
+  right: 8px;
+  text-align: right;
+}
+
+.map__legend p,
+.map__scale p {
+  margin: 1px 0;
+}
+
+.map__ramp {
+  display: flex;
+  height: 8px;
+  margin-bottom: 3px;
+}
+
+.map__ramp span {
+  flex: 1;
+}
+
+.map__bar {
+  display: inline-block;
+  height: 4px;
+  margin-right: 6px;
+  background: var(--c-text);
+  vertical-align: middle;
+}
+
+.map__readout {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--c-text-muted);
+  min-height: 1.4em;
+}
+
+.map__message {
+  margin: 4px 0 0;
+  color: var(--c-marginal);
+  font-size: 14px;
+}
+
+.map__planb {
+  margin: 0 0 6px;
+  padding: 4px 8px;
+  background: var(--c-marginal);
+  color: var(--c-bg);
+  font-weight: 600;
+  border-radius: var(--radius);
+}

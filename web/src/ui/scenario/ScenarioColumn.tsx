@@ -12,6 +12,8 @@ import { useBoot } from '../common/data';
 import { DataState, useResource } from '../common/DataState';
 import { formatLatLon, formatUtc } from '../common/format';
 import { ScenarioMarker } from './ScenarioMarker';
+import { meshPointLabel } from '../map/mapData';
+import { MESH_RELIEF } from '../common/model';
 import { SitePicker } from './SitePicker';
 
 /** What the picker is choosing for: a new scenario or the site of an existing one. */
@@ -89,15 +91,18 @@ export function ScenarioCard({ scenario, sites, onChangeSite }: CardProps) {
   const site = ref.kind === 'catalogue' ? sites.find((x) => x.id === ref.id) : undefined;
   const active = scenario.id === activeId;
 
-  const name = site?.short_name ?? (ref.kind === 'catalogue' ? ref.id : t('scenario.custom'));
+  const mesh = ref.kind === 'grid';
+  const name = site?.short_name ?? (ref.kind === 'catalogue' ? ref.id : mesh ? t('scenario.mesh') : t('scenario.custom'));
   const coords = site
     ? formatLatLon(site.lat_deg, site.lon_deg)
     : ref.kind === 'custom'
       ? formatLatLon(ref.latDeg, ref.lonDeg)
-      : '';
-  // Custom points are smooth Moon until the mesh lookup (core/grid.ts) exists (D-69).
-  const smooth = site ? site.relief === 'smooth' || !site.has_mask : true;
-  const reliefLabel = site && !smooth ? site.relief_label : t('relief.smooth');
+      : ref.kind === 'grid'
+        ? meshPointLabel(ref.i, ref.j)
+        : '';
+  // Mesh points (map click, 08 §7) have relief; custom coordinates are smooth Moon (D-69).
+  const smooth = mesh ? false : site ? site.relief === 'smooth' || !site.has_mask : true;
+  const reliefLabel = mesh ? MESH_RELIEF : site && !smooth ? site.relief_label : t('relief.smooth');
   const horizonId = site && !smooth ? site.id : null;
   const [horizon, retry] = useResource(horizonId && `horizon:${horizonId}`, () =>
     loader.loadHorizon(config.data_base_url, horizonId ?? ''),
