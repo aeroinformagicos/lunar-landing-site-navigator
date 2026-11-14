@@ -58,6 +58,8 @@ export interface AppState {
   storyStep: number | null;
   /** `Link dates` (10_interfaz.md §4, on by default): landing and duration apply to every scenario. */
   linkDates: boolean;
+  /** The comparison table (F8) replaces the main view until `Close comparison`. */
+  comparing: boolean;
 }
 
 export interface AppActions {
@@ -84,6 +86,7 @@ export interface AppActions {
   /** Copies scenario `id` into a free letter (no-op with 4). Returns the new id. */
   duplicateScenario(id: ScenarioId): ScenarioId | null;
   setLinkDates(link: boolean): void;
+  setComparing(comparing: boolean): void;
   /** Landing of the active scenario, or of all with `linkDates`; the cursor keeps its offset. */
   setLanding(unix: number): void;
   /** Mission length (days) of the active scenario, or of all with `linkDates`. */
@@ -126,6 +129,7 @@ export function initialState(defaults: SiteDefaults): AppState {
     mapPeriod: 'mean186',
     storyStep: null,
     linkDates: true,
+    comparing: false,
   };
 }
 
@@ -193,6 +197,7 @@ export const useAppStore = create<AppStore>()((set, get) => ({
     return r?.id ?? null;
   },
   setLinkDates: (linkDates) => set({ linkDates }),
+  setComparing: (comparing) => set({ comparing }),
   setLanding: (unix) =>
     set((s) => {
       const active = activeOf(s);
