@@ -72,6 +72,9 @@ fuente (CLAUDE.md §2).
 | Paso de búsqueda de cruces | 600 | s | `07_visibilidad.md` §6.1 | `web/src/core/events.ts` (`SCAN_STEP_S`) |
 | Horizonte de la cuenta atrás | 60 | días | `07_visibilidad.md` §7 | `web/src/core/metrics.ts` (`NEXT_EVENT_HORIZON_S`) |
 | Ley de muestreo `full` / `fast` (web) | 20 m × 1.000 + 1,001ⁿ (3.709) / 40 m × 500 + 1,002ⁿ (1.855) | m | `06_horizonte.md` §3 | `web/src/core/law.ts` (`LAWS`) |
+| Rangos de fecha de aterrizaje admitidos | 1969-01-01 – 1973-01-01 y 2024-01-01 – 2045-01-01 (UTC) | — | Validez de los tramos de `ephemeris.meta.json` (`09` §3.2, `05` §4.5) | `web/src/state/selectors.ts` (`SUPPORTED_RANGES`) |
+| Duración de la misión | 0,5 – 60, paso 0,5 | días | `10_interfaz.md` §4, `01_alcance.md` F2 | `web/src/state/selectors.ts` |
+| Paso del deslizador del cursor | 600 (flechas); 86.400 (PageUp/PageDown); 3.600 (botones y `[` `]`) | s | `10_interfaz.md` §4, §12 | `web/src/state/selectors.ts`, `ui/controls/TimeControls.tsx` |
 
 ## Valores medidos
 
