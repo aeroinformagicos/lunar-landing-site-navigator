@@ -563,9 +563,11 @@ def run_chunks(
         kwargs["pts_batch"] = pts_batch
     if ring is not None:
         kwargs["ring"] = ring
+    chunks = list(chunks)
     summary = RunSummary([], [], 0, 0.0)
     t_start = time.perf_counter()
-    for row, col in chunks:
+    compute_s = 0.0
+    for k, (row, col) in enumerate(chunks, 1):
         if not force and chunk_is_valid(cube_dir, row, col, law, observer_height_m):
             done[row, col] = 1
             summary.skipped.append((row, col))
@@ -580,12 +582,103 @@ def run_chunks(
         write_index(cube_dir, done, law, stack.names, observer_height_m)
         summary.computed.append((row, col))
         summary.samples += res.n_samples
+        dt = time.perf_counter() - t0
+        compute_s += dt
         if progress is not None:
-            dt = time.perf_counter() - t0
-            progress(f"chunk ({row:02d}, {col:02d}): {int(res.computed.sum())} points in {dt:.1f} s")
+            # Upper bound: the chunks still to come may already exist and be skipped.
+            left_s = compute_s / len(summary.computed) * (len(chunks) - k)
+            progress(
+                f"[{k}/{len(chunks)}] chunk ({row:02d}, {col:02d}): {int(res.computed.sum())} points "
+                f"in {dt:.1f} s; at most {format_duration(left_s)} left"
+            )
     write_index(cube_dir, done, law, stack.names, observer_height_m)
     summary.seconds = time.perf_counter() - t_start
     return summary
+
+
+# ---------------------------------------------------------------------------------------------
+# Running the cube by levels and shards (T-25): `make cube LEVELS=… SHARD=k/n LAW=…`
+# ---------------------------------------------------------------------------------------------
+
+DEFAULT_LAW = "full"  # decision D-59: the whole cube with the law `full`
+ALL_LEVELS = (1, 2, 3, 4)
+
+
+def cube_dir_of(out_dir: str | Path) -> Path:
+    """Where the chunks, ``done.bin`` and ``cube.json`` go: ``<out>/heavy/cube`` (02 §9, 09 §10)."""
+    return Path(out_dir) / "heavy" / "cube"
+
+
+def parse_levels(text: str | None) -> tuple[int, ...]:
+    """``"2,3,4"`` -> (2, 3, 4). Empty or None: all four levels. Raises ValueError otherwise."""
+    if text is None or not text.strip():
+        return ALL_LEVELS
+    try:
+        levels = {int(part) for part in text.replace(" ", "").split(",") if part}
+    except ValueError:
+        raise ValueError(f"LEVELS must be a list such as 1 or 2,3,4; got {text!r}") from None
+    if not levels or not levels <= set(ALL_LEVELS):
+        raise ValueError(f"LEVELS must use the levels 1 to 4; got {text!r}")
+    return tuple(sorted(levels))
+
+
+def parse_shard(text: str | None) -> tuple[int, int]:
+    """``"k/n"`` -> (k, n) with 0 <= k < n. Empty or None: (0, 1), the whole list."""
+    if text is None or not text.strip():
+        return (0, 1)
+    try:
+        k_text, n_text = text.strip().split("/")
+        k, n = int(k_text), int(n_text)
+    except ValueError:
+        raise ValueError(f"SHARD must be k/n, for example 0/2; got {text!r}") from None
+    if n < 1 or not 0 <= k < n:
+        raise ValueError(f"SHARD k/n needs 0 <= k < n; got {text!r}")
+    return (k, n)
+
+
+def select_plan(
+    plan: Sequence[PlanEntry], levels: Iterable[int] = ALL_LEVELS, shard: tuple[int, int] = (0, 1)
+) -> list[PlanEntry]:
+    """Entries of the given levels whose index in the whole ordered list satisfies ``index mod n == k``.
+
+    The index is the one of the complete plan (08 §2), not the position among the selected levels,
+    so a shard is the same set of chunks whatever levels each machine runs.
+    """
+    wanted = set(levels)
+    k, n = shard
+    return [e for e in plan if e.level in wanted and e.index % n == k]
+
+
+def run_cube(
+    stack,
+    cube_dir: str | Path,
+    law: str = DEFAULT_LAW,
+    levels: Iterable[int] = ALL_LEVELS,
+    shard: tuple[int, int] = (0, 1),
+    plan: Sequence[PlanEntry] | None = None,
+    observer_height_m: float = DEFAULT_OBSERVER_HEIGHT_M,
+    pts_batch: int | None = None,
+    ring: int | None = None,
+    points=None,
+    progress: Callable[[str], None] | None = None,
+) -> RunSummary:
+    """Compute the chunks of the plan selected by ``levels`` and ``shard``, in priority order.
+
+    Resumable: a chunk that already exists and is valid is skipped, so the same call after an
+    interruption finishes the work and leaves the same bytes as a run without interruption.
+    """
+    selected = select_plan(build_plan() if plan is None else plan, levels, shard)
+    return run_chunks(
+        stack,
+        [(e.row, e.col) for e in selected],
+        law,
+        cube_dir,
+        observer_height_m=observer_height_m,
+        pts_batch=pts_batch,
+        ring=ring,
+        points=points,
+        progress=progress,
+    )
 
 
 def run_bench(
