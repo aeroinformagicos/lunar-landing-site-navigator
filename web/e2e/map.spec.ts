@@ -2,7 +2,7 @@
 // T-29 end to end (F11, minimal version of 12_tareas.md §11) on the example heavy origin: layers,
 // legend, pointer readout, click → `Nearest mesh point…` scenario, «not computed», zoom with buttons
 // and keys, plan B label, and no heavy origin.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './example';
 
 /** Screen point of the centre of cell (i, j) with the initial fit. */
 async function cellPoint(page: Page, i: number, j: number) {

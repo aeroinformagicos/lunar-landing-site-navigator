@@ -1,7 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // T-72 end to end (16_vista_3d.md §15.2: E2 for the three modes, E3, E7, E8, and Go to) on the served
 // data, inside the v2 shell, with WebGL 2 by software. Captures go to docs/handoff/.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './example';
 
 const HANDOFF = '../docs/handoff/';
 const stage = (page: Page) => page.locator('.stage3d');
