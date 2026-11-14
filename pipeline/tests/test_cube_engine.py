@@ -533,7 +533,9 @@ def test_cli_cube_plan_and_bench(engine, flat_stack, tmp_path, monkeypatch, caps
     out = tmp_path / "out"
     assert main(["--data-dir", str(tmp_path), "--out-dir", str(out), "cube-plan"]) == 0
     assert json.loads((out / "cube" / "plan.json").read_text(encoding="ascii"))["chunks_total"] == 1974
-    assert main(["--data-dir", str(tmp_path), "cube"]) == 2  # the run itself arrives with T-25
+    # The cube run (T-25) without the DEMs says so and fails.
+    assert main(["--data-dir", str(tmp_path), "--out-dir", str(out), "cube"]) == 1
+    assert "cannot compute the cube" in capsys.readouterr().out
     # Without the DEMs the measurement says so and fails.
     assert main(["--data-dir", str(tmp_path), "--out-dir", str(out), "cube", "--bench"]) == 1
     assert "cannot measure" in capsys.readouterr().out

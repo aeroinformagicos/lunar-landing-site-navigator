@@ -9,9 +9,11 @@ them accept ``--data-dir`` (default: $LLSN_DATA_DIR, else ./data) and
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import os
 import sys
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -34,9 +36,22 @@ def build_parser() -> argparse.ArgumentParser:
         "--in-memory", action="store_true", help="load P1 and P2 whole instead of mapping them"
     )
     sub.add_parser("cube-plan", help="write the priority list of the cube chunks (out/cube/plan.json)")
-    cube = sub.add_parser("cube", help="horizon cube; with --bench, measure its cost with 4 chunks")
+    cube = sub.add_parser(
+        "cube", help="horizon cube by chunks into out/heavy/cube (resumable); --bench measures its cost"
+    )
     cube.add_argument("--bench", action="store_true", help="measure the cost and write out/cube/bench.json")
-    cube.add_argument("--law", choices=("both", "full", "fast"), default="both", help="laws to measure")
+    cube.add_argument(
+        "--law",
+        choices=("both", "full", "fast"),
+        default=None,
+        help="cube law (default full, decision D-59); with --bench, the laws to measure (default both)",
+    )
+    cube.add_argument(
+        "--levels", default=None, help="levels of the plan to compute, e.g. 1 or 2,3,4 (default all)"
+    )
+    cube.add_argument(
+        "--shard", default=None, help="k/n: only the chunks whose plan index mod n is k (default 0/1)"
+    )
     cube.add_argument(
         "--device", choices=("auto", "cuda", "cpu"), default=None, help="default: $LLSN_DEVICE or auto"
     )
@@ -132,10 +147,26 @@ def cmd_cube_plan(args: argparse.Namespace) -> int:
     return 0
 
 
+def open_log(args: argparse.Namespace, name: str):
+    """Print a line and append it, with its UTC time, to ``<out>/logs/<name>.log`` (02 §9)."""
+    path = out_dir(args) / "logs" / f"{name}.log"
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    def log(line: str) -> None:
+        print(line, flush=True)
+        stamp = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(f"{stamp} {line}\n")
+
+    return log
+
+
 def cmd_cube(args: argparse.Namespace) -> int:
-    """Cost of the cube measured with four fixed chunks (08_mapa_polar.md §4)."""
+    """The cube by levels and shards (08 §2, T-25) or, with --bench, its cost (08 §4)."""
     if not args.bench:
-        print("Only `cube --bench` exists so far; the resumable run of the cube arrives with T-25.")
+        return cmd_cube_run(args)
+    if args.levels is not None or args.shard is not None:
+        print("--levels and --shard are for the cube run, not for --bench")
         return 2
     try:
         import torch  # noqa: F401
@@ -160,7 +191,7 @@ def cmd_cube(args: argparse.Namespace) -> int:
     print(f"{' + '.join(stack.names)} loaded on {device.type} in {load_s:.1f} s")
     bench = cube.run_bench(
         stack,
-        laws=cube.BENCH_LAWS if args.law == "both" else (args.law,),
+        laws=cube.BENCH_LAWS if args.law in (None, "both") else (args.law,),
         pts_batch=args.pts_batch,
         ring=args.ring,
         points=None if args.points is None else list(range(args.points)),
@@ -173,6 +204,79 @@ def cmd_cube(args: argparse.Namespace) -> int:
     for line in cube.bench_summary_lines(bench):
         print(line)
     print(f"written to {path}")
+    return 0
+
+
+def cmd_cube_run(args: argparse.Namespace) -> int:
+    """Compute the chunks of the selected levels and shard into out/heavy/cube (resumable, 08 §2)."""
+    from pipeline.horizon import cube
+
+    if args.points is not None:
+        print("--points is only for --bench: a cube chunk always has its 256 points")
+        return 2
+    law = args.law or cube.DEFAULT_LAW
+    if law == "both":
+        print("A cube has a single law: --law full or --law fast")
+        return 2
+    try:
+        levels = cube.parse_levels(args.levels)
+        shard = cube.parse_shard(args.shard)
+    except ValueError as exc:
+        print(exc)
+        return 2
+    cube_dir = cube.cube_dir_of(out_dir(args))
+    previous = cube.read_cube_json(cube_dir)
+    if previous is not None and previous.get("law") != law:
+        print(
+            f"{cube_dir} holds a cube with law {previous.get('law')!r}; asked {law!r}. "
+            "One cube never mixes two laws: use the same LAW, or move that folder away."
+        )
+        return 1
+    plan = cube.build_plan()
+    selected = cube.select_plan(plan, levels, shard)
+    log = open_log(args, "cube")
+    log(
+        f"cube: law {law}, levels {','.join(map(str, levels))}, shard {shard[0]}/{shard[1]}: "
+        f"{len(selected)} chunks ({len(selected) * cube.POINTS_PER_CHUNK} points) -> {cube_dir}"
+    )
+    if importlib.util.find_spec("torch") is None:
+        log("PyTorch is not installed: run make setup-gpu (CUDA) or pip install torch==2.15.0 (CPU).")
+        return 1
+    from pipeline.dem.stack import DemDataMissing, lola_polar_stack
+
+    t0 = time.perf_counter()
+    try:
+        dem = lola_polar_stack(args.data_dir, in_memory=True)  # before importing PyTorch: fails fast
+        from pipeline.horizon import engine_torch
+
+        device = engine_torch.pick_device(args.device)
+        stack = engine_torch.TorchStack.from_dem_stack(dem, device)
+    except (DemDataMissing, RuntimeError, ValueError) as exc:
+        log(f"cannot compute the cube: {exc}")
+        return 1
+    log(f"{' + '.join(stack.names)} loaded on {device.type} in {time.perf_counter() - t0:.1f} s")
+    try:
+        summary = cube.run_cube(
+            stack,
+            cube_dir,
+            law=law,
+            levels=levels,
+            shard=shard,
+            plan=plan,
+            pts_batch=args.pts_batch,
+            ring=args.ring,
+            progress=log,
+        )
+    except KeyboardInterrupt:
+        log("interrupted: run the same command again to resume (finished chunks are kept)")
+        return 130
+    rate = summary.samples / summary.seconds if summary.seconds > 0 else 0.0
+    done = cube.read_cube_json(cube_dir) or {}
+    log(
+        f"computed {len(summary.computed)} chunks, skipped {len(summary.skipped)} already done, "
+        f"in {cube.format_duration(summary.seconds)} ({rate:.3e} samples/s); "
+        f"cube.json: {done.get('chunks_done', 0)}/{cube.CHUNKS_TOTAL} chunks done"
+    )
     return 0
 
 

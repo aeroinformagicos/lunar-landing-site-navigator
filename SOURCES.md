@@ -20,6 +20,7 @@ in which it is first used. Content owner: A2.
 | Firefly Aerospace, Blue Ghost Mission 1 updates | Landing time of `blue-ghost-1`; eclipse and sunset times quoted in the example validation report | https://fireflyspace.com/?p=3379 | Cited, not redistributed |
 | NASA candidate landing regions near the lunar south pole (2024 list): centres and sizes via nasanow.org, citing USGS ScienceBase record 671a6fa8d34efed5620f89f8 | `map/regions.json` of the example data | https://www.nasanow.org/artemis ; https://www.sciencebase.gov/catalog/item/671a6fa8d34efed5620f89f8 | Public; centres pending verification by A2 |
 | JPL Horizons | Named as the reference of case A1 in the example validation report | https://ssd.jpl.nasa.gov/horizons/ | NASA JPL, public |
+| Cloudflare Pages documentation: "Limits" (files per site, size per file) and "Headers" (`_headers` file format) | `make deploy-heavy`: limits checked before publishing and the CORS `_headers` file of the heavy origin | https://developers.cloudflare.com/pages/platform/limits/ and https://developers.cloudflare.com/pages/configuration/headers/ | Cloudflare documentation (reference only, nothing copied) |
 
 ## Software libraries
 

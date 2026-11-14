@@ -64,6 +64,10 @@ fuente (CLAUDE.md §2).
 | Radios de la Luna, el Sol y la Tierra (web) | 1.737,4; 695.700; 6.378,137 | km | `00_indice.md` §3; `ephemeris.meta.json` `constants` (`09` §3.2) | `web/src/core/constants.ts` (`R_MOON_KM`, `R_SUN_KM`, `R_EARTH_KM`) |
 | Registro y paso de la tabla de efemérides | 24 B (6 `float32`) y 3.600 s | B, s | `05_efemerides.md` §4.3 | `web/src/core/ephemeris.ts` |
 | Umbral del convenio del cénit | 10⁻¹² (fracción de la longitud del vector) | — | D-62 | `web/src/core/frames.ts` (`ZENITH_REL`) |
+| `DEFAULT_LAW` (ley del cubo cuando no se indica `LAW`) | `full` | — | D-59 | `pipeline/horizon/cube.py` |
+| `CF_MAX_FILES`, `CF_MAX_FILE_BYTES` (límites de Cloudflare Pages, plan gratuito; `deploy-heavy` se niega a publicar si se superan) | 20.000; 25 MiB (26.214.400) | ficheros; B | `02_arquitectura.md` §6.2 (documentación oficial de Cloudflare Pages, «Limits», en `SOURCES.md`) | `ops/tasks.mjs` |
+| `HEAVY_HEADERS` (fichero `_headers` del origen pesado) | `/*` → `Access-Control-Allow-Origin: *` | — | `02` §6.2; formato: documentación de Cloudflare Pages, «Headers» (`SOURCES.md`) | `ops/tasks.mjs` |
+| `heavy_base_url` por defecto de `deploy-heavy` | `https://aeroinformagicos-llsn-data.pages.dev` | — | D-45 (proyecto) y `<proyecto>.pages.dev` (documentación de Cloudflare Pages); `HEAVY_BASE_URL` lo cambia | `ops/tasks.mjs` |
 | Franjas del disco y cota inferior de cos(el) | 32 y 0,05 | — | `07_visibilidad.md` §4.1 | `web/src/core/visibility.ts` (`DISC_STRIPS`, `MIN_COS_EL`) |
 | Paso de búsqueda de cruces | 600 | s | `07_visibilidad.md` §6.1 | `web/src/core/events.ts` (`SCAN_STEP_S`) |
 | Horizonte de la cuenta atrás | 60 | días | `07_visibilidad.md` §7 | `web/src/core/metrics.ts` (`NEXT_EVENT_HORIZON_S`) |
