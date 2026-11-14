@@ -58,8 +58,7 @@ describe('evaluate', () => {
       const s = evaluate(table, frame, mask, t0 + rnd() * span);
       expect(s.sun.discFraction).toBeGreaterThanOrEqual(0);
       expect(s.sun.discFraction).toBeLessThanOrEqual(1);
-      expect(s.eclipse.covered).toBe(0);
-      expect(s.sun.litFraction).toBe(s.sun.discFraction);
+      expect(s.sun.litFraction).toBeCloseTo(s.sun.discFraction * (1 - s.eclipse.covered), 12);
       expect(s.sun.visible).toBe(s.sun.marginDeg > 0);
       expect(s.earth.visible).toBe(s.earth.marginDeg > 0);
       expect(s.both).toBe(s.sun.visible && s.earth.visible);

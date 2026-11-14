@@ -1,6 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Crossings, events and windows (07_visibilidad.md §6). Times in Unix seconds.
-import type { EphemerisTable } from './ephemeris';
+import { findSegment, type EphemerisTable } from './ephemeris';
+import { eclipseMarginFns } from './eclipse';
 import type { SiteFrame } from './frames';
 import type { Mask } from './horizon';
 import { margins } from './visibility';
@@ -158,13 +159,46 @@ export function earthMarginFn(table: EphemerisTable, frame: SiteFrame, mask: Mas
   return (t) => margins(table, frame, mask, t).earth;
 }
 
-/** Sunrise/sunset and Earthrise/Earthset in [tA, tB], sorted by time (07 §6.2). Eclipses: F13. */
+/** Sunrise/sunset, Earthrise/Earthset and eclipse events in [tA, tB], sorted by time (07 §6.2). */
 export function findEvents(table: EphemerisTable, frame: SiteFrame, mask: Mask, tA: number, tB: number): SkyEvent[] {
   const sun = findCrossings(sunMarginFn(table, frame, mask), tA, tB).crossings;
   const earth = findCrossings(earthMarginFn(table, frame, mask), tA, tB).crossings;
   const events: SkyEvent[] = [
     ...sun.map((c): SkyEvent => ({ tUnix: c.t, kind: c.rising ? 'sunrise' : 'sunset' })),
     ...earth.map((c): SkyEvent => ({ tUnix: c.t, kind: c.rising ? 'earthrise' : 'earthset' })),
+    ...eclipseTimeline(table, frame, tA, tB).events,
   ];
   return events.sort((x, y) => x.tUnix - y.tUnix);
+}
+
+// ---- Eclipses (07 §9): searched with the same crossings over the displayed interval ----
+
+export interface EclipseTimeline {
+  events: SkyEvent[];
+  /** Any part of the Sun covered. */
+  windows: Window[];
+  /** The Sun fully covered. */
+  totality: Window[];
+}
+
+/** Eclipse events and windows in [tA, tB] (searched over the displayed interval, 07 §9). */
+export function eclipseTimeline(table: EphemerisTable, frame: SiteFrame, tA: number, tB: number): EclipseTimeline {
+  // Clip to the table segment: the search needs every instant to exist.
+  const seg = findSegment(table, tA) ?? findSegment(table, tB);
+  if (!seg) return { events: [], windows: [], totality: [] };
+  const a = Math.max(tA, seg.validFromUnix);
+  const b = Math.min(tB, seg.validToUnix);
+  if (b <= a) return { events: [], windows: [], totality: [] };
+  const f = eclipseMarginFns(table, frame);
+  const e = findCrossings(f.eclipse, a, b);
+  const tot = findCrossings(f.totality, a, b);
+  const events: SkyEvent[] = [
+    ...e.crossings.map((c): SkyEvent => ({ tUnix: c.t, kind: c.rising ? 'eclipse_start' : 'eclipse_end' })),
+    ...tot.crossings.map((c): SkyEvent => ({ tUnix: c.t, kind: c.rising ? 'totality_start' : 'totality_end' })),
+  ].sort((x, y) => x.tUnix - y.tUnix);
+  return {
+    events,
+    windows: windowsFrom(e.crossings, e.initialState, a, b),
+    totality: windowsFrom(tot.crossings, tot.initialState, a, b),
+  };
 }

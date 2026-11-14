@@ -75,7 +75,8 @@ function Scene({ v, model, sky, showSmooth, idp }: { v: View; model: ScenarioMod
         const d = discOf(v, sky[b]);
         return (
           <g key={b} data-body={b}>
-            <circle cx={d.cx} cy={d.cy} r={d.r} fill={COLOR[b]} clipPath={`url(#${idp}-sky)`} />
+            {/* During an eclipse the Earth is in front of the Sun and shows its night side (F13). */}
+            <circle cx={d.cx} cy={d.cy} r={d.r} fill={b === 'earth' && sky.eclipse.kind !== 'none' ? 'var(--c-bg)' : COLOR[b]} clipPath={`url(#${idp}-sky)`} data-testid={`disc-${b}`} />
           </g>
         );
       })}
