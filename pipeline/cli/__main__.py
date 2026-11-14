@@ -73,6 +73,27 @@ def build_parser() -> argparse.ArgumentParser:
     cube.add_argument(
         "--points", type=int, default=None, help="quick check: only the first N points of each chunk"
     )
+    mask = sub.add_parser(
+        "site-mask", help="horizon/<site>.json and profile/<site>.bin.gz of one site into <out>/light"
+    )
+    mask.add_argument("--site", required=True, help="site id of contract/sites.catalog.json")
+    pcsv = sub.add_parser(
+        "profile-csv", help="every unreduced sample of some rays of a site, as CSV (case A5)"
+    )
+    pcsv.add_argument("--site", required=True, help="site id of contract/sites.catalog.json")
+    pcsv.add_argument(
+        "--az", type=float, action="append", required=True, help="azimuth in degrees (repeatable)"
+    )
+    sites = sub.add_parser(
+        "sites", help="every site in batch order into <out>/light, publishing after each (04 §6)"
+    )
+    sites.add_argument("--sites", default=None, help="comma-separated ids: compute only these")
+    sites.add_argument("--force", action="store_true", help="recompute sites whose files already exist")
+    sites.add_argument("--no-publish", action="store_true", help="do not copy to web/public/data")
+    sites.add_argument("--web-dir", type=Path, default=None, help="default: web/public/data")
+    sub.add_parser("regions", help="map/regions.json from the catalog into <out>/heavy/map")
+    pub = sub.add_parser("publish", help="copy <out>/light to web/public/data and write manifest.json")
+    pub.add_argument("--web-dir", type=Path, default=None, help="default: web/public/data")
     check = sub.add_parser("check-contract", help="validate data directories against the contract (09)")
     check.add_argument(
         "dirs", nargs="*", type=Path, help="default: contract/examples/data and web/public/data"
@@ -325,6 +346,152 @@ def cmd_cube_run(args: argparse.Namespace) -> int:
     return 0
 
 
+def _catalog_site(site_id: str) -> dict | None:
+    from pipeline.common.catalog import default_catalog, sites_by_id
+
+    site = sites_by_id(default_catalog()).get(site_id)
+    if site is None:
+        print(f"Unknown site {site_id!r}: it is not in contract/sites.catalog.json")
+    return site
+
+
+def cmd_site_mask(args: argparse.Namespace) -> int:
+    """Mask and profile of one site into <out>/light (06 §5); does not touch sites.json."""
+    from pipeline.horizon import site_mask
+
+    site = _catalog_site(args.site)
+    if site is None:
+        return 2
+    light = site_mask.light_dir_of(out_dir(args))
+    t0 = time.perf_counter()
+    mask, reason = site_mask.compute_site(site, site_mask.default_stack_factory(args.data_dir))
+    if mask is None:
+        print(f"{args.site}: no mask, smooth Moon ({reason})")
+        return 0 if site["relief"] == "smooth" else 1
+    seconds = time.perf_counter() - t0
+    json_path, profile_path = site_mask.write_site_outputs(light, site, mask)
+    s = mask.stats
+    print(f"{args.site}: {mask.relief_label} ({' + '.join(mask.dem_stack)}), law {mask.law}")
+    h_min, h_max = s['min_el_deg'], s['max_el_deg']
+    print(f"  site height {mask.site_height_m:.1f} m; horizon {h_min:.4f}..{h_max:.4f} deg")
+    print(
+        f"  truncated az {s['truncated_az']} (min cut {s['min_truncation_dist_m']}), "
+        f"empty az {s['empty_az']}, "
+        f"nodata samples {s['nodata_samples']}, warning {s['warning']}"
+    )
+    print("  grid usage: " + ", ".join(f"{k} {v:.4f}" for k, v in s["grid_usage"].items()))
+    print(f"  {seconds:.2f} s -> {json_path} ({json_path.stat().st_size} B), {profile_path.name} "
+          f"({profile_path.stat().st_size} B)")
+    return 0
+
+
+def cmd_profile_csv(args: argparse.Namespace) -> int:
+    """Unreduced samples of some rays of a site (06 §8, case A5) into <out>/profile_csv."""
+    import csv
+    import io
+
+    from pipeline.dem.stack import DemDataMissing
+    from pipeline.horizon import site_mask
+    from pipeline.horizon.engine_ref import SiteOutsideRelief
+
+    site = _catalog_site(args.site)
+    if site is None:
+        return 2
+    try:
+        stack = site_mask.default_stack_factory(args.data_dir)(site)
+    except DemDataMissing as exc:
+        print(f"{args.site}: relief data missing: {exc}")
+        return 1
+    if stack is None:
+        print(f"{args.site}: smooth Moon, no terrain samples")
+        return 1
+    target = out_dir(args) / "profile_csv"
+    target.mkdir(parents=True, exist_ok=True)
+    for az in args.az:
+        try:
+            text = site_mask.profile_csv_text(site, stack, az)
+        except SiteOutsideRelief as exc:
+            print(exc)
+            return 1
+        path = target / f"{args.site}_az{site_mask.csv_az_label(az)}.csv"
+        path.write_text(text, encoding="utf-8", newline="")
+        rows = [r for r in csv.DictReader(io.StringIO(text)) if r["el_deg"]]
+        best = max(rows, key=lambda r: float(r["el_deg"])) if rows else None
+        summary = (
+            f"max el {float(best['el_deg']):.4f} deg at i {best['i']}, {float(best['dist_m']):.0f} m, "
+            f"height {float(best['height_m']):.1f} m" if best else "no valid sample"
+        )
+        print(f"az {az:g} deg: {len(rows)} valid samples; {summary} -> {path}")
+    return 0
+
+
+def cmd_sites(args: argparse.Namespace) -> int:
+    """The site batch (04 §6): masks into <out>/light, sites.json, and publish after each site."""
+    from pipeline.common.catalog import default_catalog
+    from pipeline.horizon import site_mask
+
+    catalog = default_catalog()
+    light = site_mask.light_dir_of(out_dir(args))
+    web = args.web_dir if args.web_dir is not None else site_mask.WEB_DATA_DIR
+    log = open_log(args, "sites")
+    only = [s.strip() for s in args.sites.split(",") if s.strip()] if args.sites else None
+
+    def after(_result) -> None:
+        if not args.no_publish:
+            site_mask.publish(light, web)
+
+    log(f"sites: {len(catalog['sites'])} in the catalog -> {light}" + ("" if args.no_publish else f", {web}"))
+    t0 = time.perf_counter()
+    try:
+        results = site_mask.run_batch(
+            catalog,
+            light,
+            site_mask.default_stack_factory(args.data_dir),
+            only=only,
+            force=args.force,
+            after_site=after,
+            progress=log,
+        )
+    except (KeyError, RuntimeError, site_mask.PublishError) as exc:
+        log(f"sites: {exc}")
+        return 1
+    masks = sum(r.has_mask for r in results.values())
+    log(f"sites: {masks} with mask, {len(catalog['sites']) - masks} smooth Moon, "
+        f"{time.perf_counter() - t0:.1f} s")
+    if args.no_publish:
+        return 0
+    from pipeline.cli import contract_check
+
+    return contract_check.main([web])
+
+
+def cmd_regions(args: argparse.Namespace) -> int:
+    """map/regions.json from the catalog (09 §8.2) into <out>/heavy/map."""
+    from pipeline.common.catalog import default_catalog
+    from pipeline.horizon import site_mask
+
+    path = site_mask.heavy_dir_of(out_dir(args)) / "map" / "regions.json"
+    doc = site_mask.regions_doc(default_catalog())
+    site_mask.write_if_changed(path, site_mask.json_bytes(doc))
+    print(f"{len(doc['regions'])} regions written to {path}")
+    return 0
+
+
+def cmd_publish(args: argparse.Namespace) -> int:
+    """Copy <out>/light to web/public/data, write manifest.json and check the contract (09 §3.1)."""
+    from pipeline.cli import contract_check
+    from pipeline.horizon import site_mask
+
+    web = args.web_dir if args.web_dir is not None else site_mask.WEB_DATA_DIR
+    try:
+        manifest = site_mask.publish(site_mask.light_dir_of(out_dir(args)), web)
+    except site_mask.PublishError as exc:
+        print(exc)
+        return 1
+    print(f"published {manifest['sites']} sites to {web} (commit {manifest['git_commit']})")
+    return contract_check.main([web])
+
+
 def cmd_check_contract(args: argparse.Namespace) -> int:
     """Schemas, sizes, headers and cross references of the contract files (09_contrato_datos.md)."""
     from pipeline.cli import contract_check
@@ -340,6 +507,11 @@ def main(argv: list[str] | None = None) -> int:
         "bench-sampler": cmd_bench_sampler,
         "cube-plan": cmd_cube_plan,
         "cube": cmd_cube,
+        "site-mask": cmd_site_mask,
+        "profile-csv": cmd_profile_csv,
+        "sites": cmd_sites,
+        "regions": cmd_regions,
+        "publish": cmd_publish,
         "check-contract": cmd_check_contract,
     }
     return handlers[args.command](args)
