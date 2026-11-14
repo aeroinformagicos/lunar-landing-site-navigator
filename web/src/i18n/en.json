@@ -162,5 +162,17 @@
   "pano.terrain_effect": "Terrain effect",
   "pano.strip_label": "360° horizon strip: choose the direction of the 40° view",
   "pano.unavailable": "Panorama unavailable.",
-  "summary.label": "Plain summary"
+  "summary.label": "Plain summary",
+  "section.toward": "Section toward",
+  "section.toward_sun": "Toward Sun",
+  "section.toward_earth": "Toward Earth",
+  "section.fit": "Fit to blocker",
+  "section.full": "Full 300 km",
+  "section.exaggeration": "Vertical exaggeration ×{x}",
+  "section.label": "Terrain cross-section toward the {body}",
+  "section.observer": "Observer, {h} m",
+  "section.smooth": "Smooth Moon (dashed)",
+  "section.loading": "Loading terrain profile…",
+  "section.mesh_only": "Cross-section is available for catalogue sites only.",
+  "section.unavailable": "Terrain profile unavailable."
 }

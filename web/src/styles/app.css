@@ -932,3 +932,53 @@ input[aria-invalid='true'] {
     padding-right: 4px;
   }
 }
+
+/* ---- Cross-section (10 §6.3) ---- */
+.section__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.section__figure {
+  margin: 0;
+}
+
+.section__svg {
+  display: block;
+  border-radius: var(--radius);
+}
+
+.section__exag {
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.section__horizon-line {
+  fill: none;
+  stroke: var(--c-text);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.section__mast {
+  stroke: var(--c-text);
+  stroke-width: 2;
+}
+
+.section__eye {
+  fill: var(--c-text);
+}
+
+.section__blocker {
+  fill: none;
+  stroke: var(--c-text);
+  stroke-width: 2;
+}
+
+.section__text {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
