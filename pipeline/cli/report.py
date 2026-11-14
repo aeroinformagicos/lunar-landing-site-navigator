@@ -182,7 +182,7 @@ def write_case(
     results_dir = Path(results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
     path = results_dir / (f"{case_id}.json" if part is None else f"{case_id}.{part}.json")
-    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     return path
 
 
@@ -391,11 +391,12 @@ def mark_in_manifest(web_dir: Path) -> None:
     manifest = json.loads(path.read_text(encoding="utf-8"))
     if manifest.get("has_validation_report") is not True:
         manifest["has_validation_report"] = True
-        path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        text = json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
+        path.write_text(text, encoding="utf-8", newline="\n")
 
 
 def write_report(report: dict, web_dir: Path) -> Path:
     path = Path(web_dir) / "validation_report.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     return path
