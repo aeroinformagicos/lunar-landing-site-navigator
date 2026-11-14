@@ -91,6 +91,8 @@ fuente (CLAUDE.md §2).
 | Tira de 360°: rango de elevación | −15 a +15 | ° | D-74 | `web/src/ui/panorama/geometry.ts` (`STRIP_MIN_EL`, `STRIP_MAX_EL`) |
 | Enlace compartible: versión, prefijo del fragmento e intervalo mínimo entre escrituras | 1; `#s=`; 500 | —; —; ms | `10_interfaz.md` §10 («como mucho dos veces por segundo») | `web/src/state/url.ts` (`URL_VERSION`, `HASH_PREFIX`, `URL_WRITE_INTERVAL_MS`) |
 | Rango admitido de `maxNightHours` en un enlace | 0 – 400 | h | `07_visibilidad.md` §8.1 («editable: 0–400») | `web/src/state/url.ts` (`MAX_NIGHT_HOURS_RANGE`) |
+| Móvil: objetivo táctil mínimo; alto de la vista principal; columnas del panel de cifras | 44 × 44; 55 % del alto de pantalla; 3 | px; —; — | `10_interfaz.md` §12 («Táctil»), §3.2 | `web/src/styles/app.css` (bloque T-20) |
+| Móvil: hueco reservado bajo la página para la barra de tiempo fija (`--timebar-h`) | 144 | px | Medido (T-20): la barra mide 136 px a 390 × 844 con controles de 44 px (tres filas); 8 px de margen | `web/src/styles/app.css` |
 
 ## Valores medidos
 
