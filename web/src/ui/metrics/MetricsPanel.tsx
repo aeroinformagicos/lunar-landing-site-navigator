@@ -3,7 +3,9 @@
 // requirement chip, the `Now` block with the two countdowns and the provenance line.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { t, type TextKey } from '../../i18n/t';
-import { useAppStore } from '../../state/store';
+import { assess } from '../../core/requirements';
+import { useAppStore, type Scenario } from '../../state/store';
+import { Summary } from '../summary/Summary';
 import { formatDeg, formatHours, formatMargin, formatPct } from '../common/format';
 import type { ScenarioModel } from '../common/model';
 import { countdownText, cursorState, requirementChecks } from './derive';
@@ -57,13 +59,14 @@ function Figure({ id, icon, value }: { id: 'sunlight' | 'earth_link' | 'longest_
   );
 }
 
-export function MetricsPanel({ model, mission }: { model: ScenarioModel; mission: MissionResult }) {
+export function MetricsPanel({ model, mission, scenario }: { model: ScenarioModel; mission: MissionResult; scenario: Scenario }) {
   const cursor = useAppStore((s) => s.cursorUnix);
   const playing = useAppStore((s) => s.playing);
   const requirements = useAppStore((s) => s.requirements);
   const { metrics, landing } = mission;
   const now = useMemo(() => cursorState(model.table, model.frame, model.mask, cursor), [model, cursor]);
   const checks = requirementChecks(landing, metrics, requirements);
+  const assessment = useMemo(() => (landing ? assess(landing, metrics, requirements) : null), [landing, metrics, requirements]);
 
   const sunCountdown = now?.nextSun ? countdownText(now.nextSun, cursor) : '';
   const earthCountdown = now?.nextEarth ? countdownText(now.nextEarth, cursor) : '';
@@ -114,6 +117,8 @@ export function MetricsPanel({ model, mission }: { model: ScenarioModel; mission
           {live}
         </p>
       </section>
+
+      {now && assessment && <Summary model={model} mission={mission} scenario={scenario} now={now} assessment={assessment} />}
 
       <p className="provenance">{t('metrics.provenance', { terrain: model.reliefLabel })}</p>
     </>

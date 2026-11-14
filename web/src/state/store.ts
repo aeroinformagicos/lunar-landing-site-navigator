@@ -8,6 +8,7 @@ import {
   PLAY_SPEEDS,
   SCENARIO_LETTERS,
 } from '../core/constants';
+import type { Requirements } from '../core/requirements';
 import { DAY_S, isoToUnix } from '../core/time';
 import type { ObserverHeight, SiteDefaults } from '../core/types';
 
@@ -28,14 +29,8 @@ export interface Scenario {
   observerHeightM: ObserverHeight;
 }
 
-/** 07_visibilidad.md §8.1. */
-export interface Requirements {
-  needSunAtLanding: boolean;
-  needEarthAtLanding: boolean;
-  maxNightHours: number;
-  marginalEarthMarginDeg: number;
-  marginalSunFraction: number;
-}
+/** 07_visibilidad.md §8.1 (defined in core/requirements.ts). */
+export type { Requirements };
 
 export const DEFAULT_REQUIREMENTS: Readonly<Requirements> = Object.freeze({
   needSunAtLanding: true,

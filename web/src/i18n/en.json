@@ -161,5 +161,6 @@
   "pano.margin": "Margin: {margin}",
   "pano.terrain_effect": "Terrain effect",
   "pano.strip_label": "360° horizon strip: choose the direction of the 40° view",
-  "pano.unavailable": "Panorama unavailable."
+  "pano.unavailable": "Panorama unavailable.",
+  "summary.label": "Plain summary"
 }
