@@ -276,7 +276,7 @@ def test_resume_computes_nothing_and_files_are_identical(engine, flat_stack, tmp
     done = np.frombuffer(before["done.bin"], dtype=np.uint8).reshape(42, 47)
     assert done.sum() == 2 and done[23, 25] == 1 and done[22, 24] == 1
     assert json.loads(before["cube.json"]) == {
-        "contract_version": "1.0.0",
+        "contract_version": "1.1.0",
         "grid": "map/grid.json",
         "law": "fast",
         "observer_height_m": 2,

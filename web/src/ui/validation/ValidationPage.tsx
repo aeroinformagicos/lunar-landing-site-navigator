@@ -176,6 +176,8 @@ function Report({ report, baseUrl }: { report: ValidationReport; baseUrl: string
         ))}
       </div>
       {summary && <p className="validation__summary">{summary}</p>}
+      {/* Limitation of every rise and set time (decision D-95). */}
+      <p className="validation__limits">{t('limits.rise_set')}</p>
       <button type="button" aria-expanded={all} aria-controls="all-checks" onClick={() => setAll(!all)}>
         {all ? t('validation.hide_all') : t('validation.show_all', { n: checkCount(report) })}
       </button>

@@ -29,18 +29,19 @@ describe('headline states (Match, Mismatch, Pending)', () => {
     expect(headlineState('manual')).toBe('pending');
   });
 
-  it('the example report opens with B3 (Match), A3 and A7B7 (Pending)', () => {
+  it('the example report opens with A1 and B3 (Match) and A7B7 (Pending, computed tonight)', () => {
     const hs = orderedHeadlines(example);
     expect(hs.map((h) => [h.id, headlineState(h.status)])).toEqual([
+      ['A1', 'match'],
       ['B3', 'match'],
-      ['A3', 'pending'],
       ['A7B7', 'pending'],
     ]);
+    expect(hs[2].note).toMatch(/^Computed tonight/);
   });
 
-  it('keeps the order B3, A3, A7B7 whatever the file order', () => {
+  it('keeps the order A1, B3, A7B7 whatever the file order (decision D-95: A3 retired)', () => {
     const shuffled = { ...example, headline: [...example.headline].reverse() };
-    expect(orderedHeadlines(shuffled).map((h) => h.id)).toEqual(['B3', 'A3', 'A7B7']);
+    expect(orderedHeadlines(shuffled).map((h) => h.id)).toEqual(['A1', 'B3', 'A7B7']);
   });
 });
 

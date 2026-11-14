@@ -131,7 +131,7 @@ describe('404', () => {
 describe('network failures', () => {
   it('retries once after 2 s and succeeds', async () => {
     const { loader, calls, sleeps } = setup({ 'data/manifest.json': ['network-error', { json: manifest }] });
-    expect((await loader.loadManifest('data')).contract_version).toBe('1.0.0');
+    expect((await loader.loadManifest('data')).contract_version).toBe('1.1.0'); // example data, contract 1.1.0 (D-95)
     expect(calls).toHaveLength(2);
     expect(sleeps).toEqual([NETWORK_RETRY_DELAY_MS]);
   });

@@ -392,7 +392,7 @@ def test_publish_writes_a_valid_web_folder(tmp_path, catalog):
     web = web_copy(tmp_path)
     manifest = site_mask.publish(light, web, git_commit="abc1234", generated_utc="2026-11-14T12:00:00Z")
     assert manifest == {
-        "contract_version": "1.0.0", "generated_utc": "2026-11-14T12:00:00Z", "git_commit": "abc1234",
+        "contract_version": "1.1.0", "generated_utc": "2026-11-14T12:00:00Z", "git_commit": "abc1234",
         "sites": 3, "ephemeris": {"file": "ephemeris.bin", "bytes": 5_260_176, "synthetic": True},
         "has_validation_report": False,
     }

@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "projection": "polar_stereographic_south",
   "radius_m": 1737400,
   "cell_m": 500,
