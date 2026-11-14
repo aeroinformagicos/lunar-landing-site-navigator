@@ -1,7 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // T-72 end to end (16_vista_3d.md §15.2: E2 for the three modes, E3, E7, E8, and Go to) on the served
 // data, inside the v2 shell, with WebGL 2 by software. Captures go to docs/handoff/.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './example';
 
 const HANDOFF = '../docs/handoff/';
 const stage = (page: Page) => page.locator('.stage3d');
@@ -72,22 +72,12 @@ test('E7 · a click on a computed cell chooses that mesh point; elsewhere it say
   await stage(page).focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button', { name: /^Scenario A: Nearest mesh point: [\d.]+° S, [\d.]+° [EW] \(500 m grid\)$/ })).toBeVisible({ timeout: 20_000 });
-  // The pole: «not computed» with the example cube; with the full published cube (T-39) it is computed
-  // and the scenario moves there instead (minimal change by T-63).
-  const pin = page.getByRole('button', { name: /^Scenario A: Nearest mesh point: / });
-  const before = await pin.getAttribute('aria-label');
+  // The pole is not computed in the example cube.
   await hook(page, 'focusMap', 0, 0);
   await page.waitForTimeout(500);
   await stage(page).focus();
   await page.keyboard.press('Enter');
-  await expect
-    .poll(
-      async () =>
-        (await page.locator('.stage3d__controls').getByText('This area has not been computed yet.').isVisible()) ||
-        ((await pin.count()) > 0 && (await pin.first().getAttribute('aria-label')) !== before),
-      { timeout: 20_000 },
-    )
-    .toBe(true);
+  await expect(page.locator('.stage3d__controls').getByText('This area has not been computed yet.')).toBeVisible({ timeout: 20_000 });
 });
 
 test('Go to · a region flies there and shows its outline and name; the compass resets north', async ({ page }) => {

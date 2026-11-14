@@ -2,7 +2,7 @@
 // T-29 end to end (F11, minimal version of 12_tareas.md §11) on the example heavy origin: layers,
 // legend, pointer readout, click → `Nearest mesh point…` scenario, «not computed», zoom with buttons
 // and keys, plan B label, and no heavy origin.
-import { expect, test, type Page } from './v1';
+import { expect, v1Test as test, type Page } from './example';
 
 /** Screen point of the centre of cell (i, j) with the initial fit. */
 async function cellPoint(page: Page, i: number, j: number) {
@@ -39,14 +39,9 @@ test('a click on a computed cell creates the mesh-point scenario; elsewhere, «n
   await expect(card).toContainText('Mesh point');
   await expect(card).toContainText(/Nearest mesh point: \d+\.\d{3}° S, \d+\.\d{3}° E \(500 m grid\)/);
   await expect(page.locator('.figure--sunlight .figure__value')).toHaveText(/ h · /, { timeout: 20_000 });
-  // Elsewhere: «not computed» with the example cube; with the full published cube (T-39) the click
-  // moves the scenario to that other mesh point instead.
-  const before = await card.innerText();
   p = await cellPoint(page, 200, 200);
   await page.mouse.click(p.x, p.y);
-  await expect
-    .poll(async () => (await page.getByText('This area has not been computed yet.').isVisible()) || (await card.innerText()) !== before, { timeout: 20_000 })
-    .toBe(true);
+  await expect(page.getByText('This area has not been computed yet.')).toBeVisible();
 });
 
 test('zoom buttons and keyboard (+, arrows, Enter on the centre cross)', async ({ page }) => {
@@ -59,10 +54,8 @@ test('zoom buttons and keyboard (+, arrows, Enter on the centre cross)', async (
   await expect(canvas).toHaveAttribute('data-zoom', '1');
   await page.keyboard.press('+');
   await expect(canvas).toHaveAttribute('data-zoom', '2');
-  // Enter selects the cell under the centre cross: «not computed» in the example cube, a mesh point
-  // with the full published cube (T-39).
-  await page.keyboard.press('Enter');
-  await expect(page.getByText('This area has not been computed yet.').or(page.getByRole('article', { name: 'Scenario A' }).getByText(/Nearest mesh point/))).toBeVisible({ timeout: 20_000 });
+  await page.keyboard.press('Enter'); // centre cell is not computed in the example cube
+  await expect(page.getByText('This area has not been computed yet.')).toBeVisible();
 });
 
 test('plan B is labelled; without the heavy origin, the message', async ({ page }) => {

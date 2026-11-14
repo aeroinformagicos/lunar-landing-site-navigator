@@ -1,9 +1,9 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
-// T-23 end to end (F9, 10_interfaz.md §6.7) on the served report (web/public/data): three headline
+// T-23 end to end (F9, 10_interfaz.md §6.7) on the example report (e2e/fixtures, T-82): three headline
 // cards (JPL Horizons, the Blue Ghost 1 eclipse and the NASA maps; decision D-95) with prediction,
 // fact, tolerance, linked source and state; the retired A3 stays in the full table; the full table
 // unfolds and each row expands; a mismatch is shown; without a report, the message.
-import { expect, test, type Page } from './v1';
+import { exampleReport, expect, v1Test as test, type Page } from './example';
 
 async function openValidation(page: Page) {
   await page.goto('/');
@@ -27,10 +27,8 @@ test('three headline cards with prediction, fact, tolerance, source and state', 
   // A3 is retired (decision D-95): no card.
   await expect(page.getByRole('article', { name: /Sunset seen by Blue Ghost 1/ })).toHaveCount(0);
   const a7 = page.getByRole('article', { name: /south pole maps vs NASA/ });
-  // Pending until the night run publishes the comparison (T-39); then Match or Mismatch with its values.
-  await expect(a7).toContainText(/Pending|Match|Mismatch/);
-  if ((await a7.innerText()).includes('Pending')) await expect(a7).toContainText(/Computed tonight/);
-  else await expect(a7).toContainText(/Pearson r/);
+  await expect(a7).toContainText('Pending');
+  await expect(a7).toContainText(/Computed tonight/);
   await expect(a7).toContainText("NASA counts a point as lit when any part of the Sun's or Earth's disc is visible");
   await expect(page.getByText(/^[\d,]+ values checked against JPL Horizons · largest difference 0\.\d+°$/)).toBeVisible();
   await expect(page.getByText(/^Rise and set times are only as accurate as the terrain map\./)).toBeVisible();
@@ -58,14 +56,13 @@ test('the full table unfolds, each row expands, and the retired A3 says why', as
 
 test('a mismatch is shown with its difference and note, not hidden', async ({ page }) => {
   await page.route('**/validation_report.json', async (route) => {
-    const res = await route.fetch();
-    const r = await res.json();
-    const b3 = r.headline.find((h: { id: string }) => h.id === 'B3');
+    const r = exampleReport();
+    const b3 = r.headline.find((h) => h.id === 'B3')!;
     b3.status = 'fail';
     b3.rows[0].ok = false;
     b3.rows[0].observed = '05:20 UTC';
     b3.note = 'Off by 19 min.';
-    await route.fulfill({ response: res, json: r });
+    await route.fulfill({ json: r });
   });
   await openValidation(page);
   const b3 = page.getByRole('article', { name: /Total solar eclipse/ });
