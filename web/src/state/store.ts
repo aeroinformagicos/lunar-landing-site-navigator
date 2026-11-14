@@ -8,6 +8,7 @@ import {
   PLAY_SPEEDS,
   SCENARIO_LETTERS,
 } from '../core/constants';
+import { DAY_S, isoToUnix } from '../core/time';
 import type { ObserverHeight, SiteDefaults } from '../core/types';
 
 export type Mode = 'explore' | 'plan' | 'learn';
@@ -87,14 +88,11 @@ export interface AppActions {
 
 export type AppStore = AppState & AppActions & { initialised: boolean };
 
-export function parseUtc(iso: string): number {
-  const ms = Date.parse(iso);
-  if (Number.isNaN(ms)) throw new Error(`Invalid UTC instant: ${iso}`);
-  return Math.round(ms / 1000);
-}
+/** `YYYY-MM-DDTHH:MM:SSZ` → Unix seconds (core/time.ts). */
+export const parseUtc = isoToUnix;
 
 export function missionEnd(s: Scenario): number {
-  return s.landingUnix + Math.round(s.missionDays * 86_400);
+  return s.landingUnix + Math.round(s.missionDays * DAY_S);
 }
 
 /** Initial state: scenarios A and B on `demo_pair`, landing `demo_landing_utc`, cursor at landing. */
