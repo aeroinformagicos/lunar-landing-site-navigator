@@ -175,16 +175,3 @@
 .stage3d__help dd {
   margin: 0;
 }
-
-/* Interface v1 with ?ui=v2&vm=3d (16 §10.5): the 3D view inside the main view box. */
-.stage3d-v1 {
-  position: relative;
-  height: clamp(360px, 62vh, 720px);
-  --stage3d-inset-bottom: 12px;
-  --stage3d-inset-right: 12px;
-}
-.stage3d-v1__notice {
-  margin: 0 0 8px;
-  color: var(--c-warn-text, #fb923c);
-  font-size: 14px;
-}

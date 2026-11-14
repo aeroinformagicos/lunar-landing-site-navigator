@@ -325,7 +325,7 @@ Lee, con los selectores existentes y `useScenarioModel`: escenarios, escenario a
 
 ### 10.3 Paso a 2D por fallo (D-97 n, propuesta a I2)
 
-El armazón decide `viewMode` al arrancar (anexo A: `'2d'` sin WebGL o con ventana < 768 px). **Requisito concreto: WebGL 2** (three.js ya no admite WebGL 1); I2 debe comprobar `canvas.getContext('webgl2')`. Si la 3D falla después de montarse (contexto perdido y no recuperado en 3 s, error de compilación de sombreadores, fallo del trabajador o de three.js), Stage3D **lanza el error durante el render** y el límite de errores del armazón (D-102) monta la 2D con su aviso; no hace falta acción ni campo nuevo en el almacén (D-107 a). En la interfaz actual con `?ui=v2&vm=3d`, el límite propio de `stage3d/V1Mount.tsx` hace lo mismo con `stage3d.fallback`. Un error de **datos** no pasa a 2D: baja de escena (§2.1).
+El armazón decide `viewMode` al arrancar (anexo A: `'2d'` sin WebGL o con ventana < 768 px). **Requisito concreto: WebGL 2** (three.js ya no admite WebGL 1); I2 debe comprobar `canvas.getContext('webgl2')`. Si la 3D falla después de montarse (contexto perdido y no recuperado en 3 s, error de compilación de sombreadores, fallo del trabajador o de three.js), Stage3D **lanza el error durante el render**; el límite de errores del armazón (`Fallback3d` en `ui/shell/Stage.tsx`, D-102) llama a `fallbackTo2d` del almacén, que pone `viewMode = '2d'` y `viewNotice = 'webgl_failed'`, y el armazón muestra `The 3D view is not available on this device. Showing the 2D view.` con `Dismiss` (D-106, D-107 a). Un error de **datos** no pasa a 2D: baja de escena (§2.1).
 
 ### 10.4 Textos
 
@@ -362,7 +362,7 @@ Todos en `web/src/i18n/en.json`, en un bloque contiguo de claves `stage3d.*` col
 
 ### 10.5 Antes de que exista el armazón v2
 
-Si T-71 empieza antes de que T-61 esté en `main`: Stage3D se ve con `?ui=v2&vm=3d` en la interfaz actual, sustituyendo al panorama dentro del recuadro de la vista principal (cambio mínimo en `ui/layout/AppLayout.tsx`, explicado en la petición), sin tocar nada más. Sin esos parámetros, la interfaz actual no cambia (prueba E5).
+Ya no aplica: T-61 está en `main` y la 3D se abre con `?ui=v2` (y `vm=3d` o `vm=2d` para forzar el modo). Mientras T-61 no estaba, T-71 la montaba en la v1 con `?ui=v2&vm=3d` (D-107 a).
 
 ## 11. Ficheros del carril
 

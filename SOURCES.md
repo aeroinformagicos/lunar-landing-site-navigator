@@ -51,3 +51,4 @@ in which it is first used. Content owner: A2.
 | d3-array, d3-scale, d3-shape, d3-selection, d3-zoom | 3.2.5, 4.0.3, 3.2.1, 3.0.1, 3.0.1 | Charts and map zoom | ISC |
 | three.js (`three`, `@types/three`), https://threejs.org | 0.187.0 | 3D view: WebGL 2 renderer, shader materials, geometry (loaded on demand) | MIT |
 | Wrangler | 4.160.0 | Cloudflare Pages deployment | MIT OR Apache-2.0 |
+| @fontsource/inter, @fontsource/jetbrains-mono | 5.3.0, 5.3.0 | Fonts of the v2 interface (Inter, JetBrains Mono), bundled, latin subset only | OFL-1.1 (fonts); MIT (package) |
