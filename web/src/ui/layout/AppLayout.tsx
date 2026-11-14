@@ -23,7 +23,7 @@ import { ScenarioColumn } from '../scenario/ScenarioColumn';
 import { Header } from './Header';
 import { Button } from '../common/Button';
 import { WelcomeCard } from '../welcome/WelcomeCard';
-import { WELCOME_AT_START } from '../welcome/welcome';
+import { welcomePending } from '../welcome/welcome';
 
 /** The map and its data load on demand, outside the main bundle (02_arquitectura.md §7). */
 const MapView = lazy(() => import('../map/MapView'));
@@ -43,8 +43,8 @@ function useIsMobile(): boolean {
   return mobile;
 }
 
-/** Global shortcuts: `1`–`4` tabs, `Space` play, `[` `]` ±1 h, `?` help. */
-function useShortcuts(onHelp: () => void) {
+/** Global shortcuts: `1`–`4` tabs, `Space` play, `[` `]` ±1 h, `?` help. `remapTab` reorders the tabs (v2). */
+export function useShortcuts(onHelp: () => void, remapTab: (tab: Tab) => Tab = (tab) => tab) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const target = e.target as HTMLElement | null;
@@ -61,14 +61,14 @@ function useShortcuts(onHelp: () => void) {
       if (!sc) return;
       e.preventDefault();
       const s = useAppStore.getState();
-      if (sc.kind === 'tab') s.setTab(sc.tab);
+      if (sc.kind === 'tab') s.setTab(remapTab(sc.tab));
       else if (sc.kind === 'play') togglePlay();
       else if (sc.kind === 'step') s.setCursor(s.cursorUnix + sc.seconds);
       else onHelp();
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onHelp]);
+  }, [onHelp, remapTab]);
 }
 
 export function AppLayout() {
@@ -82,7 +82,7 @@ export function AppLayout() {
   const init = useAppStore((s) => s.init);
   const mobile = useIsMobile();
   const [help, setHelp] = useState(false);
-  const [welcome, setWelcome] = useState(WELCOME_AT_START);
+  const [welcome, setWelcome] = useState(welcomePending);
   useShortcuts(() => setHelp(true));
 
   const storyStep = useAppStore((s) => s.storyStep);

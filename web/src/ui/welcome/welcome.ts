@@ -34,6 +34,7 @@ export function shouldWelcome(hash: string, search: string, store: KeyStore | nu
 }
 
 export function rememberWelcomeClosed(store: KeyStore | null = storage()): void {
+  pending = false;
   try {
     store?.setItem(WELCOME_KEY, '1');
   } catch {
@@ -43,3 +44,12 @@ export function rememberWelcomeClosed(store: KeyStore | null = storage()): void 
 
 /** Read once when the app starts, before the URL sync writes the state into the fragment. */
 export const WELCOME_AT_START = typeof location === 'undefined' ? false : shouldWelcome(location.hash, location.search);
+
+/**
+ * Whether the card is still due in this page load. Kept outside React: the layout unmounts while the
+ * story shows the validation page (step 7), and the card must not come back when it mounts again.
+ */
+let pending = WELCOME_AT_START;
+export function welcomePending(): boolean {
+  return pending;
+}

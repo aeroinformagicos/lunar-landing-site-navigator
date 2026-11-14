@@ -119,7 +119,7 @@ export function sentenceNext(input: SummaryInput): string {
 /** What the verdict needs (the comparison table shows only this sentence, 10 §8). */
 export type VerdictInput = Pick<SummaryInput, 'assessment' | 'missionDays' | 'sunPct' | 'earthPct' | 'maxNightHours' | 'marginalEarthMarginDeg'>;
 
-function reasonText(r: ReasonCode, input: VerdictInput): string {
+export function reasonText(r: ReasonCode, input: VerdictInput): string {
   const night = formatHours(input.assessment.longestNightH);
   switch (r) {
     case 'no_sun_at_landing':
