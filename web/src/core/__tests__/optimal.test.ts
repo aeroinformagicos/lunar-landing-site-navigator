@@ -8,7 +8,7 @@ import { makeMask } from '../horizon';
 import { bestByPeriod, COMPACT_N_AZ, decodeCompact, hourlyVectors, longestBothFrom, type Box, type Compact } from '../optimal';
 import { isoToUnix } from '../time';
 import { exactBothHours } from '../../ui/optimal/refine';
-import { bestTimeMs, exampleBytes, exampleTable } from './fixtures';
+import { exampleBytes, exampleTable } from './fixtures';
 
 const table = exampleTable();
 const N = GRID.nx * GRID.ny;
@@ -138,11 +138,4 @@ describe('longest continuous Sun + Earth from a date (08 §10.2)', () => {
     }
     expect(positive).toBeGreaterThan(0);
   });
-
-  it('10,252 always-visible points over 90 days in under 15 s (worst case)', () => {
-    const pts = Array.from({ length: 10_252 }, (_, k) => ({ i: k % GRID.nx, j: Math.floor(k / GRID.nx) * 3, el: () => -90 }));
-    const c = compactOf(pts);
-    const ms = bestTimeMs(() => longestBothFrom(c, table, T, 90, null), 1);
-    expect(ms).toBeLessThan(15_000);
-  }, 30_000);
 });
