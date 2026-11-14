@@ -18,6 +18,7 @@
     "cube-plan": "node ops/tasks.mjs cube-plan",
     "cube": "node ops/tasks.mjs cube",
     "layers": "node ops/tasks.mjs layers",
+    "compact": "node ops/tasks.mjs compact",
     "night": "node ops/tasks.mjs night",
     "deploy-heavy": "node ops/tasks.mjs deploy-heavy",
     "examples": "node ops/tasks.mjs examples",
