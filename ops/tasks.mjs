@@ -150,6 +150,8 @@ const tasks = {
     run('npx', ['vitest', 'run'], { cwd: WEB });
     if (hasContract()) cli('check-contract');
     if (existsSync(join(WEB, 'e2e')) && process.env.LLSN_SKIP_E2E !== '1') {
+      // Playwright serves `web/dist` with `vite preview`: build it first so the tests never run on a stale one.
+      tasks.build();
       run('npx', ['playwright', 'test', '--pass-with-no-tests'], { cwd: WEB });
     }
   },
