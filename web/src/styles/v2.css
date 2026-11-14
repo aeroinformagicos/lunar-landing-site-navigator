@@ -1,0 +1,1279 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* Interface v2 shell (15_interfaz_v2.md §3, §6, §7; T-61). Every rule is under `.ui-v2`, so the v1
+   (?ui=v1, the safety net) is untouched. Values from docs/design/open-horizon/C-Cinematic.dc.html
+   (1440 × 900), adapted with D-101: side gutters clamp(24px, 4.44vw, 64px), nothing under 12 px. */
+
+.ui-v2 {
+  --gutter: clamp(24px, 4.44vw, 64px);
+  --right-w: 296px;
+  --top-pills: clamp(16px, 5.3vh, 48px);
+  /* Clear of the folded Sites and Setup tabs on the left edge. */
+  --left-clear: max(var(--gutter), 206px);
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  font-family: var(--font-v2-sans);
+  color: var(--c-text);
+  background: var(--c-bg-0);
+}
+
+.ui-v2 .v2 {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0a0e17 0%, #101827 48%, #162032 62%, #0a0e17 100%);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ui-v2 .v2 :focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+/* Banners of the app (example data, partly restored link) float over the shell. */
+.ui-v2 .banner {
+  position: fixed;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  z-index: 60;
+  border-radius: var(--radius-pill);
+  padding: 6px 16px;
+}
+
+.ui-v2 .v2-mono,
+.ui-v2 .countdown {
+  font-family: var(--font-v2-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-v2 .v2-skip {
+  position: absolute;
+  left: 8px;
+  top: -60px;
+  z-index: 70;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--c-text);
+  color: var(--c-bg-0);
+  font-weight: 600;
+}
+
+.ui-v2 .v2-skip:focus {
+  top: 8px;
+}
+
+/* ---- Shared controls ---- */
+.ui-v2 .v2 button,
+.ui-v2 .v2 .button-link {
+  font-family: inherit;
+}
+
+.ui-v2 .v2-link {
+  min-height: 44px;
+  min-width: 0;
+  padding: 0 10px;
+  border: 0;
+  background: none;
+  color: var(--c-earth);
+  font: 500 13px var(--font-v2-sans);
+  cursor: pointer;
+}
+
+.ui-v2 .v2-link:hover {
+  color: var(--c-earth-2);
+}
+
+.ui-v2 .v2-link[aria-pressed='true'] {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.ui-v2 .pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(var(--blur-pill));
+  color: var(--c-text-2);
+  font: 500 13px var(--font-v2-sans);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ui-v2 .pill[aria-pressed='true'] {
+  border-color: var(--c-earth);
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+.ui-v2 .pill--scenario span {
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ui-v2 .pill--scenario[aria-pressed='true'] .scenario-marker {
+  color: var(--c-earth);
+}
+
+.ui-v2 .pill--add {
+  width: 44px;
+  padding: 0;
+  justify-content: center;
+  border-style: dashed;
+  border-color: var(--c-dim);
+  background: rgba(17, 24, 39, 0.5);
+  color: var(--c-text);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+/* Small pills: 32 px like the mockup, with a 44 px hit area (D-105). */
+.ui-v2 .pill--small {
+  height: 32px;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  background: none;
+  backdrop-filter: none;
+  font-size: 12px;
+}
+
+.ui-v2 .pill--small::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
+}
+
+.ui-v2 .pill--sun[aria-pressed='true'] {
+  border-color: var(--c-sun);
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--c-sun-2);
+}
+
+.ui-v2 .pill--earth[aria-pressed='true'] {
+  border-color: var(--c-earth);
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--c-earth-2);
+}
+
+.ui-v2 .btn--primary {
+  background: var(--c-text);
+  border-color: var(--c-text);
+  color: var(--c-bg-0);
+}
+
+.ui-v2 .btn--primary:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: #ffffff;
+}
+
+.ui-v2 .btn--secondary {
+  background: transparent;
+  border: 1px solid var(--c-line);
+  color: var(--c-text-2);
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+.ui-v2 .btn--ghost {
+  color: var(--c-muted);
+  font-size: 13px;
+}
+
+.ui-v2 .v2 input,
+.ui-v2 .v2 select {
+  min-height: 36px;
+  background: rgba(10, 14, 23, 0.6);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  color: var(--c-text);
+  font: 400 13px var(--font-v2-mono);
+}
+
+.ui-v2 .v2 input[type='checkbox'] {
+  min-height: 0;
+  min-width: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--c-earth);
+}
+
+.ui-v2 .v2 .field__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  font-size: 13px;
+  color: var(--c-text-2);
+}
+
+/* ---- H: brand ---- */
+.ui-v2 .v2-brand {
+  position: absolute;
+  left: var(--gutter);
+  top: clamp(16px, 4.9vh, 44px);
+  z-index: 20;
+}
+
+.ui-v2 .v2-brand__link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ui-v2 .v2-brand__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ui-v2 .v2-brand__name {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.ui-v2 .v2-brand__motto {
+  max-width: 320px;
+  font-size: 13px;
+  color: var(--c-muted);
+}
+
+/* ---- P: scenario pills ---- */
+.ui-v2 .v2-pills {
+  position: absolute;
+  left: 50%;
+  top: var(--top-pills);
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- M: mode and Validation ---- */
+.ui-v2 .v2-modes {
+  position: absolute;
+  right: var(--gutter);
+  top: var(--top-pills);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ui-v2 .v2-modes__tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.ui-v2 .tab {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  min-height: 44px;
+  min-width: 0;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--c-muted);
+  font: 500 13px var(--font-v2-sans);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ui-v2 .tab:hover {
+  color: var(--c-text);
+}
+
+.ui-v2 .tab--mode[aria-selected='true'] {
+  color: var(--c-text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 8px;
+  text-decoration-color: var(--c-accent);
+  text-decoration-thickness: 2px;
+}
+
+.ui-v2 .v2-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--c-line);
+}
+
+.ui-v2 .v2-modes .share button {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  background: none;
+  color: var(--c-muted);
+  font: 500 13px var(--font-v2-sans);
+}
+
+/* ---- T: 3D / 2D switch ---- */
+.ui-v2 .v2-toggle {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--top-pills) + 56px);
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  padding: 3px;
+  border: 1px solid var(--c-line);
+  border-radius: 21px;
+  background: var(--c-panel);
+  backdrop-filter: blur(var(--blur-pill));
+}
+
+.ui-v2 .v2-toggle__opt {
+  position: relative;
+  min-width: 56px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 17px;
+  background: none;
+  color: var(--c-muted);
+  font: 500 13px var(--font-v2-mono);
+  cursor: pointer;
+}
+
+.ui-v2 .v2-toggle__opt::before {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
+}
+
+.ui-v2 .v2-toggle__opt[aria-checked='true'] {
+  background: rgba(56, 189, 248, 0.14);
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+.ui-v2 .v2-toggle__opt:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---- Floating panels (L1, L2, R) ---- */
+.ui-v2 .v2-left {
+  position: absolute;
+  left: 0;
+  top: 150px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  max-height: calc(100vh - 150px - 200px);
+}
+
+.ui-v2 .v2-left .fp {
+  margin-left: 24px;
+}
+
+.ui-v2 .v2-right {
+  position: absolute;
+  right: 24px;
+  top: 130px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ui-v2 .v2-right:has(.fp-tab) {
+  right: 0;
+}
+
+.ui-v2 .fp {
+  width: var(--right-w);
+  max-height: calc(100vh - 130px - 170px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-panel);
+  background: var(--c-panel);
+  backdrop-filter: blur(var(--blur-panel));
+  box-shadow: var(--shadow-panel);
+  animation: fp-in 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.ui-v2 .fp--left {
+  transform-origin: left center;
+}
+
+.ui-v2 .fp--right {
+  transform-origin: right center;
+}
+
+@keyframes fp-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--fp-from, 0)) scale(0.98);
+  }
+}
+
+.ui-v2 .fp--left {
+  --fp-from: -12px;
+}
+
+.ui-v2 .fp--right {
+  --fp-from: 12px;
+}
+
+.ui-v2 .fp__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 10px 4px 20px;
+}
+
+.ui-v2 .fp__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ui-v2 .fp__fold {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 22px;
+  background: none;
+  color: var(--c-muted);
+  cursor: pointer;
+}
+
+.ui-v2 .fp__fold:hover {
+  color: var(--c-text);
+}
+
+.ui-v2 .fp__body {
+  padding: 8px 20px 18px;
+  overflow: hidden;
+}
+
+.ui-v2 .fp-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--c-line);
+  border-left: 0;
+  border-radius: 0 22px 22px 0;
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(var(--blur-pill));
+  color: var(--c-text);
+  font: 500 12px var(--font-v2-sans);
+  cursor: pointer;
+}
+
+.ui-v2 .fp-tab--right {
+  border-left: 1px solid var(--c-line);
+  border-right: 0;
+  border-radius: 22px 0 0 22px;
+  padding: 0 12px 0 14px;
+}
+
+.ui-v2 .fp-icon {
+  flex: none;
+  color: var(--c-muted);
+}
+
+/* Sites: v1 scenario cards in the v2 style. */
+/* The one list allowed to scroll inside its panel (3–4 scenarios on a short window). */
+.ui-v2 .v2-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: calc(100vh - 150px - 300px);
+  overflow-y: auto;
+}
+
+.ui-v2 .v2-cards > li + li {
+  border-top: 1px solid var(--c-line);
+}
+
+.ui-v2 .v2-cards .scenario-card {
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.ui-v2 .v2-cards .scenario-card--active .scenario-card__name {
+  color: var(--c-earth);
+}
+
+.ui-v2 .v2-cards .scenario-card__select {
+  min-height: 36px;
+  padding: 0;
+  gap: 8px;
+  font-size: 15px;
+  background: none;
+  border: 0;
+}
+
+.ui-v2 .v2-cards .scenario-card p {
+  font-size: 13px;
+  color: var(--c-muted);
+}
+
+.ui-v2 .v2-cards .scenario-card__coords,
+.ui-v2 .v2-cards .scenario-card__date {
+  font-family: var(--font-v2-mono);
+}
+
+.ui-v2 .v2-cards .scenario-card__actions {
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin: 4px 0 0 -8px;
+}
+
+.ui-v2 .v2-cards .scenario-card__actions .btn {
+  padding: 0 8px;
+  font-size: 13px;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ui-v2 .v2-note {
+  margin: 8px 0 0;
+  color: var(--c-muted);
+  font-size: 13px;
+}
+
+/* Setup */
+.ui-v2 .v2-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ui-v2 .v2-setup .field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--c-muted);
+}
+
+.ui-v2 .v2-setup .field__error,
+.ui-v2 .v2-setup .field__warn {
+  flex-basis: 100%;
+  font-size: 13px;
+}
+
+.ui-v2 .v2-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 16px -20px 0;
+  padding: 14px 20px 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.ui-v2 .v2-section__title {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-night {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-text-2);
+  font-size: 13px;
+}
+
+.ui-v2 .v2-night input {
+  width: 5.5em;
+}
+
+/* Now at site */
+.ui-v2 .v2-dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.ui-v2 .v2-dl__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.ui-v2 .v2-dl dt {
+  color: var(--c-muted);
+}
+
+.ui-v2 .v2-dl__v {
+  margin: 0;
+  text-align: right;
+  font-family: var(--font-v2-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-v2 .v2-dl__v--sun {
+  color: var(--c-sun);
+}
+
+.ui-v2 .v2-dl__v--earth {
+  color: var(--c-earth);
+}
+
+.ui-v2 .v2-dl__sub {
+  display: block;
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+.ui-v2 .v2-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px -20px 0;
+  padding: 16px 20px 0;
+  border-top: 1px solid var(--c-line);
+  list-style: none;
+  font-size: 13px;
+}
+
+.ui-v2 .v2-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ui-v2 .v2-check__mark {
+  width: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ui-v2 .v2-check--ok .v2-check__mark {
+  color: var(--c-earth);
+}
+
+.ui-v2 .v2-check--fail {
+  color: var(--c-sun-2);
+}
+
+.ui-v2 .v2-eclipse {
+  margin: 12px 0 0;
+  color: var(--c-eclipse);
+  font-weight: 600;
+}
+
+.ui-v2 .v2-focus {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px -20px 0;
+  padding: 16px 20px 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.ui-v2 .v2-focus__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---- Stage ---- */
+.ui-v2 .v2-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  outline: none;
+}
+
+.ui-v2 .v2-stage3d {
+  position: absolute;
+  inset: 0;
+  /* Where lane I3 puts its camera controls (16_vista_3d.md §10.1): clear of the right panel's
+     column, above the view tabs and the time bar. */
+  --stage3d-inset-right: calc(var(--gutter) + 220px);
+  --stage3d-inset-bottom: 160px;
+}
+
+.ui-v2 .v2-stage__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: var(--c-muted);
+  font-size: 14px;
+}
+
+/* Provisional 2D view (T-61): the current panorama in the free area of the stage. */
+.ui-v2 .v2-stage2d {
+  position: absolute;
+  left: var(--left-clear);
+  right: calc(var(--right-w) + 48px);
+  top: calc(var(--top-pills) + 104px);
+  bottom: var(--bottom-h, 330px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: auto;
+}
+
+.ui-v2 .v2-stage2d .pano {
+  width: 100%;
+}
+
+.ui-v2 .v2-stage2d .pano__toolbar {
+  display: none;
+}
+
+/* Data views in the central sheet (15 §5.3). */
+.ui-v2 .v2-sheet {
+  position: absolute;
+  left: var(--left-clear);
+  right: calc(var(--right-w) + 48px);
+  top: calc(var(--top-pills) + 72px);
+  bottom: var(--bottom-h, 240px);
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-panel);
+  background: var(--c-panel);
+  backdrop-filter: blur(var(--blur-panel));
+  box-shadow: var(--shadow-panel);
+}
+
+.ui-v2 .v2-state {
+  color: var(--c-muted);
+}
+
+/* ---- B: bottom strip ---- */
+.ui-v2 .v2-bottom {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 8px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.ui-v2 .v2-bottom > * {
+  pointer-events: auto;
+}
+
+.ui-v2 .v2-mission {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 640px;
+  margin-bottom: 16px;
+}
+
+.ui-v2 .v2-verdict {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 18px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ui-v2 .v2-verdict--go {
+  color: var(--c-go);
+}
+
+.ui-v2 .v2-verdict--marginal {
+  color: var(--c-marginal);
+}
+
+.ui-v2 .v2-verdict--no_go {
+  color: var(--c-nogo);
+}
+
+.ui-v2 .v2-figs {
+  display: flex;
+  gap: 48px;
+  min-height: 78px;
+}
+
+.ui-v2 .v2-fig {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.ui-v2 .v2-fig__value {
+  margin: 0;
+  font: 300 56px/1 var(--font-v2-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  color: var(--c-text);
+}
+
+.ui-v2 .v2-fig--sun .v2-fig__value {
+  color: var(--c-sun);
+}
+
+.ui-v2 .v2-fig--earth .v2-fig__value {
+  color: var(--c-earth);
+}
+
+.ui-v2 .v2-fig__unit {
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.ui-v2 .v2-fig__label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-help {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ui-v2 .v2-help::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
+.ui-v2 .v2-fig__help {
+  max-width: 300px;
+  margin: 4px 0 0;
+  padding: 8px 10px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: rgba(17, 24, 39, 0.92);
+  font-size: 13px;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-summary {
+  max-width: 560px;
+}
+
+.ui-v2 .v2-summary .summary {
+  border: 0;
+  padding: 0;
+}
+
+.ui-v2 .v2-summary .summary p {
+  display: inline;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-summary .summary p + p::before {
+  content: ' ';
+}
+
+.ui-v2 .v2-summary:not(.v2-summary--all) .summary p:nth-child(n + 3) {
+  display: none;
+}
+
+.ui-v2 .v2-summary__more {
+  min-height: 32px;
+  padding: 0;
+  font-size: 13px;
+}
+
+.ui-v2 .v2-tabs {
+  display: flex;
+  gap: 20px;
+}
+
+.ui-v2 .tab--view {
+  padding: 0;
+  border-top: 2px solid transparent;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ui-v2 .tab--view[aria-selected='true'] {
+  border-top-color: var(--c-text);
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+/* Time bar */
+.ui-v2 .v2-time {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.ui-v2 .v2-play {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  padding: 0;
+  border-radius: 28px;
+}
+
+.ui-v2 .v2-step {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  color: var(--c-text);
+  font: 500 13px var(--font-v2-mono);
+  cursor: pointer;
+}
+
+.ui-v2 .v2-speed {
+  font-family: var(--font-v2-mono);
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-track {
+  position: relative;
+  flex: 1;
+  min-width: 160px;
+  height: 52px;
+}
+
+.ui-v2 .v2-track__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--c-line);
+  overflow: hidden;
+}
+
+.ui-v2 .v2-track__bar > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.ui-v2 .v2-track__bar--sun > span {
+  background: var(--c-sun);
+}
+
+/* The Earth bar keeps its diagonal stripes (10 §2): not only colour. */
+.ui-v2 .v2-track__bar--earth > span {
+  background: repeating-linear-gradient(135deg, var(--c-earth) 0 4px, rgba(56, 189, 248, 0.55) 4px 6px);
+}
+
+.ui-v2 .v2-track__cursor {
+  position: absolute;
+  top: 2px;
+  width: 2px;
+  height: 34px;
+  margin-left: -1px;
+  background: var(--c-text);
+  pointer-events: none;
+}
+
+.ui-v2 .v2 .v2-track__slider {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 100%;
+  height: 34px;
+  min-height: 34px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.ui-v2 .v2-track__slider::-webkit-slider-runnable-track {
+  height: 34px;
+  background: transparent;
+}
+
+.ui-v2 .v2-track__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 34px;
+  background: transparent;
+  border: 0;
+}
+
+.ui-v2 .v2-track__slider::-moz-range-thumb {
+  width: 16px;
+  height: 34px;
+  background: transparent;
+  border: 0;
+}
+
+.ui-v2 .v2-track__ticks {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 36px;
+  height: 14px;
+  font: 400 12px var(--font-v2-mono);
+  color: var(--c-muted);
+}
+
+.ui-v2 .v2-track__ticks > span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.ui-v2 .v2-track__ticks > span:first-child {
+  transform: none;
+}
+
+.ui-v2 .v2-track__ticks > span:last-child {
+  transform: translateX(-100%);
+}
+
+.ui-v2 .v2-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 150px;
+  font-family: var(--font-v2-mono);
+  white-space: nowrap;
+}
+
+.ui-v2 .v2-readout__day {
+  font-size: 18px;
+}
+
+.ui-v2 .v2-readout__utc {
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+.ui-v2 .v2-provenance {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 16px;
+  margin: 8px 0 0;
+  font: 400 12px var(--font-v2-mono);
+  color: var(--c-muted);
+}
+
+.ui-v2 .v2-credits {
+  font-family: var(--font-v2-sans);
+}
+
+/* Data views open: a compact strip (figures at 28 px, no summary) so the sheet has room (D-106). */
+.ui-v2 .v2--sheet .v2-mission {
+  flex-direction: row;
+  align-items: center;
+  gap: 32px;
+  max-width: none;
+  margin-bottom: 8px;
+}
+
+.ui-v2 .v2--sheet .v2-figs {
+  gap: 32px;
+  min-height: 0;
+}
+
+.ui-v2 .v2--sheet .v2-fig__value {
+  font-size: 28px;
+}
+
+.ui-v2 .v2--sheet .v2-fig__unit {
+  font-size: 14px;
+}
+
+/* Learn: only the verdict line and the time bar under the story card. */
+.ui-v2 .v2--learn .v2-mission {
+  margin-bottom: 8px;
+}
+
+/* ---- Overlays ---- */
+.ui-v2 .v2-notice {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--top-pills) + 104px);
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px 4px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  background: rgba(17, 24, 39, 0.92);
+}
+
+.ui-v2 .v2-welcome {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(10, 14, 23, 0.55);
+}
+
+.ui-v2 .v2-welcome .welcome {
+  position: static;
+  inset: auto;
+  padding: 0;
+  background: none;
+}
+
+.ui-v2 .v2-welcome .welcome__card {
+  border-radius: var(--radius-panel);
+  border-color: var(--c-line);
+  background: var(--c-panel);
+  backdrop-filter: blur(var(--blur-panel));
+}
+
+.ui-v2 .story {
+  border-color: var(--c-line);
+  border-radius: var(--radius-panel);
+  background: var(--c-panel);
+  backdrop-filter: blur(var(--blur-panel));
+  bottom: 120px;
+}
+
+.ui-v2 .dialog {
+  border-color: var(--c-line);
+  border-radius: var(--radius-panel);
+  background: rgba(17, 24, 39, 0.96);
+}
+
+/* Shorter windows: smaller figures and the first sentence only (D-101). */
+@media (max-height: 800px) {
+  .ui-v2 .v2-fig__value {
+    font-size: 44px;
+  }
+  .ui-v2 .v2-mission {
+    gap: 12px;
+  }
+  .ui-v2 .v2-summary:not(.v2-summary--all) .summary p:nth-child(n + 2) {
+    display: none;
+  }
+  .ui-v2 .v2-left {
+    top: 132px;
+  }
+  .ui-v2 .v2-right {
+    top: 112px;
+  }
+  .ui-v2 .fp {
+    max-height: calc(100vh - 112px - 160px);
+  }
+  .ui-v2 .fp__head {
+    padding-top: 6px;
+  }
+  .ui-v2 .v2-dl {
+    gap: 6px;
+  }
+  .ui-v2 .v2-checks,
+  .ui-v2 .v2-focus {
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+}
+
+/* Narrower desktops: the motto wraps so the scenario pills keep the centre. */
+@media (max-width: 1400px) {
+  .ui-v2 .v2-brand__motto {
+    max-width: 230px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-v2 .fp {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  .ui-v2 .fp,
+  .ui-v2 .v2-sheet,
+  .ui-v2 .pill,
+  .ui-v2 .fp-tab {
+    background: #111827;
+    backdrop-filter: none;
+  }
+}
+
+/* Touch screens: every target 44 × 44 px (14 §6). */
+@media (pointer: coarse) {
+  .ui-v2 .pill--small,
+  .ui-v2 .v2-toggle__opt,
+  .ui-v2 .v2-help {
+    height: 44px;
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
