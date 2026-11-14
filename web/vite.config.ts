@@ -6,7 +6,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: './',
-  build: { outDir: 'dist', sourcemap: true },
+  // The 3D chunk (three.js, loaded with import(), 16_vista_3d.md §12.3) is ~580 kB before gzip.
+  build: { outDir: 'dist', sourcemap: true, chunkSizeWarningLimit: 700 },
   test: {
     environment: 'node',
     // Two groups (D-91): every test in parallel, then the timing budgets (`*.perf.test.ts`) one at a

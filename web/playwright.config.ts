@@ -7,6 +7,8 @@ export default defineConfig({
   testDir: './e2e',
   use: {
     baseURL,
+    // WebGL 2 by software in headless Chromium, for the 3D view (16_vista_3d.md §15.2).
+    launchOptions: { args: ['--enable-unsafe-swiftshader'] },
     // The welcome card (T-53) counts as closed in every test except `ux.spec.ts`, which clears it.
     storageState: { cookies: [], origins: [{ origin: baseURL, localStorage: [{ name: 'llsn.welcome.closed', value: '1' }] }] },
   },

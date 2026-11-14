@@ -24,6 +24,10 @@ import { Header } from './Header';
 import { Button } from '../common/Button';
 import { WelcomeCard } from '../welcome/WelcomeCard';
 import { WELCOME_AT_START } from '../welcome/welcome';
+import { Stage3DV1, stage3dInV1 } from '../stage3d/V1Mount';
+
+/** `?ui=v2&vm=3d`: the 3D view replaces the panorama until the v2 shell exists (16_vista_3d.md §10.5). */
+const STAGE3D_V1 = stage3dInV1();
 
 /** The map and its data load on demand, outside the main bundle (02_arquitectura.md §7). */
 const MapView = lazy(() => import('../map/MapView'));
@@ -196,7 +200,11 @@ function ActiveView({ tab }: { tab: Tab | 'panel' }) {
         tab === 'panel' ? (
           <MetricsPanel model={d.model} mission={d.mission} scenario={scenario} />
         ) : tab === 'panorama' ? (
-          <Panorama model={d.model} mission={d.mission} scenario={scenario} />
+          STAGE3D_V1 ? (
+            <Stage3DV1 fallback={<Panorama model={d.model} mission={d.mission} scenario={scenario} />} />
+          ) : (
+            <Panorama model={d.model} mission={d.mission} scenario={scenario} />
+          )
         ) : tab === 'section' ? (
           <CrossSection model={d.model} scenario={scenario} />
         ) : (
