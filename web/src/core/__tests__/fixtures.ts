@@ -1,6 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Test helpers: the T-02 example files and a scripted fetch.
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { buildTable, type EphemerisMeta, type EphemerisTable } from '../ephemeris';
 
 const EXAMPLES = new URL('../../../../contract/examples/data/', import.meta.url);
 
@@ -30,4 +31,26 @@ export function fakeFetch(routes: Record<string, Reply | Reply[]>) {
     return new Response(body, { status: reply.status ?? 200 });
   };
   return { fetch: fn as typeof fetch, calls };
+}
+
+/** The T-02 synthetic ephemeris table (09 §13, D-56). */
+export function exampleTable(): EphemerisTable {
+  return buildTable(exampleJson<EphemerisMeta>('ephemeris.meta.json'), exampleBytes('ephemeris.bin'));
+}
+
+const ROOT = new URL('../../../../', import.meta.url);
+
+/** A file of the repository (tests/golden/…, web/public/data/…), or null if it does not exist. */
+export function repoFile(path: string): Uint8Array | null {
+  const url = new URL(path, ROOT);
+  return existsSync(url) ? new Uint8Array(readFileSync(url)) : null;
+}
+
+/** The real table published by T-06 in web/public/data, or null while it is synthetic or absent. */
+export function realTable(): EphemerisTable | null {
+  const metaBytes = repoFile('web/public/data/ephemeris.meta.json');
+  if (!metaBytes) return null;
+  const meta = JSON.parse(new TextDecoder().decode(metaBytes)) as EphemerisMeta;
+  if (meta.synthetic !== false) return null;
+  return buildTable(meta, repoFile('web/public/data/ephemeris.bin')!);
 }

@@ -68,6 +68,10 @@ fuente (CLAUDE.md §2).
 | `CF_MAX_FILES`, `CF_MAX_FILE_BYTES` (límites de Cloudflare Pages, plan gratuito; `deploy-heavy` se niega a publicar si se superan) | 20.000; 25 MiB (26.214.400) | ficheros; B | `02_arquitectura.md` §6.2 (documentación oficial de Cloudflare Pages, «Limits», en `SOURCES.md`) | `ops/tasks.mjs` |
 | `HEAVY_HEADERS` (fichero `_headers` del origen pesado) | `/*` → `Access-Control-Allow-Origin: *` | — | `02` §6.2; formato: documentación de Cloudflare Pages, «Headers» (`SOURCES.md`) | `ops/tasks.mjs` |
 | `heavy_base_url` por defecto de `deploy-heavy` | `https://aeroinformagicos-llsn-data.pages.dev` | — | D-45 (proyecto) y `<proyecto>.pages.dev` (documentación de Cloudflare Pages); `HEAVY_BASE_URL` lo cambia | `ops/tasks.mjs` |
+| Franjas del disco y cota inferior de cos(el) | 32 y 0,05 | — | `07_visibilidad.md` §4.1 | `web/src/core/visibility.ts` (`DISC_STRIPS`, `MIN_COS_EL`) |
+| Paso de búsqueda de cruces | 600 | s | `07_visibilidad.md` §6.1 | `web/src/core/events.ts` (`SCAN_STEP_S`) |
+| Horizonte de la cuenta atrás | 60 | días | `07_visibilidad.md` §7 | `web/src/core/metrics.ts` (`NEXT_EVENT_HORIZON_S`) |
+| Ley de muestreo `full` / `fast` (web) | 20 m × 1.000 + 1,001ⁿ (3.709) / 40 m × 500 + 1,002ⁿ (1.855) | m | `06_horizonte.md` §3 | `web/src/core/law.ts` (`LAWS`) |
 
 ## Valores medidos
 
