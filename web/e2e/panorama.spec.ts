@@ -59,7 +59,7 @@ test('smooth-Moon line and Terrain effect box (F4)', async ({ page }) => {
   const fx = page.getByRole('region', { name: 'Terrain effect' });
   await expect(fx).toContainText(/Sunlight: ([+−]\d+\.\d|0) h/);
   await expect(fx).toContainText(/Earth contact: ([+−]\d+\.\d|0) h/);
-  await expect(page.getByTestId('first-event-shift')).toHaveText(/^(Sunset|Sunrise): /);
+  await expect(page.getByTestId('first-event-shift')).toHaveText(/^(Sunset|Sunrise)(: | with terrain, )/);
 });
 
 test('loading and error states', async ({ page }) => {

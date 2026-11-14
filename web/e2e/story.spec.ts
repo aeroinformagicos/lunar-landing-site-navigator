@@ -2,10 +2,10 @@
 // T-30 end to end (F15, 10_interfaz.md §11): Learn walks the seven steps with `Next`, each showing its
 // view; keys ← → work; the last step offers `Try it yourself` and `Restart`; `Exit tour` on every step.
 import { expect, test } from '@playwright/test';
-import { sitesInfo } from './data';
+import { DAY, sitesInfo, utc } from './data';
 
 test('the seven steps with Next, then Try it yourself', async ({ page, request }) => {
-  const { pair } = await sitesInfo(request);
+  const { pair, landingUnix } = await sitesInfo(request);
   await page.goto('/');
   await expect(page.getByRole('article', { name: 'Scenario A' })).toBeVisible();
   await page.getByRole('tab', { name: 'Learn' }).click();
@@ -37,7 +37,7 @@ test('the seven steps with Next, then Try it yourself', async ({ page, request }
 
   await next();
   await expect(count).toHaveText('5 / 7');
-  await expect(page.getByText('Ranking for landing 2027-08-13 00:00 UTC')).toBeVisible();
+  await expect(page.getByText(`Ranking for landing ${utc(landingUnix + 12 * DAY)} UTC`)).toBeVisible();
 
   await next();
   await expect(count).toHaveText('6 / 7');

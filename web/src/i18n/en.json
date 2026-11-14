@@ -365,5 +365,15 @@
   "view.3d_unavailable": "The 3D view is not available on this device. Showing the 2D view.",
   "view.loading_3d": "Loading 3D view…",
   "shortcuts.view": "V: switch 3D / 2D view",
-  "shell.skip": "Skip to main view"
+  "shell.skip": "Skip to main view",
+  "stage.sun": "Sun",
+  "stage.earth": "Earth",
+  "stage.sun_behind_ridge": "Sun · behind the ridge",
+  "stage.sun_below": "Sun · below the horizon",
+  "stage.earth_below": "Earth · below the horizon",
+  "stage.margin": "margin {margin}",
+  "stage.eclipse": "Eclipse · Earth covers {pct} of the Sun",
+  "panel.horizon_detail": "Horizon detail",
+  "minimap.open": "Open the map",
+  "minimap.label": "South pole"
 }

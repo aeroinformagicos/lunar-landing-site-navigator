@@ -34,15 +34,16 @@ test('countdown matches the next event marker to the minute (F6)', async ({ page
   const marker = page.getByRole('button', { name: new RegExp(`^${m![1]}, `) }).first();
   const t = Number(await marker.getAttribute('data-t'));
   expect(Math.abs(t - cursor - seconds)).toBeLessThan(60);
-  // Clicking the marker moves the cursor there and the countdown flips.
-  await marker.click();
+  // Activating the marker moves the cursor there and the countdown flips. The event can fall after the
+  // drawn interval (it is searched 60 days ahead), so the click goes to the button itself.
+  await marker.dispatchEvent('click');
   await expect(page.getByTestId('sun-countdown')).not.toHaveText(countdown);
 });
 
 test('panel: three figures with unit, help and source (F7)', async ({ page }) => {
   const panel = page.getByRole('complementary', { name: 'Mission figures' });
   await expect(panel.getByText(/^\d+(\.\d)? h · (\d+|<1|>99) %$/).first()).toBeVisible();
-  await expect(panel.getByText('Longest night')).toBeVisible();
+  await expect(panel.getByText('Longest night', { exact: true })).toBeVisible(); // the verdict sentence also says «longest night»
   await panel.getByRole('button', { name: 'About Sunlight' }).click();
   await expect(panel.getByText(/Source: JPL DE440 ephemeris and LOLA terrain\./)).toBeVisible();
   await expect(panel.getByText(/^Rise and set times are only as accurate as the terrain map\./)).toBeVisible();

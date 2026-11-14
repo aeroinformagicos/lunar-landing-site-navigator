@@ -19,9 +19,14 @@ function storage(): KeyStore | null {
   }
 }
 
-/** A URL carries state when its fragment or query is not empty (`#/validation` included). */
+/** Query parameters that choose the interface, not shared state (15_interfaz_v2.md §10, §4.1). */
+const UI_PARAMS = new Set(['ui', 'vm']);
+
+/** A URL carries state when its fragment is not empty (`#/validation` included) or its query has
+ * anything besides the interface choice (`?ui=v2`, `?vm=2d`). */
 export function urlHasState(hash: string, search: string): boolean {
-  return (hash !== '' && hash !== '#') || (search !== '' && search !== '?');
+  if (hash !== '' && hash !== '#') return true;
+  return [...new URLSearchParams(search).keys()].some((k) => !UI_PARAMS.has(k));
 }
 
 export function shouldWelcome(hash: string, search: string, store: KeyStore | null = storage()): boolean {

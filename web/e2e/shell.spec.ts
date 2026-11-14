@@ -3,7 +3,7 @@
 // keyboard navigation through header and cards, site picker, 4-scenario limit, date validation,
 // custom coordinates in Plan, playback.
 import { expect, test } from '@playwright/test';
-import { sitesInfo } from './data';
+import { DAY, HOUR, sitesInfo, utc } from './data';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -13,15 +13,16 @@ test.beforeEach(async ({ page }) => {
 test('opens with the demo pair; the example banner follows the manifest', async ({ page, request }) => {
   const manifest = await (await request.get('/data/manifest.json')).json();
   await expect(page.getByText('Example data — not for use')).toHaveCount(manifest.ephemeris.synthetic ? 1 : 0);
-  const { pair } = await sitesInfo(request);
+  const { pair, landingUnix } = await sitesInfo(request);
   await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText(pair[0].short_name);
   await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText(pair[1].short_name);
-  await expect(page.getByLabel('Landing (UTC)')).toHaveValue('2027-08-01T00:00');
+  await expect(page.getByLabel('Landing (UTC)')).toHaveValue(utc(landingUnix).replace(' ', 'T'));
   await expect(page.getByLabel('Mission', { exact: true })).toHaveValue('14');
-  await expect(page.getByText('Day 0, 00:00 · 2027-08-01 00:00 UTC')).toBeVisible();
+  await expect(page.getByText(`Day 0, 00:00 · ${utc(landingUnix)} UTC`)).toBeVisible();
 });
 
-test('keyboard: Tab reaches the header, the cards and the tabs; shortcuts work', async ({ page }) => {
+test('keyboard: Tab reaches the header, the cards and the tabs; shortcuts work', async ({ page, request }) => {
+  const { landingUnix } = await sitesInfo(request);
   await page.getByRole('link', { name: 'Lunar Landing Site Navigator' }).focus();
   const seen: string[] = [];
   for (let i = 0; i < 40; i++) {
@@ -46,20 +47,21 @@ test('keyboard: Tab reaches the header, the cards and the tabs; shortcuts work',
   await page.keyboard.press('2');
   await expect(page.getByRole('tab', { name: 'Timeline' })).toHaveAttribute('aria-selected', 'true');
   await page.keyboard.press(']');
-  await expect(page.getByText('Day 0, 01:00 · 2027-08-01 01:00 UTC')).toBeVisible();
+  await expect(page.getByText(`Day 0, 01:00 · ${utc(landingUnix + HOUR)} UTC`)).toBeVisible();
   await page.keyboard.press('?');
   await expect(page.getByRole('dialog', { name: 'Keyboard shortcuts' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
-test('slider: arrows ±10 min, PageUp +1 day; ±1 hour buttons', async ({ page }) => {
+test('slider: arrows ±10 min, PageUp +1 day; ±1 hour buttons', async ({ page, request }) => {
+  const { landingUnix } = await sitesInfo(request);
   const slider = page.getByLabel('Time within mission');
   await slider.focus();
   await page.keyboard.press('ArrowRight');
-  await expect(page.getByText('Day 0, 00:10 · 2027-08-01 00:10 UTC')).toBeVisible();
+  await expect(page.getByText(`Day 0, 00:10 · ${utc(landingUnix + 600)} UTC`)).toBeVisible();
   await page.keyboard.press('PageUp');
-  await expect(page.getByText('Day 1, 00:10 · 2027-08-02 00:10 UTC')).toBeVisible();
+  await expect(page.getByText(`Day 1, 00:10 · ${utc(landingUnix + DAY + 600)} UTC`)).toBeVisible();
   await page.getByRole('button', { name: 'Forward 1 hour' }).click();
   await expect(page.getByText('Day 1, 01:10')).toBeVisible();
 });

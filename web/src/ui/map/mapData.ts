@@ -5,6 +5,8 @@ import { decodeChunk, maskOfCell, type Chunk } from '../../core/cube';
 import { chunkFileName, chunkOfCell, gridMatches, GRID, latLonOfCell } from '../../core/grid';
 import { DataError, joinUrl, type Loader } from '../../core/loaders';
 import type { Mask } from '../../core/horizon';
+import { UI_VERSION } from '../shell/uiVersion';
+import { oklabRamp } from '../shell/horizon2d';
 
 export const LAYER_BYTES = 3 * GRID.nx * GRID.ny; // 1,516,032
 export const DEM_BYTES = 2 * GRID.nx * GRID.ny; // 1,010,688
@@ -113,7 +115,16 @@ export function rampStep(v: number): number | null {
   return Math.min(10, Math.floor((v * PCT_PER_UNIT) / 10 + 0.5));
 }
 
-export function rampColour(step: number, band: Band): [number, number, number] {
+/** v2 ramps (15_interfaz_v2.md §7.5, D-103): from --c-bg-1 to the v2 concept colours, in OKLab. */
+const RAMP_FROM_V2: [number, number, number] = [0x16, 0x20, 0x32];
+export const BAND_COLOUR_V2: Record<Band, [number, number, number]> = {
+  sun: [0xf5, 0x9e, 0x0b],
+  earth: [0x38, 0xbd, 0xf8],
+  both: [0x2d, 0xd4, 0xbf],
+};
+
+export function rampColour(step: number, band: Band, palette: 'v1' | 'v2' = UI_VERSION): [number, number, number] {
+  if (palette === 'v2') return oklabRamp(RAMP_FROM_V2, BAND_COLOUR_V2[band], step);
   const to = BAND_COLOUR[band];
   return [0, 1, 2].map((k) => Math.round(RAMP_FROM[k] + ((to[k] - RAMP_FROM[k]) * step) / 10)) as [number, number, number];
 }
