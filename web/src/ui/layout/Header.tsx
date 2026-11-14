@@ -74,7 +74,7 @@ export function Header({ onReset }: { onReset: () => void }) {
 }
 
 /** Copies the page URL, whose fragment carries the state (F16, 10 §10); without clipboard, shows it. */
-function ShareButton() {
+export function ShareButton() {
   const [state, setState] = useState<'idle' | 'copied' | 'manual'>('idle');
 
   async function share() {

@@ -11,10 +11,14 @@ import { BootContext } from './ui/common/data';
 import { DataState, useResource } from './ui/common/DataState';
 import { AppLayout } from './ui/layout/AppLayout';
 import { routeOf } from './ui/validation/report';
+import { UI_VERSION } from './ui/shell/uiVersion';
 
 // Loaded on demand to keep the main bundle under 350 kB (02_arquitectura.md §7).
 const ValidationPage = lazy(() => import('./ui/validation/ValidationPage').then((m) => ({ default: m.ValidationPage })));
 const StoryOverlay = lazy(() => import('./ui/story/StoryOverlay').then((m) => ({ default: m.StoryOverlay })));
+// The v2 interface (15_interfaz_v2.md) loads only with `?ui=v2` until T-63 makes it the default.
+const ShellV2 = lazy(() => import('./ui/shell/ShellV2'));
+const V2 = UI_VERSION === 'v2';
 
 function bootError(error: Error): string {
   return error instanceof DataError && (error.kind === 'contract' || error.kind === 'format')
@@ -61,7 +65,7 @@ export function App() {
   const synthetic = boot.status === 'ready' && boot.data.manifest.ephemeris.synthetic;
 
   return (
-    <div className="app">
+    <div className={V2 ? 'app ui-v2' : 'app'}>
       {synthetic && (
         <div className="banner banner--example" role="note">
           {t('banner.example')}
@@ -83,6 +87,10 @@ export function App() {
                 <Suspense fallback={<p className="data-state data-state--loading">{t('validation.loading')}</p>}>
                   <ValidationPage />
                 </Suspense>
+              ) : V2 ? (
+                <Suspense fallback={<p className="data-state data-state--loading">{t('common.loading')}</p>}>
+                  <ShellV2 />
+                </Suspense>
               ) : (
                 <AppLayout />
               )}
@@ -95,7 +103,8 @@ export function App() {
           ) : null
         }
       </DataState>
-      <footer className="app__footer">
+      {/* The v2 shell carries the credits in its bottom line (15 §2.4); the validation page keeps this footer. */}
+      <footer className="app__footer" hidden={V2 && route !== 'validation'}>
         <p>{t('footer.credit')}</p>
         <p>{t('about.ai')}</p>
       </footer>

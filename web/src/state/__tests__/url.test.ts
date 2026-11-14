@@ -90,8 +90,17 @@ describe('restoreFromHash: the example of 10 §10', () => {
     expect(r.state.requirements).toMatchObject({ maxNightHours: 24, needSunAtLanding: true, needEarthAtLanding: true });
   });
 
-  it('writes the example back with the same JSON', () => {
-    expect(toLinkState(restore(SPEC_EXAMPLE).state)).toEqual(SPEC_EXAMPLE);
+  it('writes the example back with the same JSON, plus the view mode (vm, 15_interfaz_v2.md §4.1)', () => {
+    // The example predates `vm`: restored with the device default (2D without WebGL 2 here).
+    expect(toLinkState(restore(SPEC_EXAMPLE).state)).toEqual({ ...SPEC_EXAMPLE, vm: '2d' });
+  });
+
+  it('vm: 2d is kept, 3d needs a device that can show it, anything else is dropped with the notice', () => {
+    expect(restore({ ...SPEC_EXAMPLE, vm: '2d' }).state.viewMode).toBe('2d');
+    expect(restore({ ...SPEC_EXAMPLE, vm: '3d' }).state.viewMode).toBe('2d'); // no WebGL 2 in the test runner
+    const bad = restore({ ...SPEC_EXAMPLE, vm: 'vr' });
+    expect(bad.partial).toBe(true);
+    expect(bad.state.viewMode).toBe('2d');
   });
 });
 
