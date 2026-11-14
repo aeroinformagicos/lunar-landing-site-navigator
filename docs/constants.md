@@ -445,6 +445,31 @@ Valores medidos (portátil de I1, RTX 4060 Laptop, PyTorch 2.15.0+cu132; tabla r
 | Centro de Shackleton en N1 / N5 | 0 / +20.000 | 0 / +20.000 | `03` §6 |
 | Celda de Shackleton (415, 380), media 3 × 3 de N1 | 0 % (± 1) | Sombra permanente | `03` §6 |
 
+### T-31 · Elección del par de la demo (2026-11-14)
+
+Constantes nuevas (`pipeline/vis/demo.py` y `pipeline/tests/test_pick_demo.py`):
+
+| Nombre | Valor | Fuente |
+| --- | --- | --- |
+| `FIRST_MONTH`, `LAST_MONTH` | 2027-01; 2028-12 | `04_catalogo_sitios.md` §5.1, paso 2 |
+| `MIN_BOTH_A_PCT`, `MAX_BOTH_B_PCT` | 60 %; 10 % | `04` §5.1, paso 2 |
+| `MAX_PAIR_DIST_M`, `RELAXED_PAIR_DIST_M` | 1.000 m (2 celdas); 2.000 m | `04` §5.1, paso 2 y relajaciones |
+| `N_PAIRS` | 5 | `04` §5.1, paso 3 |
+| `SEARCH_STEP_S`, `DELAY_DAYS`, `RELAXED_DELAY_DAYS` | 6 h; 12 d; 10–16 d (cada 6 h, la más cercana a 12 d primero) | `04` §5.1, paso 4 y relajaciones; D-108 |
+| `MISSION_DAYS`, `OBSERVER_HEIGHTS_M`, `LAW` | 14 d; 2 y 10 m; `full` | `04` §5.1, pasos 3 y 4 |
+| `PAIR_RELIEF` | `lola_polar` | El relieve de las regiones candidatas del catálogo (`04` §3) |
+| `LATLON_DECIMALS` (coordenadas de A y B) | 5 | Como `horizon/<site>.json` (`06` §5); D-108 |
+
+Cifras medidas con los datos reales (cubo completo, capas `computed`, 2026-11-14):
+
+| Medida | Valor |
+| --- | --- |
+| Parejas que cumplen el paso 2 a ≤ 1.000 m | 103 (57 con su mejor mes en 2028-10) |
+| Media de «ambos» en las celdas de regiones, 2027-01 … 2028-12 | 11,5 % (2027-05) … 33,7 % (2028-10) |
+| Parejas con fecha sin relajar / con relajación 1 / sin fecha | 3 / 1 / 1 |
+| Evaluaciones completas de `assess` | 484 |
+| Duración de `pick-demo` | 451 s |
+
 ## T-05 · Valores de referencia de Horizons (A1, A2)
 
 | Constante | Valor | Fuente |
