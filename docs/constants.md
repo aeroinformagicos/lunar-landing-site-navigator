@@ -267,6 +267,50 @@ Medido con los cuatro núcleos de `$LLSN_DATA_DIR/kernels` y la tabla publicada:
 | Ídem, diámetro aparente (9 filas) | 0,0033″ | < 0,05″ | D-76 e |
 | `test_ephem_table.py` (24 pruebas) ejecutada sola | 0,8 s | — | — |
 
+### T-10 · Referencia de visibilidad en Python (2026-11-14)
+
+Constantes nuevas (`pipeline/vis/`, `pipeline/tests/test_vis_*.py`, `test_b3_eclipse.py`):
+
+| Nombre | Valor | Fuente |
+| --- | --- | --- |
+| `DISC_STRIPS`, `MIN_COS_EL` (franjas del disco y cota inferior de cos(el)) | 32; 0,05 | `07_visibilidad.md` §4.1 (mismos valores que `web/src/core/visibility.ts`) |
+| `ANY_COLUMNS` (columnas del criterio «cualquier fracción», en radios del disco) | −0,8; −0,4; 0; 0,4; 0,8 | `07` §4.2 |
+| `SCAN_STEP_S` (paso de búsqueda de cruces) | 600 s | `07` §6.1 (mismo valor que `web/src/core/events.ts`) |
+| `FORMULA_ARGS` (máscaras por fórmula: `flat`, `tilt`, `sine`) | 1; 1; 2 argumentos | `07` §12.3 |
+| `DEG` | π/180 | Definición del grado; escrito como en `web/src/core/eclipse.ts` (D-89 b) |
+| `RHO_SUN`, `RHO_EARTH` / `A`, `B` (radios aparentes de las pruebas) | 0,265°; 0,95° | `07` §13.2 y §13.5 |
+| `SEGMENT_TOL` / `DISC_TOL` (32 franjas frente al segmento circular exacto) | 0,003 | `07` §13.2 |
+| Tabla de `horizon_at` (máscara `el[j] = j`) | 0,25 → 0,5; 359,75 → 359,5; 360 → 0; −0,5 → 719 | `07` §13.1 |
+| Luna lisa a 2 m: elevación y distancia de tangencia | −0,0869°; 2.636 m | `06_horizonte.md` §9 |
+| Puesta lisa de Blue Ghost 1 (18,56° N, 61,81° E), 0 m; tolerancia | 2025-03-16T20:10:39Z; ± 10 s | `07` §13.3 (Horizons, `05` §8.3) |
+| Salida lisa en el sitio previsto de IM-2 (84,78° S, 29,13° E), 0 m; tolerancia | 2025-03-04T09:14:10Z; ± 20 s | `07` §13.3 (Horizons, `05` §8.3) |
+| Puesta lisa de Blue Ghost 1 con el observador a 2 m; tolerancia | 2025-03-16T20:21:31Z; ± 15 s | `07` §13.3 |
+| Filas de Horizons del Sol y la Tierra en Blue Ghost 1 (18:15, 20:10 y 20:11 del 16/03/2025); `TABLE_TOL_DEG` | Tabla de `05` §8.3; 0,001° | `05_efemerides.md` §8.3 |
+| B3: sitio, cifras de comprobación del plan y tolerancia de regresión | 18,562° N, 61,810° E, 0 m; 05:01, 06:17:30, 08:34:00 y 09:51 UTC del 14/03/2025; ± 60 s | `07` §13.4; `11_validacion.md` §4 (B3) |
+| B3: horas de Firefly y tolerancia | `tests/golden/events_published.csv`; `B3_min` = 5 min de `tolerances.json` | `11` §1 y §3 |
+| B3: instante con el Sol tapado del todo | 2025-03-14T07:30:00Z | `07` §13.4 |
+| Lente de dos discos unidad a distancia 1 (prueba del solape) | 2π/3 − √3/2 | Geometría elemental (dos segmentos circulares de 120°) |
+| Día lunar en Blue Ghost 1 (prueba de ventanas): medio mes sinódico; holgura | 14,77 d; ± 0,1 d | Mes sinódico de 29,53 d (`09` §13); `07` §13.7 («la noche dura unos 14,8 días») |
+| (−89,9°, 0°): sitio donde la Tierra sale y se pone (prueba de `find_events`) | \|elevación de la Tierra\| < 7,5° | `07` §13.6 |
+
+Medido con la tabla publicada (`web/public/data/ephemeris.bin`) y los cuatro núcleos:
+
+| Qué | Valor medido | Esperado | Fuente del esperado |
+| --- | --- | --- | --- |
+| Puesta lisa de Blue Ghost 1, 0 m | 2025-03-16T20:10:39Z (0 s) | 20:10:39 ± 10 s | `07` §13.3 |
+| Salida lisa en el sitio previsto de IM-2, 0 m | 2025-03-04T09:14:10Z (0 s) | 09:14:10 ± 20 s | `07` §13.3 |
+| Puesta lisa de Blue Ghost 1, observador a 2 m | 2025-03-16T20:21:31Z (0 s) | 20:21:31 ± 15 s | `07` §13.3 |
+| A2 (7 cruces de marzo de 2025 en `apollo-11`, `blue-ghost-1` y `change-3`): máximo de \|Δt\| | 0,5 s | < 5 min; esperado < 15 s | `11` §4 (A2) |
+| B3 sobre la tabla: inicio, totalidad y fin | 05:00:46; 06:17:27–08:34:27; 09:51:13 UTC | 05:01; 06:17:30–08:34:00; 09:51 (± 60 s) | `07` §13.4 |
+| B3: máximo de \|Δt\| frente al plan / frente a Firefly | 27 s / 47 s | 60 s / 5 min | `07` §13.4; `tolerances.json` |
+| B3 solo con SPICE (`spkcpo`, sin tabla) frente a la tabla | Los cuatro sucesos iguales al segundo | — | — |
+| Python frente al núcleo de la web (comprobación de la sesión, no versionada): `horizon_at`, 460 casos | 3·10⁻¹⁷° | 10⁻⁶° | `07` §12.4 |
+| Ídem, `disc_fraction`, 1.500 casos (6 máscaras reales y 4 por fórmula) | 0 (idénticos) | 10⁻⁶ | `07` §12.4 |
+| Ídem, `evaluate`, 1.925 casos (6 sitios reales a 2 m y 10 m, y el eclipse de B3: 56 parciales y 47 totales) | Ángulos 7·10⁻¹³°; fracciones 8·10⁻¹⁴; distancias 0 km; estados idénticos | 10⁻⁶°; 10⁻⁶; 10⁻³ km | `07` §12.4 |
+| Ídem, sucesos y ventanas, 13 intervalos de 45 a 61 días (138 sucesos) | Iguales al segundo | ± 1 s | `07` §12.4 |
+| Coste en Python: `sky_at` / `evaluate` | 31 µs / 39 µs | — | — |
+| Las 86 pruebas nuevas, ejecutadas solas | 1,5 s | — | — |
+
 ## T-05 · Valores de referencia de Horizons (A1, A2)
 
 | Constante | Valor | Fuente |
