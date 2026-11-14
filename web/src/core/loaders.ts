@@ -10,7 +10,9 @@ import {
   EPHEMERIS_BYTES,
   N_AZ,
   NETWORK_RETRY_DELAY_MS,
+  PROFILE_BYTES,
 } from './constants';
+import { lawNSamples, type LawName } from './law';
 import { maybeGunzip } from './gz';
 import type { AppConfig, BootData, HorizonFile, Manifest, Resource, SitesFile } from './types';
 
@@ -144,6 +146,46 @@ export function checkBinary(url: string, bytes: Uint8Array, check: BinaryCheck):
   return bytes;
 }
 
+/** Terrain profile of a site (09_contrato_datos.md §6): heights per azimuth (720) and bin (512). */
+export interface Profile {
+  law: LawName;
+  nSamples: number;
+  nBins: number;
+  siteHeightM: number;
+  observerHeightM: number;
+  /** int16[720][512], metres; PROFILE_NODATA = no data. */
+  heightM: Int16Array;
+}
+
+export const PROFILE_MAGIC = 'LLSNPRF1';
+export const PROFILE_NODATA = -32768;
+const PROFILE_HEADER_BYTES = 32;
+
+/** Decodes a decompressed profile (09 §6), checking every header field. */
+export function decodeProfile(url: string, bytes: Uint8Array): Profile {
+  checkBinary(url, bytes, { bytes: PROFILE_BYTES, magic: PROFILE_MAGIC });
+  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const u16 = (o: number) => dv.getUint16(o, true);
+  if (u16(8) !== CONTRACT_MAJOR) throw new DataError('contract', url, `Profile contract version ${u16(8)}`);
+  const nAz = u16(12);
+  const nBins = u16(14);
+  const lawId = u16(16);
+  const nSamples = u16(18);
+  const law: LawName | null = lawId === 1 ? 'full' : lawId === 2 ? 'fast' : null;
+  if (nAz !== N_AZ || nBins !== 512) fail(url, `Profile of ${nAz} × ${nBins}, expected ${N_AZ} × 512`);
+  if (!law) fail(url, `Unknown law_id ${lawId}`);
+  if (nSamples !== lawNSamples(law)) fail(url, `n_samples ${nSamples} does not match law ${law}`);
+  const aligned = bytes.byteOffset % 2 === 0 ? bytes : bytes.slice();
+  return {
+    law,
+    nSamples,
+    nBins,
+    siteHeightM: dv.getFloat32(20, true),
+    observerHeightM: dv.getFloat32(24, true),
+    heightM: new Int16Array(aligned.buffer, aligned.byteOffset + PROFILE_HEADER_BYTES, N_AZ * nBins),
+  };
+}
+
 export function createLoader(options: LoaderOptions = {}) {
   const doFetch = options.fetch ?? ((input, init) => globalThis.fetch(input, init));
   const retryDelayMs = options.retryDelayMs ?? NETWORK_RETRY_DELAY_MS;
@@ -246,6 +288,13 @@ export function createLoader(options: LoaderOptions = {}) {
   const loadSites = (base: string) => json(joinUrl(base, 'sites.json'), validateSites);
   const loadHorizon = (base: string, siteId: string) =>
     json(joinUrl(base, `horizon/${siteId}.json`), (url, j) => validateHorizon(url, j, siteId));
+  /** `profile/<site>.bin.gz` (or the `file` named by the horizon file), decompressed and decoded. */
+  const loadProfile = (base: string, file: string) => {
+    const url = joinUrl(base, file);
+    return cached(`profile:${url}`, async () =>
+      decodeProfile(url, await binary(url, { bytes: PROFILE_BYTES, magic: PROFILE_MAGIC, gzip: true })),
+    );
+  };
   const loadEphemerisBytes = (base: string, manifest: Manifest) =>
     binary(joinUrl(base, manifest.ephemeris.file), { bytes: manifest.ephemeris.bytes });
 
@@ -265,6 +314,7 @@ export function createLoader(options: LoaderOptions = {}) {
     loadSites,
     loadHorizon,
     loadEphemerisBytes,
+    loadProfile,
     loadBoot,
     /** Generic loaders for later tasks (profile, layers, cube…), same cache and checks. */
     json,

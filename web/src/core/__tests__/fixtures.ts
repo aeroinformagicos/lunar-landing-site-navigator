@@ -54,3 +54,17 @@ export function realTable(): EphemerisTable | null {
   if (meta.synthetic !== false) return null;
   return buildTable(meta, repoFile('web/public/data/ephemeris.bin')!);
 }
+
+/**
+ * Best of `rounds` timings of `fn` (milliseconds). Budgets (07 §11) are checked on the best round:
+ * Vitest runs test files in parallel, and a round that shares the CPU measures the machine, not the code.
+ */
+export function bestTimeMs(fn: () => void, rounds = 5): number {
+  let best = Infinity;
+  for (let r = 0; r < rounds; r++) {
+    const start = performance.now();
+    fn();
+    best = Math.min(best, performance.now() - start);
+  }
+  return best;
+}
