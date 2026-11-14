@@ -95,6 +95,11 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("regions", help="map/regions.json from the catalog into <out>/heavy/map")
     pub = sub.add_parser("publish", help="copy <out>/light to web/public/data and write manifest.json")
     pub.add_argument("--web-dir", type=Path, default=None, help="default: web/public/data")
+    vec = sub.add_parser(
+        "core-vectors", help="tests/golden/core_vectors.json: shared Python -> TypeScript vectors (07 §12.3)"
+    )
+    vec.add_argument("--web-dir", type=Path, default=None, help="light data; default: web/public/data")
+    vec.add_argument("--out", type=Path, default=None, help="default: tests/golden/core_vectors.json")
     rep = sub.add_parser(
         "report", help="validation_report.json from <out>/test_results and docs/manual_checks.json (11 §7.1)"
     )
@@ -497,6 +502,25 @@ def cmd_publish(args: argparse.Namespace) -> int:
     return contract_check.main([web])
 
 
+def cmd_core_vectors(args: argparse.Namespace) -> int:
+    """Shared vectors written by the Python reference (07_visibilidad.md §12.3)."""
+    from pipeline.vis import vectors
+
+    web = args.web_dir if args.web_dir is not None else WEB_DATA_DIR
+    out = args.out if args.out is not None else REPO_ROOT / "tests" / "golden" / "core_vectors.json"
+    t0 = time.perf_counter()
+    try:
+        doc = vectors.build_vectors(web)
+    except (OSError, ValueError, KeyError) as exc:
+        print(f"core-vectors: {exc}")
+        return 1
+    path = vectors.write_vectors(doc, out)
+    n = sum(len(v) for k, v in doc.items() if isinstance(v, list))
+    print(f"{n} cases in {len(vectors.BLOCKS)} blocks written to {path} ({path.stat().st_size / 1e6:.2f} MB, "
+          f"{time.perf_counter() - t0:.0f} s)")
+    return 0
+
+
 def cmd_report(args: argparse.Namespace) -> int:
     """Gather the recorded cases into validation_report.json and check the contract (09 §7)."""
     from pipeline.cli import contract_check, report
@@ -544,6 +568,7 @@ def main(argv: list[str] | None = None) -> int:
         "sites": cmd_sites,
         "regions": cmd_regions,
         "publish": cmd_publish,
+        "core-vectors": cmd_core_vectors,
         "report": cmd_report,
         "check-contract": cmd_check_contract,
     }
