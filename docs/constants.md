@@ -470,6 +470,27 @@ Cifras medidas con los datos reales (cubo completo, capas `computed`, 2026-11-14
 | Evaluaciones completas de `assess` | 484 |
 | Duración de `pick-demo` | 451 s |
 
+### T-34 · Máscaras compactas (2026-11-14)
+
+Constantes nuevas (`pipeline/horizon/compact.py` y `pipeline/tests/test_compact.py`):
+
+| Nombre | Valor | Fuente |
+| --- | --- | --- |
+| `MAGIC`, `HEADER` | `LLSNCMP1`; cabecera de 32 B | `09_contrato_datos.md` §11 |
+| `N_AZ_COMPACT`, `STEP_CDEG` | 180 acimuts; paso de 200 centésimas de grado (2°) | `09` §11 |
+| `WINDOW` | 2 acimuts completos a cada lado de `4·b` (± 1°) | `09` §11, `el_q[b] = max(q[(4b + m) mod 720], m = −2…2)` |
+| `OVERVIEW_STEP` | 4 (un punto de cada 4 en cada dirección; i, j = 0, 4, 8, …) | `09` §11; el origen en 0 es D-109 |
+| `REGION_NONE` | 255 | `09` §11 |
+| `REGION_POINTS`, `OVERVIEW_POINTS` (pruebas) | 10.252; 188 × 168 = 31.584 | `09` §11 |
+
+Cifras medidas:
+
+| Medida | Valor |
+| --- | --- |
+| Puntos por región con las cajas del catálogo | de Gerlache Rim 2 484, Haworth 1.156, Malapert Massif 576, Mons Mouton 324, Mons Mouton Plateau 5.776, Nobile Rim 1 484, Nobile Rim 2 484, Peak near Cabeus B 484, Slater Plain 484 (total 10.252, sin solapes) |
+| `regions` sin comprimir | 32 + 368 · 10.252 = 3.772.768 B |
+| Leer y compactar un trozo del cubo | ~6 ms → ~12 s para los 1.974 trozos (estimado con un trozo sintético) |
+
 ## T-05 · Valores de referencia de Horizons (A1, A2)
 
 | Constante | Valor | Fuente |

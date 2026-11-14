@@ -1569,7 +1569,7 @@
   bottom: calc(var(--bottom-h, 200px) + 8px);
 }
 
-/* ---- Phones (< 768 px): one column, 2D, panels inline (15 §9, simplified, D-107) ---- */
+/* ---- Phones (< 768 px): one column, 2D, panels inline (15 §9, simplified, D-111) ---- */
 @media (max-width: 767px) {
   .ui-v2 {
     height: auto;

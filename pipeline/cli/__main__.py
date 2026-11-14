@@ -110,6 +110,13 @@ def build_parser() -> argparse.ArgumentParser:
     layers.add_argument("--block-steps", type=int, default=None, help="hourly steps per block (default 512)")
     layers.add_argument("--force", action="store_true", help="recompute every chunk, not only the new ones")
     layers.add_argument("--web-dir", type=Path, default=None, help="ephemeris; default: web/public/data")
+    comp = sub.add_parser(
+        "compact", help="compact masks compact/regions.bin.gz from the cube into <out>/heavy (09 §11)"
+    )
+    comp.add_argument(
+        "--overview", action="store_true",
+        help="also compact/overview.bin.gz (1 point in 4 per direction; points not in the cube are left out)",
+    )
     sub.add_parser("hillshade", help="map/hillshade_250m.png and map/dem_500m.bin.gz from P2 (08 §6)")
     sub.add_parser(
         "compare-nasa", help="mean186_any vs the NASA AVGVISIB maps: case B7 and its two figures (08 §8)"
@@ -570,6 +577,30 @@ def cmd_layers(args: argparse.Namespace) -> int:
     return 1 if summary.bad else 0
 
 
+def cmd_compact(args: argparse.Namespace) -> int:
+    """Compact masks of the region boxes (and, with --overview, of the coarse mesh) from the cube."""
+    from pipeline.horizon import compact, cube
+
+    cube_dir = cube.cube_dir_of(out_dir(args))
+    if not (cube_dir / "done.bin").is_file():
+        print(f"compact: {cube_dir / 'done.bin'} does not exist: run make cube first")
+        return 1
+    out = compact.compact_dir_of(out_dir(args))
+    sources = ("regions", "overview") if args.overview else ("regions",)
+    for source in sources:
+        t0 = time.perf_counter()
+        try:
+            path, r = compact.run_compact(cube_dir, out, source)
+        except (OSError, EOFError, ValueError) as exc:
+            print(f"compact {source}: {exc}")
+            return 1
+        missing = f", {r.n_missing} left out (not in the cube)" if r.n_missing else ""
+        print(f"compact {source}: {r.n_points} points{missing}, law {r.law}, {r.chunks_read} chunks; "
+              f"{path} ({path.stat().st_size} B, {len(r.data)} B uncompressed) in "
+              f"{time.perf_counter() - t0:.1f} s")
+    return 0
+
+
 def cmd_hillshade(args: argparse.Namespace) -> int:
     """Hillshade and 500 m heights of the map background from P2 (08 §6), plus map/grid.json."""
     from pipeline.dem.grids import read_pds_image
@@ -756,6 +787,7 @@ def main(argv: list[str] | None = None) -> int:
         "sites": cmd_sites,
         "regions": cmd_regions,
         "layers": cmd_layers,
+        "compact": cmd_compact,
         "hillshade": cmd_hillshade,
         "compare-nasa": cmd_compare_nasa,
         "pick-demo": cmd_pick_demo,
