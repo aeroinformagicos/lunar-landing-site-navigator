@@ -232,3 +232,28 @@ Medido con los cuatro núcleos de `$LLSN_DATA_DIR/kernels` y la tabla publicada:
 | `sky_at` frente a las 15 filas de Horizons: máximo de \|Δaz\| y \|Δel\| | 0,0000181° | < 0,001° | `05` §8.3 |
 | Ídem, diámetro aparente (9 filas) | 0,0033″ | < 0,05″ | D-76 e |
 | `test_ephem_table.py` (24 pruebas) ejecutada sola | 0,8 s | — | — |
+
+## T-05 · Valores de referencia de Horizons (A1, A2)
+
+| Constante | Valor | Fuente |
+| --- | --- | --- |
+| Tolerancias de `tests/golden/tolerances.json` | Las 16 cifras del §1 | `11_validacion.md` §1 (copiadas sin cambios) |
+| `API_VERSION`, líneas obligatorias de la cabecera | `1.2`; `MEAN_ME`, radios 1737,4 km, `NO (AIRLESS)` | `11` §2.2 |
+| `MIN_INTERVAL_S`, `RETRY_WAIT_S` | 1 s entre consultas; 10 s tras un error HTTP | `11` §2.2 |
+| `MAX_ATTEMPTS` | 4 | Elegido (D-80 e); no afecta a ningún valor |
+| Sitios, instantes y consultas de A1 y A2 | 8 sitios × 8 instantes; 3 sitios, marzo de 2025, 1 h y 1 min, ±60 min | `11` §2.3 y §2.4 |
+| `A1_EXPECTED_MAX_DEG` | 0,001° (se informa, no es el criterio) | `11` §4, A1 |
+| `BG1_SUNSET`, `BG1_SUNSET_TOL_S` | 2025-03-16T20:10:39Z; 1 s (la cifra tiene resolución de 1 s) | `05` §8.3, `11` §2.4 |
+| `FINE_ROWS` | 121 | `11` §2.4 (de −60 a +60 min con paso de 1 min) |
+| `STEP_S` de A2 | 600 s | `07` §6.2 (paso por defecto de `find_crossings`) |
+| `A2_EXPECTED_MAX_S` | 15 s (se informa) | `11` §4, A2 |
+
+Medido (`make golden`, 2026-11-14, 27 s con 26 consultas):
+
+| Qué | Valor medido | Esperado |
+| --- | --- | --- |
+| A1, `azel_spice` frente a Horizons, 128 filas: máximo de \|Δaz\|·cos(el); de \|Δel\| | 5,7·10⁻⁷°; 5,5·10⁻⁷° | < 0,02° (tolerancia); < 0,001° (esperado) |
+| A1, tabla (`sky_at`) frente a Horizons: ídem | 1,2·10⁻⁶°; 2,5·10⁻⁵° | < 0,02° |
+| A2, puesta lisa de Blue Ghost 1 (interpolación lineal de Horizons) | 2025-03-16T20:10:39,07Z | 20:10:39 |
+| A2 con una `find_crossings` provisional (pseudocódigo de `07` §6.2, solo en la sesión, no integrada) | 0,5 s de diferencia máxima | < 5 min; < 15 s esperado |
+

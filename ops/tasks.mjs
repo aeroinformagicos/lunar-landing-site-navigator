@@ -262,6 +262,13 @@ const tasks = {
     }
     console.log('Commit web/public/config.json so that the next deployment of the app uses it (T-39).');
   },
+  // JPL Horizons reference values of cases A1 and A2 into tests/golden (11_validacion.md §2, T-05),
+  // then cases A1 and A2 against them. Needs network; 2-4 min. A1 reviews the files before merging.
+  golden() {
+    run(venvPython(), ['ops/fetch_golden.py']);
+    run(venvPython(), ['-m', 'pytest', '-c', 'pipeline/pyproject.toml', '-s',
+      'pipeline/tests/test_a1_horizons.py', 'pipeline/tests/test_a2_riseset.py']);
+  },
   // Synthetic example data of the contract (09_contrato_datos.md §13, T-02): writes
   // contract/examples/data, copies it to web/public/data and writes web/public/config.json.
   examples() {
