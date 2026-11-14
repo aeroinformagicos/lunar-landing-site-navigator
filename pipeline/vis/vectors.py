@@ -363,6 +363,22 @@ def block_assess(ctx: Context, rng: random.Random) -> list[dict]:
     for k in range(6):
         out.append(_retry(rng, lambda r, k=k: draw_marginal(r, k), tries=5000))
 
+    # `night_near_limit` (a night between 75 % and 100 % of the limit) is also rare at random; one case
+    # searched with the default requirements, after a cheap check that Sun and Earth are up at landing
+    # (decision D-107 j, T-31).
+    def draw_near_limit(r: random.Random) -> dict | None:
+        site_id = r.choice(polar)
+        m, f = ctx.site_mask_frame(site_id, 2)
+        landing = ctx.random_time(r, "main", 15 * DAY_S)
+        s = evaluate(ctx.table, f, m, landing)
+        if not (s.sun.visible and s.earth.visible):
+            return None
+        case, a, met = assess_case(ctx, site_id, 2, landing, 14, None)
+        ok = "night_near_limit" in a.reasons and not _assess_edge(a, met, DEFAULT_REQUIREMENTS)
+        return case if ok else None
+
+    out.append(_retry(rng, draw_near_limit, tries=5000))
+
     while len(out) < COUNTS["assess"]:
         k = len(out)
         out.append(_retry(rng, lambda r, k=k: draw(r, k)))
