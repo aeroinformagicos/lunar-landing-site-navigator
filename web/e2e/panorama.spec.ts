@@ -42,6 +42,7 @@ test('drag and arrow keys pan the view; Centre on follows the body again', async
 
 test('the strip jumps to another direction; Centre on Earth', async ({ page }) => {
   const s = strip(page);
+  await s.scrollIntoViewIfNeeded(); // at 1280 × 720 the strip can start below the fold
   const box = (await s.boundingBox())!;
   await page.mouse.click(box.x + box.width * 0.75, box.y + box.height / 2);
   expect(Math.abs((await azimuth(page)) - 270)).toBeLessThanOrEqual(1);
