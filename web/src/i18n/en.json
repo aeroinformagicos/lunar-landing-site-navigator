@@ -48,6 +48,8 @@
   "header.validation": "Validation",
   "header.share": "Share",
   "header.copied": "Link copied",
+  "share.partial": "Some settings in this link could not be restored.",
+  "share.dismiss": "Dismiss",
   "time.label": "Time controls",
   "time.slider": "Time within mission",
   "time.play": "Play",
