@@ -44,7 +44,7 @@ test('Horizon detail: zoom, disc, margin and Terrain effect; telemetry folds whi
   await expect(page.getByTestId('margin')).toContainText(/[+−]\d/);
   const fx = page.getByRole('region', { name: 'Terrain effect' });
   await expect(fx).toContainText(/Sunlight: ([+−]\d+\.\d|0) h/);
-  await expect(page.getByTestId('first-event-shift')).toHaveText(/^(Sunset|Sunrise): /);
+  await expect(page.getByTestId('first-event-shift')).toHaveText(/^(Sunset|Sunrise)(: | with terrain, )/);
   await expect(page.getByTestId('sun-countdown')).toHaveCount(0); // folded to one line
   await toggle.click();
   await expect(page.getByTestId('sun-countdown')).toHaveText(/^(Sunset|Sunrise) in |^No /);

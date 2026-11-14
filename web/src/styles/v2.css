@@ -1108,7 +1108,7 @@
   font-family: var(--font-v2-sans);
 }
 
-/* Data views open: a compact strip (figures at 28 px, no summary) so the sheet has room (D-106). */
+/* Data views open: a compact strip (figures at 28 px, no summary) so the sheet has room (D-110). */
 .ui-v2 .v2--sheet .v2-mission {
   flex-direction: row;
   align-items: center;
