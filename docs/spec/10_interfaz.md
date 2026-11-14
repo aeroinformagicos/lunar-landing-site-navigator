@@ -45,14 +45,14 @@ Reglas: ningún estado se comunica solo con color (siempre icono o texto); contr
 │ Lunar Landing Site Navigator   [Explore|Plan|Learn]   Landing [fecha UTC] Mission [14 d]     │  cabecera, 56 px
 │                                 ◀ ▶ ⏵ ×speed  ├────●─────────────┤ cursor     Validation  Share │
 ├──────────────┬───────────────────────────────────────────────────────────────┬───────────────┤
-│ Scenarios    │ [Panorama] [Timeline] [Map] [Cross-section]  (+[Replan] en Plan)│ Sunlight      │
+│ Scenarios    │ [Panorama] [Timeline] [Map] [Terrain profile] (+[Replan] Plan)  │ Sunlight      │
 │ ┌──────────┐ │                                                               │ 312 h · 93 %  │
-│ │ A  sitio │ │                    vista principal                            │ Earth link    │
+│ │ A  sitio │ │                    vista principal                            │ Earth contact │
 │ │ estado   │ │                                                               │ 201 h · 60 %  │
 │ └──────────┘ │                                                               │ Longest night │
 │ ┌──────────┐ │                                                               │ 7.5 h         │
 │ │ B  sitio │ │                                                               │ ───────────── │
-│ └──────────┘ │                                                               │ ✓ Still works │
+│ └──────────┘ │                                                               │ ✓ Works       │
 │ + Add        │                                                               │ Now: Sun 1.2° │
 │ Compare      │                                                               │ texto llano   │
 └──────────────┴───────────────────────────────────────────────────────────────┴───────────────┘
@@ -82,7 +82,7 @@ Errores de fecha: fuera de rango → el campo se marca y debajo aparece `Date ou
 
 ## 5. Columna de escenarios (F1, F8)
 
-**Tarjeta de escenario**: letra y marcador; `short_name` del sitio; `84.79° S, 29.20° E`; rótulo de relieve (en rojo con icono si es Luna lisa); fecha de aterrizaje; ficha de estado (`Still works`, `Works, low margin`, `Does not work`); botones `Change site`, `Duplicate`, `Remove`. La tarjeta activa lleva borde resaltado; un clic la activa.
+**Tarjeta de escenario**: letra y marcador; `short_name` del sitio; `84.79° S, 29.20° E`; rótulo de relieve (en rojo con icono si es Luna lisa); fecha de aterrizaje; ficha de estado (`Works`, `Tight`, `Doesn't work`); botones `Change site`, `Duplicate`, `Remove`. La tarjeta activa lleva borde resaltado; un clic la activa.
 
 | Estado de la tarjeta | Qué se ve |
 | --- | --- |
@@ -96,7 +96,7 @@ Botones de la columna: `Add scenario` (deshabilitado con 4: `Maximum of 4 scenar
 
 **Selector de sitio** (diálogo modal, `role="dialog"`, foco atrapado, `Esc` cierra): campo `Search sites`; grupos `Landed missions`, `NASA candidate landing regions near the lunar south pole (2024 list)`, `Other points`; cada fila: nombre, coordenadas, año y rótulo de relieve. Sin resultados: `No sites match "<texto>".` En Plan, sección `Custom coordinates` con campos `Latitude (°, north positive)` y `Longitude (°, east positive)` y botón `Use coordinates`. Validación: latitud fuera de [−90, 90] → `Latitude must be between −90 and 90.`; longitud fuera de [−180, 360] → `Longitude must be between −180 and 360.` (los valores mayores de 180 se pasan a negativos); dentro de la malla → se usa el punto de malla más cercano; fuera → Luna lisa con el aviso.
 
-**Comparación (F8)**: el botón `Compare` sustituye la vista principal por una tabla con una columna por escenario y estas filas: `Site`, `Landing (UTC)`, `Status`, `Sunlight` (h y %), `Earth link` (h y %), `Sun + Earth` (h y %), `Longest night` (h), `Sun elevation now`, `Solar disc visible now`, `Next sunset / sunrise`, `Next Earthset / Earthrise`, `Terrain`. La mejor cifra de cada fila numérica va en negrita con ▲. Debajo, una mini línea temporal por escenario (las tres barras) con el mismo eje de tiempo. `Close comparison` vuelve a la pestaña anterior. Con un solo escenario: `Add a second scenario to compare.`
+**Comparación (F8)**: el botón `Compare` sustituye la vista principal por una tabla con una columna por escenario y estas filas: `Site`, `Landing (UTC)`, `Status`, `Sunlight` (h y %), `Earth contact` (h y %), `Sun + Earth` (h y %), `Longest night` (h), `Sun elevation now`, `Solar disc visible now`, `Next sunset / sunrise`, `Next Earthset / Earthrise`, `Terrain`. La mejor cifra de cada fila numérica va en negrita con ▲. Debajo, una mini línea temporal por escenario (las tres barras) con el mismo eje de tiempo. `Close comparison` vuelve a la pestaña anterior. Con un solo escenario: `Add a second scenario to compare.`
 
 ## 6. Vista principal
 
@@ -110,7 +110,7 @@ Tres elementos, de arriba abajo:
 
 Interacción: arrastrar la vista de 40° desplaza el acimut (deja de seguir al astro hasta pulsar `Centre on Sun` / `Centre on Earth`); flechas izquierda y derecha ±1°; puntero encima → lectura `Az 271.5° · El 0.92° · Horizon 0.88°`.
 
-F4: conmutador `Compare with smooth Moon` y cuadro `Terrain effect` con tres líneas: `Sunlight: −2.1 h`, `Earth link: 0 h`, `Sunset: 2 h 05 min earlier` (o `later`, o `no change`).
+F4: conmutador `Compare with smooth Moon` y cuadro `Terrain effect` con tres líneas: `Sunlight: −2.1 h`, `Earth contact: 0 h`, `Sunset: 2 h 05 min earlier` (o `later`, o `no change`).
 
 Estados: cargando → esqueleto y `Loading…`; astro de enfoque bajo el horizonte → se dibuja igual (contorno) con la nota `Sun is below the horizon`; error → `Panorama unavailable.` + `Retry`.
 
@@ -126,11 +126,11 @@ Cuenta atrás (F6), en el panel derecho: `Sunset in 4d 12h 52m` / `Sunrise in �
 
 Conmutador `Toward Sun` / `Toward Earth`. Plano vertical local del observador (`06_horizonte.md` §8): eje x = distancia horizontal en km, de 0 a `1,25 × distancia del punto que bloquea` (mínimo 5 km; botones `Fit to blocker`, `Full 300 km`); eje y = altura respecto al ojo del observador en metros, con exageración vertical automática rotulada (`Vertical exaggeration ×12`). Se dibuja: perfil del terreno relleno (512 intervalos del acimut de la máscara más próximo al del astro); curva de la esfera lisa (discontinua, `Smooth Moon`); el observador en el origen con su mástil (`Observer, 2 m`); la línea del horizonte hasta el punto que bloquea, marcado con un punto y el rótulo `Blocking point: 41.2 km away, 1,930 m above the site`; la línea de visión al centro del astro (`--c-sun` o `--c-earth`) con su elevación; un abanico tenue entre el borde inferior y el superior del disco. Texto bajo el gráfico: `Sun centre is 0.33° above the terrain here.` o `Sun centre is 0.21° below the terrain here.`
 
-Estados: cargando el perfil → `Loading terrain profile…`; punto de malla → `Cross-section is available for catalogue sites only.`; Luna lisa → se dibuja solo la esfera, con `Smooth Moon: the horizon is the lunar sphere, 2.6 km away.`; error → `Terrain profile unavailable.` + `Retry`.
+Estados: cargando el perfil → `Loading terrain profile…`; punto de malla → `The terrain profile is available for catalogue sites only.`; Luna lisa → se dibuja solo la esfera, con `Smooth Moon: the horizon is the lunar sphere, 2.6 km away.`; error → `Terrain profile unavailable.` + `Retry`.
 
 ### 6.4 Mapa (F11, F32)
 
-Lienzo con el sombreado, la capa, los contornos de las regiones y los marcadores. Arriba a la izquierda, controles: capa (`Sunlight`, `Earth link`, `Sun + Earth`, `None`); periodo (`18.6-year mean` o mes: selector de año 2026–2030 y de mes); opacidad. Abajo a la izquierda: leyenda con rampa de 0 a 100 %, rótulo `Share of time (%)`, criterio `Sun or Earth centre above the real horizon, observer at 2 m` y fuente. Abajo a la derecha: escala gráfica (km), flecha `0° E (Earth side) ↑` y `Polar stereographic · 500 m grid`.
+Lienzo con el sombreado, la capa, los contornos de las regiones y los marcadores. Arriba a la izquierda, controles: capa (`Sunlight`, `Earth contact`, `Sun + Earth`, `None`); periodo (`18.6-year mean` o mes: selector de año 2026–2030 y de mes); opacidad. Abajo a la izquierda: leyenda con rampa de 0 a 100 %, rótulo `Share of time (%)`, criterio `Sun or Earth centre above the real horizon, observer at 2 m` y fuente. Abajo a la derecha: escala gráfica (km), flecha `0° E (Earth side) ↑` y `Polar stereographic · 500 m grid`.
 
 Rampas: de `#161B22` al color del concepto (`--c-sun`, `--c-earth`, `--c-both`) en 11 pasos; celda sin dato, transparente con trama de puntos.
 
@@ -139,16 +139,16 @@ Interacción: rueda o pellizco, zoom (1× a 16×); arrastre, desplazamiento; tec
 Panel `Best site` (plegado por defecto; visible en Plan y, en Explore, como botón `Find the best site`):
 
 - `Most Sun + Earth in a period`: usa el periodo del mapa; selector `Region` (`All candidate regions` o una); botón `Find`; lista de 10 con `rank · lat, lon · Both 83 % · Sun 91 % · Earth 86 %`; clic en una fila centra el mapa; `Add as scenario`.
-- `Longest continuous Sun + Earth from a date`: usa la fecha de aterrizaje de la cabecera; `Region`; botón `Search`; barra de progreso `Checking 3,412 of 10,252 points…`; `Cancel`; resultado `Best: 87.21° S, 125.48° E — 12 d 7 h of continuous sunlight and Earth link` y lista de 10; `Add as scenario`. Sin candidatos: `No point in the selected area has both sunlight and Earth link at that time.`
+- `Longest continuous Sun + Earth from a date`: usa la fecha de aterrizaje de la cabecera; `Region`; botón `Search`; barra de progreso `Finding the best site… 33 % (3,412 of 10,252 points)`; `Cancel`; resultado `Best: 87.21° S, 125.48° E — 12 d 7 h of continuous sunlight and Earth contact` y lista de 10; `Add as scenario`. Sin candidatos: `No point in the selected area has both sunlight and Earth contact at that time.`
 
 Estados del mapa: sin origen pesado → `Map data is not available in this build.`; cargando → `Loading map…`; capa del periodo cargando → indicador en la leyenda; trozo no calculado → `This area has not been computed yet.`; plan B con datos de la NASA → banda fija `NASA average illumination (Mazarico et al. 2011) — not our computation`; malla efectiva de 1 km → `Computed on a 1 km grid`.
 
 ### 6.5 Replanificación (F10, pestaña `Replan`, modo Plan)
 
-- Controles: `Delay step` (`6 h`, `12 h`, `1 day`, `2 days`); `Rows`: escenarios actuales y casilla `Include NASA candidate regions`; requisitos editables: `Mission length (days)`, `Longest night allowed (h)`, casillas `Sun at landing`, `Earth link at landing`; botón `Reset to defaults`.
+- Controles: `Delay step` (`6 h`, `12 h`, `1 day`, `2 days`); `Rows`: escenarios actuales y casilla `Include NASA candidate regions`; requisitos editables: `Mission length (days)`, `Longest night allowed (h)`, casillas `Sun at landing`, `Earth contact at landing`; botón `Reset to defaults`.
 - Matriz: filas = sitios; columnas = 31 fechas (`+0`, `+1 d`, …); celda = cuadro con color e icono; la columna de la fecha base va marcada; clic en una celda fija esa fecha en el escenario y muestra el detalle (`Landing 2027-08-13 06:00 UTC · Sun ✓ · Earth ✓ · Longest night 31 h ✕`); teclado: flechas mueven la celda activa, `Enter` la selecciona. Cada celda tiene `aria-label` completo.
 - A la derecha de cada fila: `Next valid landing window: 2027-08-20 00:00 – 2027-08-24 06:00 UTC (4 d 6 h)` o `No valid landing window in the next 90 days.`
-- Debajo: `Ranking for landing <fecha>` con las regiones candidatas: posición, nombre, estado, `Sun + Earth %`, `Longest night`, botón `Add as scenario`; y la frase `Best alternative: Malapert Massif — Still works, 88 % Sun + Earth.`
+- Debajo: `Ranking for landing <fecha>` con las regiones candidatas: posición, nombre, estado, `Sun + Earth %`, `Longest night`, botón `Add as scenario`; y la frase `Best alternative: Malapert Massif — Works, 88 % Sun + Earth.`
 - En la historia guiada se usa una versión reducida (2 filas, 13 columnas).
 
 ### 6.6 Panel derecho (F7, F18)
@@ -158,7 +158,7 @@ Tres cifras grandes del escenario activo, cada una con icono, unidad y botón de
 | Cifra | Formato | Ayuda (texto exacto) |
 | --- | --- | --- |
 | `Sunlight` | `312 h · 93 %` | `Hours within the mission when the Sun's centre is above the real horizon, seen from 2 m above the ground. Source: JPL DE440 ephemeris and LOLA terrain.` |
-| `Earth link` | `201 h · 60 %` | `Hours with the Earth's centre above the real horizon: a direct line of sight for radio contact. It does not model antennas or ground stations.` |
+| `Earth contact` | `201 h · 60 %` | `Hours with the Earth's centre above the real horizon: a direct line of sight for radio contact. It does not model antennas or ground stations.` |
 | `Longest night` | `7.5 h` | `Longest continuous period without the Sun during the mission.` |
 
 Debajo: ficha de estado con los tres requisitos (`Sun at landing ✓`, `Earth at landing ✓`, `No night over 24 h ✓`); bloque `Now` con `Sun elevation 1.21°`, `Solar disc visible 62 %`, `Earth elevation 5.80° (margin +2.10°)` y las dos cuentas atrás; aviso de eclipse si lo hay (`Eclipse in progress: Earth covers 43 % of the Sun`); el resumen llano (§8); y la línea de procedencia `Terrain: LOLA polar 40 m + 120 m · Ephemeris: JPL DE440 · Frame: MOON_ME`.
@@ -176,11 +176,11 @@ Las claves siguen el patrón `area.elemento`. Todos los textos citados en este d
 | Clave | Texto |
 | --- | --- |
 | `app.title` | `Lunar Landing Site Navigator` |
-| `app.tagline` | `Compare lunar landing sites and dates: sunlight and direct-to-Earth link above the real horizon.` |
+| `app.tagline` | `Compare Moon landing sites and dates by when the Sun (power) and Earth (radio contact) are above the real horizon.` |
 | `mode.explore` / `mode.plan` / `mode.learn` | `Explore` / `Plan` / `Learn` |
-| `tab.panorama` / `tab.timeline` / `tab.map` / `tab.section` / `tab.replan` | `Panorama` / `Timeline` / `Map` / `Cross-section` / `Replan` |
-| `status.go` / `status.marginal` / `status.no_go` | `Still works` / `Works, low margin` / `Does not work` |
-| `req.sun` / `req.earth` / `req.night` | `Sun at landing` / `Earth link at landing` / `No night over {h} h` |
+| `tab.panorama` / `tab.timeline` / `tab.map` / `tab.section` / `tab.replan` | `Panorama` / `Timeline` / `Map` / `Terrain profile` / `Replan` |
+| `status.go` / `status.marginal` / `status.no_go` | `Works` / `Tight` / `Doesn't work` |
+| `req.sun` / `req.earth` / `req.night` | `Sun at landing` / `Earth contact at landing` / `No night over {h} h` |
 | `relief.smooth_warning` | `No terrain data here — smooth Moon. Real sunrise, sunset and Earth visibility will differ.` |
 | `units.deg` / `units.h` / `units.d` / `units.km` / `units.m` / `units.pct` | `°` / `h` / `d` / `km` / `m` / `%` |
 | `time.utc` | `UTC` |
@@ -219,15 +219,15 @@ Frase 2: se evalúan las filas en este orden y se usa la primera que se cumple. 
 | Hay Sol y no hay `sunset` antes del fin de la misión | `The Sun stays up for the rest of the mission.` |
 | No hay Sol y hay `sunrise` en 60 días | `Sunrise comes in {countdown}.` |
 | No hay Sol ni `sunrise` en 60 días | `The Sun does not rise here in the next 60 days.` |
-| Además, si el próximo suceso de la Tierra (60 días) llega antes que el próximo del Sol | Se añade `Earth link {is lost|returns} in {countdown}.` |
+| Además, si el próximo suceso de la Tierra (60 días) llega antes que el próximo del Sol | Se añade `Earth contact {is lost|returns} in {countdown}.` |
 
 La cuenta atrás del panel (F6, `07_visibilidad.md` §7) sigue buscando hasta 60 días aunque la misión acabe antes; solo la frase 2 se limita a la misión.
 
 | Estado | Frase 3 |
 | --- | --- |
-| `go` | `For a {D}-day mission landing at this time, this site works: {sunPct} % sunlight, {earthPct} % Earth link, longest night {night} h.` |
+| `go` | `For a {D}-day mission landing at this time, this site works: {sunPct} % sunlight, {earthPct} % Earth contact, longest night {night} h.` |
 | `marginal` | `This site works for a {D}-day mission, but with little margin: {reason}.` — `{reason}`: `the Sun is partly hidden at landing` / `the Earth is less than 1° above the terrain at landing` / `the longest night ({night} h) is close to the limit` |
-| `no_go` | `This site does not work for a {D}-day mission landing at this time: {reason}.` — `no Sun at landing` / `no Earth link at landing` / `a night of {night} h exceeds the {limit} h limit` (varias, unidas con `and`) |
+| `no_go` | `This site does not work for a {D}-day mission landing at this time: {reason}.` — `no Sun at landing` / `no Earth contact at landing` / `a night of {night} h exceeds the {limit} h limit` (varias, unidas con `and`) |
 
 En Explore se muestran las tres; en la tabla de comparación, solo la tercera.
 
@@ -256,13 +256,13 @@ Modo `Learn`. Superposición inferior con el texto del paso, `Back`, `Next` (tam
 | --- | --- | --- | --- |
 | 1 | 0–8 | Escenario A; pestaña Panorama centrada en el Sol; cursor en `T`; reproducción a `6 h/s` durante 4 s y pausa | `At the Moon's south pole the Sun never climbs more than a few degrees. Here it skims the horizon — and the terrain decides who gets light.` |
 | 2 | 8–18 | Escenarios A y B; vista `Compare` | `These two sites are {distance} apart. One has sunlight and a direct radio link to Earth. The other has neither.` |
-| 3 | 18–27 | Escenario B activo; pestaña Cross-section hacia el Sol | `Here is why: a ridge {blockerDist} away blocks the Sun. Every answer comes with its reason.` |
+| 3 | 18–27 | Escenario B activo; pestaña Terrain profile hacia el Sol | `Here is why: a ridge {blockerDist} away blocks the Sun. Every answer comes with its reason.` |
 | 4 | 27–37 | Escenario A; pestaña Replan reducida; la columna activa pasa de `+0` a `+12 d` con una animación de 1 s | `Now the launch slips 12 days. Same site, new date — and it no longer works.` |
 | 5 | 37–46 | Ranking de regiones para `T + 12 d`; la primera fila resaltada | `The tool ranks NASA's candidate regions for the new date and proposes an alternative in seconds.` |
 | 6 | 46–53 | Con mapa: pestaña Map, capa `Sun + Earth`, mes de `T`, marcador en el mejor punto del panel `Best site`. Sin mapa: escenario `blue-ghost-1` con su fecha real, pestaña Timeline | Con mapa: `Or let it search: the best spot for sunlight and Earth contact, anywhere near the pole.` Sin mapa: `Near the equator a lunar day lasts two Earth weeks. At the pole, light can last months — or never come.` |
 | 7 | 53–60 | Página de validación, las tres tarjetas | `Every number is checked: against JPL Horizons, the eclipse Blue Ghost saw from the Moon, and NASA's illumination maps.` |
 
-Al terminar: botones `Explore it yourself` (vuelve a Explore con A y B) y `Restart`. `{distance}` y `{blockerDist}` se calculan de los datos (`830 m`, `41 km`). La comparación Luna–Tierra del plan es la frase del paso 1 y la variante del paso 6. Con `prefers-reduced-motion`, sin animaciones automáticas.
+En todos los pasos, `Exit tour` (vuelve a Explore sin tocar el estado). En el último paso, `Next` se sustituye por `Try it yourself` (vuelve a Explore con A y B) y `Restart` (`14_ux_malaga.md` §2). `{distance}` y `{blockerDist}` se calculan de los datos (`830 m`, `41 km`). La comparación Luna–Tierra del plan es la frase del paso 1 y la variante del paso 6. Con `prefers-reduced-motion`, sin animaciones automáticas.
 
 Ensayo: el guion se cronometra en el «ensayo 0» (sábado, 17:30) y A3 ajusta los textos; los cambios de texto son de tipo 2 (dentro del módulo).
 

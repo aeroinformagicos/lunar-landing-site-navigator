@@ -96,7 +96,7 @@ test('a link in the format of 10 §10 opens on the requested cursor and requirem
   await expect(page.getByText(cursorText(l, 3 * DAY + 14 * 3600 + 1200))).toBeVisible();
   await expect(page.getByRole('tab', { name: 'Replan' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByLabel('Longest night allowed (h)')).toHaveValue('36');
-  await expect(page.getByLabel('Earth link at landing')).not.toBeChecked();
+  await expect(page.getByLabel('Earth contact at landing')).not.toBeChecked();
   await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText(demo.pair[1].name);
   await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText(demo.pair[0].name);
   await expect(page.getByText(PARTIAL)).toHaveCount(0);

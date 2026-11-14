@@ -17,6 +17,7 @@ import { formatLatLon, formatPct } from '../common/format';
 import { loadCellMask, type MapData } from '../map/mapData';
 import { durationWords } from '../replan/texts';
 import { exactBothHours } from './refine';
+import { Button } from '../common/Button';
 
 export interface BestSiteProps {
   data: MapData;
@@ -171,11 +172,15 @@ export function BestSite({ data, layer, periodLabel, onFocus }: BestSiteProps) {
                 <span role="status" data-testid="best-progress">
                   {progress.total === 0
                     ? t('common.loading')
-                    : t('best.progress', { done: progress.done.toLocaleString('en-US'), total: progress.total.toLocaleString('en-US') })}
+                    : t('best.progress', {
+                        pct: Math.floor((100 * progress.done) / progress.total),
+                        done: progress.done.toLocaleString('en-US'),
+                        total: progress.total.toLocaleString('en-US'),
+                      })}
                 </span>
-                <button type="button" onClick={cancel}>
+                <Button variant="secondary" onClick={cancel}>
                   {t('common.cancel')}
-                </button>
+                </Button>
               </>
             )}
           </div>

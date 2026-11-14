@@ -67,6 +67,6 @@ test('without a report: message', async ({ page }) => {
   await page.route('**/validation_report.json', (route) => route.fulfill({ status: 404, body: 'Not found' }));
   await openValidation(page);
   await expect(page.getByText('Validation report not available in this build.')).toBeVisible();
-  await page.getByRole('link', { name: /Back to the navigator/ }).click();
+  await page.getByRole('link', { name: /Back to the app/ }).click();
   await expect(page.getByRole('article', { name: 'Scenario A' })).toBeVisible();
 });

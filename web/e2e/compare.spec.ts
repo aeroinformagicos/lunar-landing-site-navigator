@@ -20,7 +20,7 @@ test('2, 3 and 4 scenarios: one column each, same rows, best figure marked', asy
   await page.getByRole('tab', { name: 'Timeline' }).click();
   await page.getByRole('button', { name: 'Compare' }).click();
   await expect(table(page)).toBeVisible({ timeout: 20_000 });
-  const rows = ['Site', 'Landing (UTC)', 'Status', 'Sunlight', 'Earth link', 'Sun + Earth', 'Longest night', 'Sun elevation now', 'Solar disc visible now', 'Next sunset / sunrise', 'Next Earthset / Earthrise', 'Terrain'];
+  const rows = ['Site', 'Landing (UTC)', 'Status', 'Sunlight', 'Earth contact', 'Sun + Earth', 'Longest night', 'Sun elevation now', 'Solar disc visible now', 'Next sunset / sunrise', 'Next Earthset / Earthrise', 'Terrain'];
   for (const r of rows) await expect(table(page).getByRole('rowheader', { name: r, exact: true })).toBeVisible();
   for (const [n, add] of [
     [2, null],

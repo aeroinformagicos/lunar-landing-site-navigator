@@ -7,7 +7,7 @@ import { re, sitesInfo } from './data';
 
 async function openSection(page: Page) {
   await page.goto('/');
-  await page.getByRole('tab', { name: 'Cross-section' }).click();
+  await page.getByRole('tab', { name: 'Terrain profile' }).click();
 }
 
 test('profile, line of sight, horizon line and blocking point (F12)', async ({ page }) => {
@@ -62,7 +62,7 @@ test('a site without a profile and a download error', async ({ page, request }) 
   test.skip(!info.pair[0].has_profile, 'the first demo site has no profile');
   await page.route(`**/profile/${info.pair[0].id}.bin.gz`, (route) => route.abort());
   await page.goto('/?fresh');
-  await page.getByRole('tab', { name: 'Cross-section' }).click();
+  await page.getByRole('tab', { name: 'Terrain profile' }).click();
   await expect(page.getByText('Terrain profile unavailable.')).toBeVisible({ timeout: 20_000 });
   await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
 });

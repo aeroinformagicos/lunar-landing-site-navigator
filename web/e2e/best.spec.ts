@@ -28,7 +28,7 @@ test('period mode: 10 points, a row centres the map, Add as scenario', async ({ 
 test('date mode: the worker returns the best points', async ({ page }) => {
   await openBest(page);
   await page.getByRole('button', { name: 'Search' }).click();
-  await expect(page.getByTestId('best-result').or(page.getByText('No point in the selected area has both sunlight and Earth link at that time.'))).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByTestId('best-result').or(page.getByText('No point in the selected area has both sunlight and Earth contact at that time.'))).toBeVisible({ timeout: 20_000 });
 });
 
 test('Cancel stops the search, and the interface responds while it runs', async ({ page }) => {

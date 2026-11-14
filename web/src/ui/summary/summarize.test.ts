@@ -128,22 +128,22 @@ describe('sentence 2: what comes next', () => {
 
   it('adds the Earth event when it comes before the next solar event', () => {
     const lost = input({ nextEarth: { kind: 'earthset', tUnix: T + 86400 + 12 * 3600 + 17 * 60 } });
-    expect(sentenceNext(lost)).toBe('Sunset comes in 4d 12h 52m, at 2025-03-20 22:52 UTC. Earth link is lost in 1d 12h 17m.');
+    expect(sentenceNext(lost)).toBe('Sunset comes in 4d 12h 52m, at 2025-03-20 22:52 UTC. Earth contact is lost in 1d 12h 17m.');
     const back = input({ state: state(true, false), nextEarth: { kind: 'earthrise', tUnix: T + 3600 * 2 } });
-    expect(sentenceNext(back)).toMatch(/ Earth link returns in 0d 02h 00m\.$/);
+    expect(sentenceNext(back)).toMatch(/ Earth contact returns in 0d 02h 00m\.$/);
     const none = input({ nextSun: { kind: 'sunset', tUnix: null }, nextEarth: { kind: 'earthset', tUnix: T + 5 * 86400 } });
-    expect(sentenceNext(none)).toBe('The Sun stays up for the rest of the mission. Earth link is lost in 5d 00h 00m.');
+    expect(sentenceNext(none)).toBe('The Sun stays up for the rest of the mission. Earth contact is lost in 5d 00h 00m.');
   });
 
   it('… and not when it comes later', () => {
-    expect(sentenceNext(input())).not.toMatch(/Earth link/);
+    expect(sentenceNext(input())).not.toMatch(/Earth contact/);
   });
 });
 
 describe('sentence 3: verdict', () => {
   it('go', () => {
     expect(sentenceVerdict(input())).toBe(
-      'For a 14-day mission landing at this time, this site works: 93 % sunlight, 60 % Earth link, longest night 7.5 h.',
+      'For a 14-day mission landing at this time, this site works: 93 % sunlight, 60 % Earth contact, longest night 7.5 h.',
     );
   });
 
@@ -160,7 +160,7 @@ describe('sentence 3: verdict', () => {
     const n = (reasons: Assessment['reasons']) =>
       sentenceVerdict(input({ assessment: { ...go, status: 'no_go', reasons, longestNightH: 355.2 } }));
     expect(n(['no_sun_at_landing'])).toBe('This site does not work for a 14-day mission landing at this time: no Sun at landing.');
-    expect(n(['no_earth_at_landing'])).toBe('This site does not work for a 14-day mission landing at this time: no Earth link at landing.');
+    expect(n(['no_earth_at_landing'])).toBe('This site does not work for a 14-day mission landing at this time: no Earth contact at landing.');
     expect(n(['night_too_long'])).toBe('This site does not work for a 14-day mission landing at this time: a night of 355 h exceeds the 24 h limit.');
     expect(n(['no_sun_at_landing', 'night_too_long'])).toBe(
       'This site does not work for a 14-day mission landing at this time: no Sun at landing and a night of 355 h exceeds the 24 h limit.',

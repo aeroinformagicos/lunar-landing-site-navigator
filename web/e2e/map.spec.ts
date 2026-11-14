@@ -19,7 +19,7 @@ async function openMap(page: Page) {
 
 test('layers, period, legend and readout (F11)', async ({ page }) => {
   await openMap(page);
-  for (const l of ['Sunlight', 'Earth link', 'Sun + Earth', 'None']) await expect(page.getByRole('button', { name: l, exact: true })).toBeVisible();
+  for (const l of ['Sunlight', 'Earth contact', 'Sun + Earth', 'None']) await expect(page.getByRole('button', { name: l, exact: true })).toBeVisible();
   await expect(page.getByText('Share of time (%)', { exact: false })).toBeVisible();
   await expect(page.getByText('Sun or Earth centre above the real horizon, observer at 2 m')).toBeVisible();
   await expect(page.getByText('Polar stereographic · 500 m grid')).toBeVisible();

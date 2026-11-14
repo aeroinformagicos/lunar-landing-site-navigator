@@ -51,7 +51,7 @@ export function terrainEffectLines(fx: TerrainEffect, realKind: EventKind | null
   }
   return {
     sunlight: `Sunlight: ${signedHours(fx.dSunHours)}`,
-    earthLink: `Earth link: ${signedHours(fx.dEarthHours)}`,
+    earthLink: `Earth contact: ${signedHours(fx.dEarthHours)}`,
     firstEvent,
   };
 }

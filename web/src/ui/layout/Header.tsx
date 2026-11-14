@@ -8,6 +8,7 @@ import { flushUrl } from '../../state/url';
 import { LandingInput } from '../controls/LandingInput';
 import { MissionInput } from '../controls/MissionInput';
 import { TimeControls } from '../controls/TimeControls';
+import { Button, buttonClass } from '../common/Button';
 
 const MODES: Mode[] = ['explore', 'plan', 'learn'];
 
@@ -27,6 +28,7 @@ export function Header({ onReset }: { onReset: () => void }) {
   return (
     <header className="app__header">
       <div className="header__row">
+        <div className="header__brand">
         <h1 className="app__title">
           <a
             href="#"
@@ -39,6 +41,8 @@ export function Header({ onReset }: { onReset: () => void }) {
             <span className="title--short">{t('app.title_short')}</span>
           </a>
         </h1>
+        <p className="app__tagline">{t('app.tagline')}</p>
+        </div>
         <div role="tablist" aria-label={t('mode.label')} className="segmented">
           {MODES.map((m, i) => (
             <button
@@ -60,7 +64,7 @@ export function Header({ onReset }: { onReset: () => void }) {
       </div>
       <div className="header__row">
         <TimeControls />
-        <a className="button-link" href="#/validation">
+        <a className={buttonClass('ghost', 'button-link')} href="#/validation">
           {t('header.validation')}
         </a>
         {mode === 'plan' && <ShareButton />}
@@ -85,9 +89,9 @@ function ShareButton() {
 
   return (
     <span className="share">
-      <button type="button" onClick={share}>
+      <Button variant="secondary" onClick={share}>
         {t('header.share')}
-      </button>
+      </Button>
       {state === 'copied' && (
         <span role="status" className="muted">
           {t('header.copied')}
