@@ -2,6 +2,7 @@
 // Timeline (10_interfaz.md §6.2, F5): Sun and Earth elevation curves and the horizon at their
 // azimuth (Canvas: > 2,000 points, 02 §8), 0° line, day ticks, mission zone, three bars with their
 // patterns, event markers and a draggable cursor (SVG). Pointer readout; arrows ±10 min with focus.
+import { CHART_DESCRIBEDBY } from '../metrics/ChartData';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { evaluate } from '../../core/visibility';
 import { findSegment } from '../../core/ephemeris';
@@ -141,7 +142,7 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
   const y0 = y(0);
 
   return (
-    <figure className="timeline" aria-describedby="timeline-data">
+    <figure className="timeline">
       <div
         ref={box}
         className="timeline__plot"
@@ -152,6 +153,7 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
         aria-valuemax={end}
         aria-valuenow={cursor}
         aria-valuetext={formatUtc(cursor)}
+        aria-describedby={CHART_DESCRIBEDBY}
         onKeyDown={onKeyDown}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -259,48 +261,7 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
       <p className="timeline__readout" aria-hidden="true">
         {readout ?? ' '}
       </p>
-      <EventTable mission={mission} />
     </figure>
-  );
-}
-
-/** Visually hidden data table of events and windows for screen readers (10 §12). */
-function EventTable({ mission }: { mission: MissionResult }) {
-  const { metrics, eclipse } = mission;
-  const rows: [string, typeof metrics.windows.sun][] = [
-    [t('timeline.sun'), metrics.windows.sun],
-    [t('timeline.earth'), metrics.windows.earth],
-    [t('timeline.both'), metrics.windows.both],
-  ];
-  return (
-    <div id="timeline-data" className="visually-hidden">
-      <h3>{t('timeline.events')}</h3>
-      {eclipse.events.length > 0 && (
-        <ul data-testid="eclipse-events">
-          {eclipse.events.map((e) => (
-            <li key={`${e.kind}-${e.tUnix}`}>{eventLabel(e)}</li>
-          ))}
-        </ul>
-      )}
-      {metrics.events.length === 0 ? (
-        <p>{t('timeline.no_events')}</p>
-      ) : (
-        <ul>
-          {metrics.events.map((e) => (
-            <li key={`${e.kind}-${e.tUnix}`}>{eventLabel(e)}</li>
-          ))}
-        </ul>
-      )}
-      <ul>
-        {rows.flatMap(([what, ws]) =>
-          ws.map((w) => (
-            <li key={`${what}-${w.startUnix}`}>
-              {t('timeline.window', { what, from: formatUtc(w.startUnix), to: formatUtc(w.endUnix) })}
-            </li>
-          )),
-        )}
-      </ul>
-    </div>
   );
 }
 

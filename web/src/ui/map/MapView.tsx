@@ -3,6 +3,7 @@
 // region outlines and site markers; zoom 1×–16× (wheel, buttons, + −) and drag; layer, period and
 // opacity controls; legend, scale and orientation; pointer readout; click (or Enter on the centre
 // cross) creates the mesh-point scenario of 08 §7. Loaded on demand (`import()`), 02 §7.
+import { CHART_DESCRIBEDBY } from '../metrics/ChartData';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { GRID, gridRef, inGrid, xyOfLatLon } from '../../core/grid';
 import { loader } from '../../core/loaders';
@@ -347,6 +348,7 @@ function MapCanvas({ data }: { data: MapData }) {
           tabIndex={0}
           role="img"
           aria-label={t('map.label')}
+          aria-describedby={CHART_DESCRIBEDBY}
           data-zoom={view.zoom}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}

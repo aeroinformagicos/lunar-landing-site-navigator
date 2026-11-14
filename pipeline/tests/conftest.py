@@ -9,6 +9,7 @@ Markers (docs/spec/11_validacion.md §1):
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -60,6 +61,37 @@ def require_data(llsn_data_dir):
         return full
 
     return path
+
+
+# Light origin published with the web (real ephemeris table since T-06, real masks since T-21) and
+# the synthetic examples of the contract (09_contrato_datos.md §13), which are always present.
+WEB_DATA = REPO_ROOT / "web" / "public" / "data"
+EXAMPLE_DATA = REPO_ROOT / "contract" / "examples" / "data"
+
+REAL_TABLE_SKIP_MSG = "real table not published: make ephem"
+
+
+def real_table_present() -> bool:
+    meta = WEB_DATA / "ephemeris.meta.json"
+    return meta.is_file() and json.loads(meta.read_text(encoding="utf-8")).get("synthetic") is False
+
+
+@pytest.fixture(scope="session")
+def real_table():
+    """The published ephemeris table (web/public/data), or skip if it is still the synthetic one."""
+    from pipeline.ephem.interp import load_table
+
+    if not real_table_present():
+        pytest.skip(REAL_TABLE_SKIP_MSG)
+    return load_table(WEB_DATA)
+
+
+@pytest.fixture(scope="session")
+def example_table():
+    """The synthetic ephemeris table of the contract examples."""
+    from pipeline.ephem.interp import load_table
+
+    return load_table(EXAMPLE_DATA)
 
 
 def pytest_runtest_setup(item):

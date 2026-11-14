@@ -2,6 +2,7 @@
 // Panorama (10_interfaz.md §6.1, F3, F4): 40° view centred on the focus body, horizon zoom ×10 and the
 // 360° strip; `Compare with smooth Moon` and the `Terrain effect` box. Drag or arrow keys pan the view
 // (it stops following the body until `Centre on …`); the strip jumps to another direction.
+import { CHART_DESCRIBEDBY } from '../metrics/ChartData';
 import { useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { findSegment } from '../../core/ephemeris';
 import { blockerAt, horizonAt, smoothHorizon, smoothMask } from '../../core/horizon';
@@ -188,7 +189,7 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
         role="img"
         tabIndex={0}
         aria-label={t('pano.view_label', { body: bodyName })}
-        aria-describedby={`${idp}-desc`}
+        aria-describedby={`${idp}-desc ${CHART_DESCRIBEDBY}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={() => (drag.current = null)}
@@ -246,7 +247,7 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
       <div className="pano__side">
         {/* 2. Horizon zoom */}
         <figure className="pano__zoom">
-          <svg width={zv.w} height={zv.h} role="img" aria-label={t('pano.zoom_label')}>
+          <svg width={zv.w} height={zv.h} role="img" aria-label={t('pano.zoom_label')} aria-describedby={CHART_DESCRIBEDBY}>
             <Scene v={zv} model={model} sky={sky} showSmooth={showSmooth} idp={`${idp}-z`} />
             {zgrid.az.map((g) => (
               <line key={`za${g.label}`} x1={g.x} x2={g.x} y1={0} y2={zv.h} className="pano__grid" />

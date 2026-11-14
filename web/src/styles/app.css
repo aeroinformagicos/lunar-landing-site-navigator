@@ -457,7 +457,7 @@ input[aria-invalid='true'] {
     border-top: 1px solid var(--c-border);
   }
   .app {
-    padding-bottom: 120px;
+    padding-bottom: calc(var(--timebar-h) + 8px);
   }
 }
 
@@ -1245,7 +1245,7 @@ input[aria-invalid='true'] {
   .story {
     flex-direction: column;
     align-items: stretch;
-    bottom: 120px;
+    bottom: var(--timebar-h);
   }
 }
 
@@ -1395,4 +1395,72 @@ input[aria-invalid='true'] {
   background: none;
   text-align: left;
   font-size: 13px;
+}
+
+/* ---- Mobile and accessibility review (T-20, 10 §3.2, §12) ---- */
+/* Chromium focuses the inner fields of a date input, so :focus-visible never reaches the host. */
+input[type='datetime-local']:focus-within {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+/* The fixed time bar of phones (three rows of 44 px controls) and what must stay above it. */
+:root {
+  --timebar-h: 144px;
+}
+
+/* 44 × 44 px targets on touch screens and on phones. Last in the file so it wins over the compact
+   sizes of the scenario cards, the panel help, the map selects and the timeline markers. */
+@media (pointer: coarse), (max-width: 767px) {
+  button,
+  .button-link,
+  input,
+  select,
+  .scenario-card__actions button,
+  .map__controls select,
+  .figure__help {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .app__title a,
+  .field__check {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  /* Same centre as the 14 px glyph: (44 − 14) / 2 = 15 px on each side. */
+  .timeline__event {
+    width: 44px;
+    height: 44px;
+    margin: -15px;
+    line-height: 44px;
+  }
+}
+
+/* < 768 px: main view 55 % of the screen high, figures in three columns (10 §3.2). */
+@media (max-width: 767px) {
+  .view {
+    min-height: 55vh;
+    min-height: 55svh;
+  }
+  .figures {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .figure {
+    position: relative;
+    padding: 6px 8px;
+  }
+  .figure__head {
+    flex-wrap: wrap;
+    padding-right: 36px;
+  }
+  .figure__help {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  .figure__value {
+    font-size: 16px;
+  }
 }

@@ -2,6 +2,7 @@
 // Cross-section (10_interfaz.md §6.3, F12): terrain profile in the azimuth of the chosen body (512 bins
 // of the nearest mask azimuth), smooth sphere, observer and mast, horizon line to the blocking point,
 // line of sight to the body centre and a faint fan between the disc edges. Follows the cursor.
+import { CHART_DESCRIBEDBY } from '../metrics/ChartData';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { findSegment } from '../../core/ephemeris';
 import { blockerAt } from '../../core/horizon';
@@ -136,7 +137,7 @@ function SectionPlot({
           {t('section.exaggeration', { x: f.exaggeration })}
         </span>
       </div>
-      <svg width={w} height={H} role="img" aria-label={t('section.label', { body: name })} aria-describedby="plain-summary" className="section__svg">
+      <svg width={w} height={H} role="img" aria-label={t('section.label', { body: name })} aria-describedby={CHART_DESCRIBEDBY} className="section__svg">
         <defs>
           <clipPath id="section-clip">
             <rect width={w} height={H} />
