@@ -16,6 +16,10 @@ in which it is first used. Content owner: A2.
 | Gazetteer of Planetary Nomenclature (IAU / USGS), feature 5450, Shackleton | Crater centre for the DEM orientation test | https://planetarynames.wr.usgs.gov/Feature/5450 | Public |
 | Zuber, M. T., et al. (2012), "Constraints on the volatile distribution within Shackleton crater at the lunar south pole", *Nature* 486, 378-381, doi:10.1038/nature11216 | Published depth of Shackleton (4.1 km) for the DEM reading test | https://ntrs.nasa.gov/api/citations/20120013758/downloads/20120013758.pdf | Cited, not redistributed |
 | LROC, "JAXA SLIM Landing" (lander at 13.3160° S, 25.2510° E, -912 m elevation) | Known height for the SLDEM2015 reading test | https://lroc.im-ldi.com/images/1358 | Cited, not redistributed |
+| NSSDCA, "Table of Anthropogenic Impacts and Spacecraft on the Moon" | Coordinates and dates of `blue-ghost-1` and `apollo-11` in the example `sites.json` | https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html | NASA, public |
+| Firefly Aerospace, Blue Ghost Mission 1 updates | Landing time of `blue-ghost-1`; eclipse and sunset times quoted in the example validation report | https://fireflyspace.com/?p=3379 | Cited, not redistributed |
+| NASA candidate landing regions near the lunar south pole (2024 list): centres and sizes via nasanow.org, citing USGS ScienceBase record 671a6fa8d34efed5620f89f8 | `map/regions.json` of the example data | https://www.nasanow.org/artemis ; https://www.sciencebase.gov/catalog/item/671a6fa8d34efed5620f89f8 | Public; centres pending verification by A2 |
+| JPL Horizons | Named as the reference of case A1 in the example validation report | https://ssd.jpl.nasa.gov/horizons/ | NASA JPL, public |
 
 ## Software libraries
 
