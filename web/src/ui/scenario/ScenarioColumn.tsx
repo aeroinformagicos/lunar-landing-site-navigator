@@ -24,6 +24,8 @@ export function ScenarioColumn() {
   const addScenario = useAppStore((s) => s.addScenario);
   const updateScenario = useAppStore((s) => s.updateScenario);
   const setActive = useAppStore((s) => s.setActiveScenario);
+  const comparing = useAppStore((s) => s.comparing);
+  const setComparing = useAppStore((s) => s.setComparing);
   const [picker, setPicker] = useState<PickerTarget | null>(null);
   const full = scenarios.length >= MAX_SCENARIOS;
 
@@ -57,7 +59,7 @@ export function ScenarioColumn() {
           </p>
         )}
         {scenarios.length >= 2 && (
-          <button type="button" disabled title={t('view.pending')}>
+          <button type="button" aria-pressed={comparing} onClick={() => setComparing(!comparing)}>
             {t('scenario.compare')}
           </button>
         )}

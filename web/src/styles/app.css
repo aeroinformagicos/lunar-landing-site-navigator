@@ -931,6 +931,16 @@ input[aria-invalid='true'] {
     overflow-y: auto;
     padding-right: 4px;
   }
+  /* Same rule for the scenario column (up to 4 cards) and the main view (comparison table). */
+  .app__left {
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .view {
+    max-height: calc(100vh - 258px);
+    overflow-y: auto;
+  }
 }
 
 /* ---- Cross-section (10 §6.3) ---- */
@@ -981,4 +991,75 @@ input[aria-invalid='true'] {
 .section__text {
   margin: 6px 0 0;
   font-size: 14px;
+}
+
+/* ---- Comparison (10 §5, F8) ---- */
+.compare__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.compare__head h2 {
+  font-size: 17px;
+  margin: 0;
+}
+
+.compare__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.compare__table th,
+.compare__table td {
+  text-align: left;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--c-border);
+  vertical-align: top;
+}
+
+.compare__table thead th {
+  white-space: nowrap;
+}
+
+.compare__best strong {
+  font-weight: 700;
+}
+
+.compare__status--go {
+  color: var(--c-go);
+}
+
+.compare__status--marginal {
+  color: var(--c-marginal);
+}
+
+.compare__status--no_go {
+  color: var(--c-warn-text);
+}
+
+.compare__verdict {
+  font-size: 13px;
+  min-width: 160px;
+}
+
+.compare__minis {
+  margin-top: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.compare__mini-row {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.compare__mini {
+  width: 100%;
+  height: 36px;
 }
