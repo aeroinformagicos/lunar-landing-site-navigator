@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lunar Sightline — Open Horizon</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#38BDF8}a:hover{color:#7DD3FC}
+</style>
+</helmet>
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; box-sizing: border-box; font-family: Inter, system-ui, sans-serif; color: #F8FAFC; background: linear-gradient(180deg, #0A0E17 0%, #101827 48%, #162032 62%, #0A0E17 100%)">
+
+<svg role="img" aria-label="Full-width lunar horizon: the Sun sits just behind a ridge, the Earth hangs above the horizon to the right" viewBox="0 0 1440 900" width="1440" height="900" style="position: absolute; left: 0; top: 0">
+<defs>
+<linearGradient id="c-ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E293B"></stop><stop offset="0.5" stop-color="#111827"></stop><stop offset="1" stop-color="#0A0E17"></stop></linearGradient>
+<radialGradient id="c-sun" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#F59E0B" stop-opacity="0.45"></stop><stop offset="1" stop-color="#F59E0B" stop-opacity="0"></stop></radialGradient>
+</defs>
+<g stroke="#94A3B8" stroke-opacity="0.5" stroke-width="1">
+<path d="M0 500h10M0 440h6M0 380h10M0 320h6M0 260h10M0 200h6M0 140h10"></path>
+<path d="M180 0v8M360 0v8M540 0v8M720 0v12M900 0v8M1080 0v8M1260 0v8"></path>
+</g>
+<g font-family="JetBrains Mono, monospace" font-size="10.5" fill="#94A3B8">
+<text x="16" y="504">0°</text><text x="16" y="384">5°</text><text x="16" y="264">10°</text><text x="16" y="144">15°</text>
+<text x="360" y="24" text-anchor="middle">60°</text><text x="540" y="24" text-anchor="middle">65°</text><text x="720" y="28" text-anchor="middle">70° E</text><text x="900" y="24" text-anchor="middle">75°</text><text x="1080" y="24" text-anchor="middle">80°</text>
+</g>
+<path d="M-40 520 C300 300 760 250 1480 330" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-opacity="0.75"></path>
+<path d="M-40 540 C320 470 800 440 1480 470" fill="none" stroke="#F59E0B" stroke-width="1.4" stroke-dasharray="2 7" stroke-linecap="round"></path>
+<ellipse cx="770" cy="486" rx="260" ry="70" fill="url(#c-sun)"></ellipse>
+<circle cx="1010" cy="288" r="16" fill="#0A0E17" stroke="#38BDF8" stroke-width="1.5"></circle><path d="M1010 272a16 16 0 0 1 0 32z" fill="#38BDF8"></path>
+<line x1="1010" y1="312" x2="1010" y2="452" stroke="#38BDF8" stroke-width="1" stroke-dasharray="1 5"></line>
+<text x="1034" y="284" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#F8FAFC">Earth</text>
+<text x="1034" y="302" font-family="JetBrains Mono, monospace" font-size="12" fill="#38BDF8">1.71° · margin +4.03°</text>
+<path d="M0 530 C140 524 260 520 380 512 C470 506 520 494 580 486 C620 481 640 492 680 490 C720 488 735 462 765 458 C800 454 815 474 850 472 C910 469 950 452 1010 456 C1080 460 1130 478 1200 482 C1290 487 1370 498 1440 504 L1440 900 L0 900 Z" fill="url(#c-ground)"></path>
+<path d="M0 530 C140 524 260 520 380 512 C470 506 520 494 580 486 C620 481 640 492 680 490 C720 488 735 462 765 458 C800 454 815 474 850 472 C910 469 950 452 1010 456 C1080 460 1130 478 1200 482 C1290 487 1370 498 1440 504" fill="none" stroke="#F8FAFC" stroke-width="1.4"></path>
+<g fill="none" stroke="#94A3B8" stroke-opacity="0.16" stroke-width="1">
+<path d="M0 570 C300 540 520 528 720 528 C920 528 1140 540 1440 560"></path><path d="M0 630 C300 586 520 568 720 568 C920 568 1140 584 1440 618"></path><path d="M0 720 C300 656 520 630 720 630 C920 630 1140 652 1440 704"></path><path d="M0 850 C300 760 520 724 720 724 C920 724 1140 752 1440 830"></path>
+</g>
+<circle cx="790" cy="476" r="10" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3 3"></circle>
+<line x1="790" y1="458" x2="790" y2="396" stroke="#F8FAFC" stroke-width="1"></line>
+<circle cx="790" cy="458" r="3" fill="#F8FAFC"></circle>
+<text x="802" y="392" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#F8FAFC">Sun · behind the ridge</text>
+<text x="802" y="410" font-family="JetBrains Mono, monospace" font-size="12" fill="#F59E0B">0.24° · margin −1.21° · ridge 120 m away</text>
+</svg>
+
+<header style="position: absolute; left: 64px; top: 44px; display: flex; align-items: center; gap: 14px">
+<svg aria-hidden="true" width="48" height="48" viewBox="0 0 44 44"><circle cx="22" cy="22" r="15" fill="none" stroke="#94A3B8" stroke-width="1"></circle><path d="M22 4v6M22 34v6M4 22h6M34 22h6" stroke="#94A3B8" stroke-width="1"></path><path d="M6 27 Q22 17 38 27" fill="none" stroke="#F8FAFC" stroke-width="1.6"></path><ellipse cx="22" cy="24" rx="19" ry="7" transform="rotate(-18 22 24)" fill="none" stroke="#38BDF8" stroke-width="1.4"></ellipse><circle cx="30" cy="24" r="3" fill="#F59E0B"></circle></svg>
+<div style="display: flex; flex-direction: column; gap: 3px">
+<h1 style="margin: 0; font-size: 20px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase">Lunar Sightline</h1>
+<p style="margin: 0; font-size: 13px; color: #94A3B8">When will your landing site see the Sun and Earth?</p>
+</div>
+</header>
+
+<div role="group" aria-label="Scenarios" style="position: absolute; left: 50%; top: 48px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px">
+<button type="button" aria-pressed="true" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border: 1px solid #38BDF8; border-radius: 22px; background: rgba(17,24,39,0.7); color: #F8FAFC; font: 600 13px Inter, sans-serif; cursor: pointer; backdrop-filter: blur(10px)"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#38BDF8" stroke-width="2"></circle></svg>A · Chang'e 7 site</button>
+<button type="button" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border: 1px solid #334155; border-radius: 22px; background: rgba(17,24,39,0.7); color: #CBD5E1; font: 500 13px Inter, sans-serif; cursor: pointer; backdrop-filter: blur(10px)"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"></rect></svg>B · Shackleton floor</button>
+<button type="button" aria-label="Add scenario" style="width: 44px; height: 44px; border: 1px dashed #475569; border-radius: 22px; background: rgba(17,24,39,0.5); color: #F8FAFC; font: 400 18px Inter, sans-serif; cursor: pointer">+</button>
+<button type="button" style="height: 44px; padding: 0 14px; border: 0; background: none; color: #38BDF8; font: 500 13px Inter, sans-serif; cursor: pointer">Compare</button>
+</div>
+
+<div style="position: absolute; right: 64px; top: 48px; display: flex; align-items: center; gap: 6px">
+<div role="group" aria-label="Mode" style="display: flex; gap: 4px">
+<button type="button" aria-pressed="true" style="height: 44px; padding: 0 10px; border: 0; background: none; color: #F8FAFC; font: 600 13px Inter, sans-serif; text-decoration: underline; text-underline-offset: 8px; text-decoration-color: #38BDF8; text-decoration-thickness: 2px; cursor: pointer">Explore</button>
+<button type="button" style="height: 44px; padding: 0 10px; border: 0; background: none; color: #94A3B8; font: 500 13px Inter, sans-serif; cursor: pointer">Plan</button>
+<button type="button" style="height: 44px; padding: 0 10px; border: 0; background: none; color: #94A3B8; font: 500 13px Inter, sans-serif; cursor: pointer">Learn</button>
+</div>
+<span aria-hidden="true" style="width: 1px; height: 20px; background: #334155"></span>
+<button type="button" style="height: 44px; padding: 0 10px; border: 0; background: none; color: #94A3B8; font: 500 13px Inter, sans-serif; cursor: pointer">Validation</button>
+</div>
+
+<nav aria-label="Left panels (collapsed)" style="position: absolute; left: 0; top: 150px; display: flex; flex-direction: column; gap: 8px">
+<button type="button" aria-expanded="false" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px 0 12px; border: 1px solid #334155; border-left: 0; border-radius: 0 22px 22px 0; background: rgba(17,24,39,0.75); color: #F8FAFC; font: 500 12px Inter, sans-serif; cursor: pointer; backdrop-filter: blur(10px)"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 18 18"><circle cx="9" cy="9" r="6.5" fill="none" stroke="#94A3B8" stroke-width="1.4"></circle><path d="M9 0v5M9 13v5M0 9h5M13 9h5" stroke="#94A3B8" stroke-width="1.4"></path></svg>Sites</button>
+<button type="button" aria-expanded="false" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px 0 12px; border: 1px solid #334155; border-left: 0; border-radius: 0 22px 22px 0; background: rgba(17,24,39,0.75); color: #F8FAFC; font: 500 12px Inter, sans-serif; cursor: pointer; backdrop-filter: blur(10px)"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 18 18"><path d="M2 5h14M2 13h14" stroke="#94A3B8" stroke-width="1.4"></path><circle cx="6" cy="5" r="2.2" fill="#111827" stroke="#94A3B8" stroke-width="1.4"></circle><circle cx="12" cy="13" r="2.2" fill="#111827" stroke="#94A3B8" stroke-width="1.4"></circle></svg>Setup · 1 Aug 2027 · 14 d</button>
+</nav>
+
+<section aria-label="Mission figures" style="position: absolute; left: 64px; top: 570px; display: flex; flex-direction: column; gap: 18px">
+<p style="display: flex; align-items: center; gap: 10px; margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #FBBF24"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="2"></path></svg>Doesn't work · no Sun at landing</p>
+<div style="display: flex; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font: 300 56px/1 'JetBrains Mono', monospace; color: #F59E0B">319<span style="font-size: 20px; font-weight: 400"> h</span></span>
+<span style="font-size: 13px; color: #CBD5E1">Sunlight · <span style="font-family: 'JetBrains Mono', monospace">95 %</span></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font: 300 56px/1 'JetBrains Mono', monospace; color: #38BDF8">57.7<span style="font-size: 20px; font-weight: 400"> h</span></span>
+<span style="font-size: 13px; color: #CBD5E1">Earth contact · <span style="font-family: 'JetBrains Mono', monospace">17 %</span></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font: 300 56px/1 'JetBrains Mono', monospace; color: #F8FAFC">17.4<span style="font-size: 20px; font-weight: 400"> h</span></span>
+<span style="font-size: 13px; color: #CBD5E1">Longest night</span>
+</div>
+</div>
+<p style="margin: 0; max-width: 560px; font-size: 14px; line-height: 1.55; color: #CBD5E1">The Earth is in view, but the Sun is hidden behind terrain 120 m to the east-northeast, 10 m higher than the site. Sunrise comes in <span style="font-family: 'JetBrains Mono', monospace; color: #F8FAFC">0d 17h 22m</span>.</p>
+</section>
+
+<aside aria-label="Details" style="position: absolute; right: 24px; top: 130px; width: 296px; box-sizing: border-box; display: flex; flex-direction: column; border: 1px solid #334155; border-radius: 20px; background: rgba(17,24,39,0.72); backdrop-filter: blur(18px)">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 10px 4px 20px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Now at site A</h2>
+<button type="button" aria-label="Collapse details" aria-expanded="true" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: none; color: #94A3B8; cursor: pointer"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14"><path d="M5 2l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"></path></svg></button>
+</div>
+<dl style="display: grid; grid-template-columns: 1fr auto; gap: 10px 12px; margin: 0; padding: 8px 20px 16px; font-size: 13px">
+<dt style="color: #94A3B8">Sun elevation</dt><dd style="margin: 0; font-family: 'JetBrains Mono', monospace; color: #F59E0B">0.24°</dd>
+<dt style="color: #94A3B8">Solar disc visible</dt><dd style="margin: 0; font-family: 'JetBrains Mono', monospace; color: #F59E0B">0 %</dd>
+<dt style="color: #94A3B8">Earth elevation</dt><dd style="margin: 0; font-family: 'JetBrains Mono', monospace; color: #38BDF8">1.71°</dd>
+<dt style="color: #94A3B8">Sunrise in</dt><dd style="margin: 0; font-family: 'JetBrains Mono', monospace">0d 17h 22m</dd>
+<dt style="color: #94A3B8">Earthset in</dt><dd style="margin: 0; font-family: 'JetBrains Mono', monospace">2d 09h 44m</dd>
+</dl>
+<ul style="display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 16px 20px; border-top: 1px solid #334155; list-style: none; font-size: 13px">
+<li style="display: flex; align-items: center; gap: 10px; color: #FBBF24"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="2"></path></svg>Sun at landing — not met</li>
+<li style="display: flex; align-items: center; gap: 10px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14"><path d="M1.5 7.5l3.5 3.5 7.5-8" fill="none" stroke="#38BDF8" stroke-width="2"></path></svg>Earth at landing</li>
+<li style="display: flex; align-items: center; gap: 10px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14"><path d="M1.5 7.5l3.5 3.5 7.5-8" fill="none" stroke="#38BDF8" stroke-width="2"></path></svg>No night over 24 h</li>
+</ul>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px 18px; border-top: 1px solid #334155">
+<button type="button" aria-pressed="true" style="height: 32px; padding: 0 12px; border: 1px solid #F59E0B; border-radius: 16px; background: rgba(245,158,11,0.12); color: #FBBF24; font: 500 12px Inter, sans-serif; cursor: pointer">Centre on Sun</button>
+<button type="button" style="height: 32px; padding: 0 12px; border: 1px solid #334155; border-radius: 16px; background: none; color: #CBD5E1; font: 500 12px Inter, sans-serif; cursor: pointer">Centre on Earth</button>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #CBD5E1"><input type="checkbox" style="margin: 0; accent-color: #38BDF8"> Compare with smooth Moon</label>
+</div>
+</aside>
+
+<button type="button" aria-label="Open the map" style="position: absolute; right: 64px; top: 566px; width: 196px; height: 196px; padding: 0; border: 1px solid #334155; border-radius: 50%; background: rgba(10,14,23,0.8); cursor: pointer; overflow: hidden">
+<svg aria-hidden="true" viewBox="0 0 196 196" width="194" height="194">
+<defs><radialGradient id="c-lit" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#F59E0B" stop-opacity="0.45"></stop><stop offset="1" stop-color="#F59E0B" stop-opacity="0"></stop></radialGradient></defs>
+<ellipse cx="128" cy="70" rx="44" ry="30" fill="url(#c-lit)"></ellipse><ellipse cx="62" cy="132" rx="34" ry="24" fill="url(#c-lit)"></ellipse>
+<g fill="none" stroke="#94A3B8" stroke-opacity="0.4" stroke-width="1"><circle cx="98" cy="98" r="32"></circle><circle cx="98" cy="98" r="64"></circle><path d="M98 0v196M0 98h196"></path></g>
+<g fill="none" stroke="#F8FAFC" stroke-opacity="0.7" stroke-width="1"><ellipse cx="102" cy="100" rx="10" ry="9"></ellipse><ellipse cx="132" cy="132" rx="20" ry="16"></ellipse><ellipse cx="54" cy="80" rx="16" ry="13"></ellipse></g>
+<circle cx="120" cy="82" r="5" fill="#0A0E17" stroke="#38BDF8" stroke-width="2"></circle>
+<rect x="98" y="96" width="8" height="8" fill="#0A0E17" stroke="#F8FAFC" stroke-width="2"></rect>
+<text x="130" y="80" font-family="JetBrains Mono, monospace" font-size="11" fill="#38BDF8">A</text><text x="110" y="116" font-family="JetBrains Mono, monospace" font-size="11" fill="#F8FAFC">B</text>
+<text x="98" y="184" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#CBD5E1">SOUTH POLE</text>
+</svg>
+</button>
+
+<nav aria-label="Views" style="position: absolute; left: 64px; bottom: 100px; display: flex; gap: 20px">
+<button type="button" aria-pressed="true" style="height: 44px; padding: 0; border: 0; border-top: 2px solid #F8FAFC; background: none; color: #F8FAFC; font: 600 12px Inter, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer">Horizon</button>
+<button type="button" style="height: 44px; padding: 0; border: 0; border-top: 2px solid transparent; background: none; color: #94A3B8; font: 500 12px Inter, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer">Map</button>
+<button type="button" style="height: 44px; padding: 0; border: 0; border-top: 2px solid transparent; background: none; color: #94A3B8; font: 500 12px Inter, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer">Timeline</button>
+<button type="button" style="height: 44px; padding: 0; border: 0; border-top: 2px solid transparent; background: none; color: #94A3B8; font: 500 12px Inter, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer">Terrain profile</button>
+</nav>
+
+<div role="group" aria-label="Time controls" style="position: absolute; left: 64px; right: 64px; bottom: 32px; display: flex; align-items: center; gap: 14px">
+<button type="button" aria-label="Play" style="width: 56px; height: 56px; border: 0; border-radius: 28px; background: #F8FAFC; color: #0A0E17; cursor: pointer"><svg aria-hidden="true" width="14" height="16" viewBox="0 0 10 12"><path d="M1 0l9 6-9 6z" fill="currentColor"></path></svg></button>
+<button type="button" style="height: 44px; padding: 0 6px; border: 0; background: none; color: #F8FAFC; font: 500 13px 'JetBrains Mono', monospace; cursor: pointer">−1 h</button>
+<button type="button" style="height: 44px; padding: 0 6px; border: 0; background: none; color: #F8FAFC; font: 500 13px 'JetBrains Mono', monospace; cursor: pointer">+1 h</button>
+<button type="button" aria-label="Playback speed 1 h/s" style="height: 32px; padding: 0 10px; border: 1px solid #334155; border-radius: 16px; background: none; color: #CBD5E1; font: 500 12px 'JetBrains Mono', monospace; cursor: pointer">1 h/s</button>
+<div style="position: relative; flex: 1; height: 44px">
+<span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 12px; height: 5px; border-radius: 3px; background: linear-gradient(90deg, #334155 0 5.2%, #F59E0B 5.2% 100%)"></span>
+<span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 22px; height: 5px; border-radius: 3px; background: linear-gradient(90deg, #38BDF8 0 17%, #334155 17% 100%)"></span>
+<input type="range" aria-label="Time within mission" min="0" max="100" value="0" style="position: absolute; left: 0; top: 6px; width: 100%; height: 28px; margin: 0; opacity: 0.001">
+<span aria-hidden="true" style="position: absolute; left: 0; top: 2px; width: 2px; height: 34px; background: #F8FAFC"></span>
+<span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 32px; display: flex; justify-content: space-between; font: 400 10px 'JetBrains Mono', monospace; color: #94A3B8"><span style="padding-left: 6px">D0</span><span>D2</span><span>D4</span><span>D6</span><span>D8</span><span>D10</span><span>D12</span><span>D14</span></span>
+</div>
+<output style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: 'JetBrains Mono', monospace; white-space: nowrap"><span style="font-size: 18px; font-weight: 400">Day 0, 00:00</span><span style="font-size: 11px; color: #94A3B8">2027-08-01 00:00 UTC</span></output>
+</div>
+
+<p style="position: absolute; left: 64px; bottom: 8px; margin: 0; font: 400 10.5px 'JetBrains Mono', monospace; color: #94A3B8">Terrain: LOLA polar 40 m + 120 m · Ephemeris: JPL DE440 · Frame: MOON_ME</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

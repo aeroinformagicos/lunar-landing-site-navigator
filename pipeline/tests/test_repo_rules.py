@@ -9,6 +9,7 @@ HEADER = "AI-assisted: written with Claude Code, reviewed by team Aeroinformági
 SOURCE_SUFFIXES = {".py", ".ts", ".tsx", ".mjs", ".js", ".css", ".html", ".yml", ".yaml", ".sh", ".toml"}
 SOURCE_NAMES = {"Makefile"}
 MAX_VERSIONED_BYTES = 10 * 1024 * 1024
+DESIGN_DIR = REPO_ROOT / "docs" / "design"
 
 
 def _tracked_files() -> list[Path]:
@@ -25,6 +26,9 @@ def test_source_files_start_with_ai_header():
         if not path.is_file():
             continue
         if path.suffix not in SOURCE_SUFFIXES and path.name not in SOURCE_NAMES:
+            continue
+        # Design reference mockups are third-party exports kept verbatim (D-97).
+        if DESIGN_DIR in path.parents:
             continue
         lines = path.read_text(encoding="utf-8").splitlines()
         # A shebang must stay on line 1; then the header goes on line 2.
