@@ -11,7 +11,10 @@
 //     "events":        [{ site_id, observer_height_m, t_a, t_b, events: [{ t_unix, kind }] }],
 //     "metrics":       [{ site_id, observer_height_m, landing_unix, mission_days, cursor_unix,
 //                         sun_hours, earth_hours, both_hours, longest_night_h, longest_link_gap_h,
-//                         sun_el_max_deg, sun_el_min_deg }],
+//                         sun_el_max_deg, sun_el_min_deg,
+//                         // B1 (web/e2e/b1.spec.ts, D-90): the rest of 07 §7, at the cursor
+//                         sun_el_deg, sun_margin_deg, sun_disc_pct, earth_el_deg, earth_margin_deg,
+//                         sun_pct, earth_pct, next_sun_event: { kind, t_unix | null }, next_earth_event }],
 //     "assess":        [{ site_id, observer_height_m, landing_unix, mission_days, requirements?: {need_sun_at_landing,
 //                         need_earth_at_landing, max_night_hours, marginal_earth_margin_deg, marginal_sun_fraction},
 //                         status, reasons }],

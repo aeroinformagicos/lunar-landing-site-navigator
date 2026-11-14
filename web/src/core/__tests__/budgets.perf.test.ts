@@ -1,6 +1,6 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Timing budgets of the web core (05 §8, 07 §11, 08 §10.3), in one file that Vitest runs in its own
-// group, after the other tests and one at a time (vite.config.ts, D-90): a budget in microseconds must
+// group, after the other tests and one at a time (vite.config.ts, D-91): a budget in microseconds must
 // not share the CPU with another test running in a parallel worker.
 import { describe, expect, it } from 'vitest';
 import { siteFrame, skyAt } from '../frames';

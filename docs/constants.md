@@ -93,6 +93,8 @@ fuente (CLAUDE.md §2).
 | Rango admitido de `maxNightHours` en un enlace | 0 – 400 | h | `07_visibilidad.md` §8.1 («editable: 0–400») | `web/src/state/url.ts` (`MAX_NIGHT_HOURS_RANGE`) |
 | Móvil: objetivo táctil mínimo; alto de la vista principal; columnas del panel de cifras | 44 × 44; 55 % del alto de pantalla; 3 | px; —; — | `10_interfaz.md` §12 («Táctil»), §3.2 | `web/src/styles/app.css` (bloque T-20) |
 | Móvil: hueco reservado bajo la página para la barra de tiempo fija (`--timebar-h`) | 144 | px | Medido (T-20): la barra mide 136 px a 390 × 844 con controles de 44 px (tres filas); 8 px de margen | `web/src/styles/app.css` |
+| B1: tolerancia del % de disco en pantalla (más el medio paso del redondeo entero) | 10⁻⁴ (10⁻⁶ en fracción) | % | `07_visibilidad.md` §12.4 (fracciones 10⁻⁶); B1 solo da `B1_deg` y `B1_min` | `web/e2e/b1.spec.ts` |
+| B1: tolerancia de un % de tiempo en pantalla (más el medio paso del redondeo entero) | `B1_min` / (D·24 h) × 100 | % | `tests/golden/tolerances.json` (`B1_min`) llevado al porcentaje de la misión (`07` §7: horas ÷ duración × 100) | `web/e2e/b1.spec.ts` |
 
 ## Valores medidos
 

@@ -1,0 +1,62 @@
+// AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
+// Case B2 (11_validacion.md; 07_visibilidad.md §13.7; T-37): Blue Ghost 1, base landing
+// 2025-03-02T08:34Z, 14 days, observer at 2 m, default requirements. Expected (07 §13.7):
+//   0       → go                       (the real mission: 14 days of light)
+//   +14 d   → no_go, night_too_long    (the Sun sets that same day; the night lasts about 14.8 days)
+//   +29.5 d → go                       (one synodic month later the geometry repeats)
+// The scenario is opened from a shared link (10 §10) in Plan › Replan. +0 and +14 d are read in the
+// matrix with the `1 day` step (columns 0 and 14); +29.5 d is not a column of any step (31 columns,
+// 07 §8.3), so it is a scenario whose landing is base + 29.5 d, read in its column 0 and in the
+// panel's status chip. Needs the real ephemeris table (T-06) and the published Blue Ghost 1 mask (T-09).
+import { expect, test, type Page } from '@playwright/test';
+
+const SITE = 'blue-ghost-1';
+const BASE = Date.parse('2025-03-02T08:34:00Z') / 1000;
+const DAY = 86_400;
+
+function linkOf(landingUnix: number): string {
+  const state = { v: 1, m: 'plan', t: 'replan', sc: [{ s: SITE, l: landingUnix, d: 14, h: 2 }] };
+  return `/#s=${Buffer.from(JSON.stringify(state), 'utf8').toString('base64url')}`;
+}
+
+async function openReplan(page: Page, landingUnix: number) {
+  await page.goto(linkOf(landingUnix));
+  await expect(page.getByRole('tab', { name: 'Replan' })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('button', { name: '1 day', exact: true }).click();
+  await expect(page.locator('[data-cell="0-30"]')).toBeVisible({ timeout: 30_000 });
+}
+
+test.beforeEach(async ({ request }) => {
+  const manifest = await (await request.get('/data/manifest.json')).json();
+  test.skip(manifest.ephemeris.synthetic, 'B2 needs the real ephemeris table');
+  const sites = await (await request.get('/data/sites.json')).json();
+  const site = sites.sites.find((s: { id: string }) => s.id === SITE);
+  test.skip(!site?.has_mask, 'B2 needs the published Blue Ghost 1 horizon mask');
+});
+
+test('B2: Blue Ghost 1 works at the real landing and fails 14 days later (night too long)', async ({ page }) => {
+  await openReplan(page, BASE);
+  await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText('Blue Ghost 1');
+  await expect(page.locator('.replan__matrix thead th').nth(15)).toHaveText('+14 d');
+
+  // Delay 0: the real mission.
+  await expect(page.locator('[data-cell="0-0"]')).toHaveAttribute('aria-label', 'A · Blue Ghost 1, landing 2025-03-02 08:34 UTC: Still works');
+  // Delay +14 d: does not work.
+  const late = page.locator('[data-cell="0-14"]');
+  await expect(late).toHaveAttribute('aria-label', 'A · Blue Ghost 1, landing 2025-03-16 08:34 UTC: Does not work');
+
+  // The reason is the night: the Sun is still up at landing and the longest night fails.
+  await late.click();
+  await expect(page.getByTestId('cell-detail')).toHaveText(/^A · Blue Ghost 1 · Landing 2025-03-16 08:34 UTC · Sun ✓ · Earth [✓✕] · Longest night [\d.]+ h ✕$/);
+  // The click set that landing in the scenario: the panel's full chip agrees with the matrix.
+  await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText('Landing 2025-03-16 08:34 UTC');
+  await expect(page.getByTestId('status-chip')).toHaveText('✕ Does not work');
+  await expect(page.getByRole('list', { name: 'Requirements' }).getByRole('listitem').filter({ hasText: 'No night over 24 h' })).toContainText('✕');
+});
+
+test('B2: Blue Ghost 1 works again 29.5 days later (one synodic month)', async ({ page }) => {
+  await openReplan(page, BASE + 29.5 * DAY);
+  await expect(page.locator('[data-cell="0-0"]')).toHaveAttribute('aria-label', 'A · Blue Ghost 1, landing 2025-03-31 20:34 UTC: Still works');
+  await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText('Landing 2025-03-31 20:34 UTC');
+  await expect(page.getByTestId('status-chip')).toHaveText('✓ Still works');
+});

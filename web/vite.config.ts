@@ -9,7 +9,7 @@ export default defineConfig({
   build: { outDir: 'dist', sourcemap: true },
   test: {
     environment: 'node',
-    // Two groups (D-90): every test in parallel, then the timing budgets (`*.perf.test.ts`) one at a
+    // Two groups (D-91): every test in parallel, then the timing budgets (`*.perf.test.ts`) one at a
     // time, so a budget in microseconds never shares the CPU with another test.
     projects: [
       {
