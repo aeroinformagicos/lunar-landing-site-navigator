@@ -13,6 +13,7 @@ import { MetricsPanel } from '../metrics/MetricsPanel';
 import { useMission, type MissionResult } from '../metrics/useMission';
 import { Compare } from '../compare/Compare';
 import { Replan } from '../replan/Replan';
+import { replanViewForStep } from '../story/storySteps';
 import { Panorama } from '../panorama/Panorama';
 import { CrossSection } from '../section/CrossSection';
 import { Timeline } from '../timeline/Timeline';
@@ -42,6 +43,7 @@ function useShortcuts(onHelp: () => void) {
     function onKey(e: KeyboardEvent) {
       const target = e.target as HTMLElement | null;
       if (target?.closest('[role="dialog"]')) return;
+      if (useAppStore.getState().mode === 'learn') return; // the story owns ← → and Space
       const sc = shortcutFor({
         key: e.key,
         ctrlKey: e.ctrlKey,
@@ -76,7 +78,9 @@ export function AppLayout() {
   const [help, setHelp] = useState(false);
   useShortcuts(() => setHelp(true));
 
-  const tabs: Tab[] = mode === 'plan' ? [...BASE_TABS, 'replan'] : BASE_TABS;
+  const storyStep = useAppStore((s) => s.storyStep);
+  // `Replan` is a Plan tab; the guided story also shows it (steps 4 and 5).
+  const tabs: Tab[] = mode === 'plan' || tab === 'replan' ? [...BASE_TABS, 'replan'] : BASE_TABS;
   const reset = () => init(sites.defaults);
 
   function onTabKey(e: React.KeyboardEvent, i: number) {
@@ -123,7 +127,7 @@ export function AppLayout() {
               {comparing ? (
                 <Compare onClose={() => setComparing(false)} />
               ) : tab === 'replan' ? (
-                <Replan />
+                <Replan story={replanViewForStep(storyStep)} />
               ) : (
                 <ActiveView tab={tab} />
               )}

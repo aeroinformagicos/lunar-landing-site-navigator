@@ -201,5 +201,10 @@
   "replan.ranking": "Ranking for landing {date}",
   "replan.no_candidates": "No candidate regions in this build.",
   "replan.both_pct": "Sun + Earth %",
-  "replan.add": "Add as scenario"
+  "replan.add": "Add as scenario",
+  "story.label": "Guided story",
+  "story.back": "Back",
+  "story.next": "Next",
+  "story.explore": "Explore it yourself",
+  "story.restart": "Restart"
 }
