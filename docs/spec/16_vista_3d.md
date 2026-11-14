@@ -325,7 +325,7 @@ Lee, con los selectores existentes y `useScenarioModel`: escenarios, escenario a
 
 ### 10.3 Paso a 2D por fallo (D-97 n, propuesta a I2)
 
-El armazón decide `viewMode` al arrancar (anexo A: `'2d'` sin WebGL o con ventana < 768 px). **Requisito concreto: WebGL 2** (three.js ya no admite WebGL 1); I2 debe comprobar `canvas.getContext('webgl2')`. Si la 3D falla después de montarse (contexto perdido y no recuperado en 3 s, error de compilación de sombreadores, fallo del trabajador o de three.js), Stage3D **lanza el error durante el render**; el límite de errores del armazón (`Fallback3d` en `ui/shell/Stage.tsx`, D-102) llama a `fallbackTo2d` del almacén, que pone `viewMode = '2d'` y `viewNotice = 'webgl_failed'`, y el armazón muestra `The 3D view is not available on this device. Showing the 2D view.` con `Dismiss` (D-106, D-107 a). Un error de **datos** no pasa a 2D: baja de escena (§2.1).
+El armazón decide `viewMode` al arrancar (anexo A: `'2d'` sin WebGL o con ventana < 768 px). **Requisito concreto: WebGL 2** (three.js ya no admite WebGL 1); I2 debe comprobar `canvas.getContext('webgl2')`. Si la 3D falla después de montarse (contexto perdido y no recuperado en 3 s, error de compilación de sombreadores, fallo del trabajador o de three.js), Stage3D **lanza el error durante el render**; el límite de errores del armazón (`Fallback3d` en `ui/shell/Stage.tsx`, D-102) llama a `fallbackTo2d` del almacén, que pone `viewMode = '2d'` y `viewNotice = 'webgl_failed'`, y el armazón muestra `The 3D view is not available on this device. Showing the 2D view.` con `Dismiss` (D-111, D-107 a). Un error de **datos** no pasa a 2D: baja de escena (§2.1).
 
 ### 10.4 Textos
 

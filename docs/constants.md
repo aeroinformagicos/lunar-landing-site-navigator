@@ -511,7 +511,7 @@ Constantes nuevas (`pipeline/tests/test_a6_shackleton.py`, `test_a7_nasa_points.
 | `SHARE_WITHIN`, `ALL_FACTOR` (B6) | 99 % de los acimuts dentro de `B6_el_deg`; todos dentro de 2 × `B6_el_deg` (0,02°) | `11` §5, B6 |
 | `SITE`, `T_FROM`, `T_TO` (B4) | (0°, 0°); 2025-01-01 a 2031-01-01 | `11` §5, B4 |
 | `MATCH_S`, `N_TOTAL`, `MAX_INTERVALS` (B4) | ± 3 h; 6; 14 | `11` §5, B4 |
-| `SCREEN_MARGIN_DEG`, `SEARCH_PAD_S` (B4) | 1°; 2 h | D-111 a (el Sol se mueve ~0,51°/h frente a la Tierra: 360° en el mes sinódico de 29,53 días, `11` §2.4) |
+| `SCREEN_MARGIN_DEG`, `SEARCH_PAD_S` (B4) | 1°; 2 h | D-113 a (el Sol se mueve ~0,51°/h frente a la Tierra: 360° en el mes sinódico de 29,53 días, `11` §2.4) |
 
 Cifras medidas (B4 corre en `make test`; A6, A7 y B6 son `slow` y no se han ejecutado con los datos reales en
 la sesión):

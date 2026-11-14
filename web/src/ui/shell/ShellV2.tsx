@@ -13,9 +13,11 @@ import { WelcomeCard } from '../welcome/WelcomeCard';
 import { welcomePending } from '../welcome/welcome';
 import { Figures, Provenance, SummaryBlock, TimeBar, Verdict, ViewTabs } from './BottomStrip';
 import { NowPanel, SetupPanel, SitesPanel } from './Panels';
+import { can3d } from '../../state/viewMode';
+import { Minimap } from './Minimap';
 import { Stage } from './Stage';
 import { Brand, ModeNav, ScenarioPills, ViewToggle } from './TopBar';
-import { ActiveContext, useActiveData } from './useActive';
+import { ActiveContext, BottomStripContext, useActiveData } from './useActive';
 import { readPanelOpen, writePanelOpen } from './panelState';
 
 /** Shortcuts of the 3D view, listed in the global help if lane I3 has added them (16 §10.4). */
@@ -37,6 +39,7 @@ export default function ShellV2() {
   const tab = useAppStore((s) => s.tab);
   const comparing = useAppStore((s) => s.comparing);
   const viewNotice = useAppStore((s) => s.viewNotice);
+  const viewMode = useAppStore((s) => s.viewMode);
   const dismissViewNotice = useAppStore((s) => s.dismissViewNotice);
   const init = useAppStore((s) => s.init);
   const addScenario = useAppStore((s) => s.addScenario);
@@ -58,12 +61,17 @@ export default function ShellV2() {
   const onHelp = useCallback(() => setHelp(true), []);
   // The stage views end where the bottom strip starts: its height is measured, not assumed.
   const rootRef = useRef<HTMLDivElement>(null);
+  const [bottomH, setBottomH] = useState(0);
   const bottomRef = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const root = rootRef.current;
     const bottom = bottomRef.current;
     if (!root || !bottom || typeof ResizeObserver === 'undefined') return;
-    const set = () => root.style.setProperty('--bottom-h', `${Math.ceil(bottom.getBoundingClientRect().height) + 24}px`);
+    const set = () => {
+      const px = Math.ceil(bottom.getBoundingClientRect().height) + 24;
+      root.style.setProperty('--bottom-h', `${px}px`);
+      setBottomH(px);
+    };
     const ro = new ResizeObserver(set);
     ro.observe(bottom);
     set();
@@ -107,6 +115,7 @@ export default function ShellV2() {
 
   return (
     <ActiveContext.Provider value={active}>
+      <BottomStripContext.Provider value={bottomH}>
       <div ref={rootRef} className={`v2${learning ? ' v2--learn' : ''}${onHorizon ? '' : ' v2--sheet'}`}>
         <a className="v2-skip" href="#main-view">
           {t('shell.skip')}
@@ -125,6 +134,9 @@ export default function ShellV2() {
         <div className="v2-right">
           <NowPanel />
         </div>
+
+        {/* In 3D the scene already shows the pole, and lane I3's camera controls use that corner. */}
+        {onHorizon && !learning && (viewMode === '2d' || !can3d()) && <Minimap />}
 
         <section ref={bottomRef} className="v2-bottom" aria-label={t('panel.label')}>
           <div className="v2-mission">
@@ -171,6 +183,7 @@ export default function ShellV2() {
           </Dialog>
         )}
       </div>
+      </BottomStripContext.Provider>
     </ActiveContext.Provider>
   );
 }

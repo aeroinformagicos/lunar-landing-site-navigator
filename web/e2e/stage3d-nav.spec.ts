@@ -54,7 +54,7 @@ test('E3 · Ground puts the eye at the site and reads like the 2D panorama', asy
   await expect(readout(page)).toHaveText(new RegExp(`^Az ${((az3d + 1) % 360).toFixed(1)}°`));
   // The 2D panorama is centred on the same body: its readout at the centre gives the same horizon.
   await page.getByRole('radio', { name: '2D' }).click();
-  const view = page.locator('.pano__view');
+  const view = page.locator('.v2-scene');
   await expect(view).toBeVisible({ timeout: 20_000 });
   const box = (await view.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

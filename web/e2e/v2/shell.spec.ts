@@ -62,7 +62,7 @@ test('3D / 2D switch: text labels, V shortcut, 2D without the 3D module or WebGL
     await expect(stage).toHaveAttribute('data-view-mode', '2d');
     await page.locator('body').press('v');
     await expect(stage).toHaveAttribute('data-view-mode', '2d');
-    await expect(page.locator('.pano__view')).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator('.v2-scene')).toBeVisible({ timeout: 20_000 });
   } else {
     // 3D by default on a capable desktop (contract); V switches both ways.
     await expect(toggle.getByRole('radio', { name: '3D' })).toHaveAttribute('aria-checked', 'true');

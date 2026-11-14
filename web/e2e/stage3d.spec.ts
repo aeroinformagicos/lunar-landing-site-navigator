@@ -91,7 +91,7 @@ test('E4 · the 3D/2D switch goes to the 2D view and back', async ({ page }) => 
   await open3d(page);
   await page.getByRole('radio', { name: '2D' }).click();
   await expect(stage(page)).toHaveCount(0);
-  await expect(page.locator('.pano__view')).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('.v2-scene')).toBeVisible({ timeout: 20_000 });
   await page.locator('#main-view').screenshot({ path: `${HANDOFF}T-71-to-2d.png` });
   await page.keyboard.press('v');
   await expect(page.locator('.stage3d[data-state="ready"]')).toBeVisible({ timeout: 30_000 });
@@ -112,7 +112,7 @@ test('E5 · without WebGL 2 the shell opens the 2D view', async ({ page }) => {
   });
   await page.goto(URL3D);
   // The shell knows before mounting: it opens in 2D and the 3D option says why it is off.
-  await expect(page.locator('.pano__view')).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('.v2-scene')).toBeVisible({ timeout: 20_000 });
   await expect(page.getByRole('radio', { name: '3D' })).toBeDisabled();
   await expect(stage(page)).toHaveCount(0);
   expect(await page.locator('body').innerText()).not.toMatch(/undefined|NaN|\bnull\b/);
@@ -125,7 +125,7 @@ test('E6 · a lost WebGL context that does not come back falls back to 2D', asyn
     gl.getExtension('WEBGL_lose_context')!.loseContext();
   });
   await expect(page.getByRole('status').filter({ hasText: NOTICE })).toBeVisible({ timeout: 10_000 });
-  await expect(page.locator('.pano__view')).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('.v2-scene')).toBeVisible({ timeout: 20_000 });
   await expect(page.getByRole('radio', { name: '2D' })).toHaveAttribute('aria-checked', 'true');
 });
 

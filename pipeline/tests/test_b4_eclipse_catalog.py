@@ -51,7 +51,7 @@ MATCH_S = 3 * 3600  # (a) ± 3 h around the greatest eclipse
 N_TOTAL = 6  # (b)
 MAX_INTERVALS = 14  # (c)
 
-# Screening of the hourly samples (see the module docstring; decision D-111).
+# Screening of the hourly samples (see the module docstring; decision D-113).
 SCREEN_MARGIN_DEG = 1.0  # two hours of the Sun's motion against the Earth
 SEARCH_PAD_S = 2 * 3600
 

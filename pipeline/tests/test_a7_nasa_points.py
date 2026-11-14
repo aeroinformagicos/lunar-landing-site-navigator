@@ -37,7 +37,7 @@ OBSERVER_HEIGHT_M = 2.0
 
 
 def random_points(n: int = N_POINTS, seed: int = SEED, r_max_m: float = R_MAX_M) -> np.ndarray:
-    """float64 [n, 2]: map points (x, y) uniform in the disc r ≤ ``r_max_m`` (decision D-111).
+    """float64 [n, 2]: map points (x, y) uniform in the disc r ≤ ``r_max_m`` (decision D-113).
 
     Pairs ``rng.uniform(−r_max, r_max, 2)`` of ``np.random.default_rng(seed)``, drawn one after the
     other; a pair with r > r_max is dropped.

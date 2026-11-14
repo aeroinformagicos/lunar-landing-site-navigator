@@ -63,7 +63,7 @@
 /* ---- Interface v2 (15_interfaz_v2.md §0, §7; T-61) ----
    New names live on :root so lane I3 can use them anywhere. The contract values for names the v1
    already uses (--c-sun, --c-earth, --c-text…) apply only inside `.ui-v2`, so the v1 safety net
-   (?ui=v1) keeps its colours (D-106). */
+   (?ui=v1) keeps its colours (D-111). */
 :root {
   --c-bg-0: #0a0e17;
   --c-bg-1: #162032;

@@ -28,6 +28,9 @@ describe('welcome card', () => {
     expect(shouldWelcome('#s=A~demo', '', memory())).toBe(false);
     expect(shouldWelcome('#/validation', '', memory())).toBe(false);
     expect(shouldWelcome('', '?x=1', memory())).toBe(false);
+    // Choosing the interface is not shared state: the v2 still greets a first visit.
+    expect(shouldWelcome('', '?ui=v2', memory())).toBe(true);
+    expect(shouldWelcome('', '?ui=v2&vm=2d', memory())).toBe(true);
   });
 
   it('does not show again once closed', () => {

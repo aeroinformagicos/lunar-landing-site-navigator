@@ -45,7 +45,7 @@ BAND_LABELS = ("Sun", "Earth", "Sun and Earth", "Sun, any part", "Earth, any par
 def pick_cells(computed: np.ndarray, n: int = N_CELLS, seed: int = SEED) -> list[tuple[int, int]]:
     """``n`` cells (i, j) drawn without replacement among the computed ones (bool [NY, NX]).
 
-    Candidates in row-major order (j, then i); ``np.random.default_rng(seed).choice`` (decision D-111).
+    Candidates in row-major order (j, then i); ``np.random.default_rng(seed).choice`` (decision D-113).
     """
     flat = np.flatnonzero(np.asarray(computed, dtype=bool).ravel())
     if flat.size < n:
