@@ -17,6 +17,7 @@ import sys
 
 import pytest
 
+from pipeline.cli.report import HORIZONS
 from pipeline.common.timeutil import iso_to_unix, unix_to_et
 from pipeline.ephem.interp import load_table, site_frame, sky_at
 from pipeline.ephem.kernels import load_kernels
@@ -213,14 +214,29 @@ def _real_table():
 
 
 @needs_azel
-def test_a1_table_against_horizons():
+def test_a1_table_against_horizons(record_case):
     table = _real_table()
     worst_az = worst_el = 0.0
+    details, bad = [], []
     for r in _rows():
         sky = sky_at(table, site_frame(float(r["lat_deg"]), float(r["lon_deg"]), 0.0), iso_to_unix(r["utc"]))
         got = sky[r["target"]]
         e_az, e_el = _errors(r, got["az_deg"], got["el_deg"])
-        assert e_az < TOL["A1_deg"] and e_el < TOL["A1_deg"], (r, got)
+        when = r["utc"][:16] + "Z"
+        pairs = (("az", r["az_deg"], got["az_deg"], e_az), ("el", r["el_deg"], got["el_deg"], e_el))
+        for name, exp, obt, err in pairs:
+            details.append({"label": f"{r['site_id']} {r['target']} {name} {when}", "expected": float(exp),
+                            "obtained": round(obt, 9), "abs_err": err, "unit": "deg",
+                            "ok": err < TOL["A1_deg"]})
+        if not (e_az < TOL["A1_deg"] and e_el < TOL["A1_deg"]):
+            bad.append((r, got))
         worst_az, worst_el = max(worst_az, e_az), max(worst_el, e_el)
+    worst = max(worst_az, worst_el)
+    record_case("A1", "fail" if bad else "pass",
+                "JPL Horizons, observer on the lunar surface, 8 sites x 8 instants",
+                f"max |error| {worst:.1e} deg over {len(details)} comparisons", f"{TOL['A1_deg']} deg",
+                HORIZONS, details,
+                "Ephemeris table used by the web; azimuth error weighted by cos(elevation).")
     print(f"\nA1 table (sky_at): 128 rows, max |d az|*cos(el) = {worst_az:.2e} deg, "
           f"max |d el| = {worst_el:.2e} deg (tolerance {TOL['A1_deg']} deg)")
+    assert not bad, bad[:3]

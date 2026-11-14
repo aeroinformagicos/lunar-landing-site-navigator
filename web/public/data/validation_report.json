@@ -1,20 +1,25 @@
 {
   "contract_version": "1.0.0",
-  "generated_utc": "2026-11-14T00:00:00Z",
-  "git_commit": "example",
+  "generated_utc": "2026-11-14T15:49:46Z",
+  "git_commit": "8250119",
   "summary": {
-    "total": 4,
-    "passed": 2,
-    "failed": 0,
-    "manual": 1,
-    "skipped": 1,
+    "total": 21,
+    "passed": 4,
+    "failed": 1,
+    "manual": 0,
+    "skipped": 16,
     "horizons_comparisons": 256,
-    "horizons_max_abs_err_deg": 4e-05
+    "horizons_max_abs_err_deg": 2.5398885904692747e-05
   },
   "headline": [
     {
       "id": "B3",
       "title": "Total solar eclipse seen by Blue Ghost 1 (14 March 2025)",
+      "source": {
+        "label": "Firefly Aerospace, Blue Ghost Mission 1 updates",
+        "url": "https://fireflyspace.com/?p=3379"
+      },
+      "note": "Firefly gives the times as CST; they match UTC-5 (CDT). Largest difference 0.8 min. Observer at 0 m; the eclipse does not depend on the terrain.",
       "rows": [
         {
           "label": "Eclipse starts",
@@ -42,42 +47,37 @@
         }
       ],
       "tolerance": "5 min",
-      "source": {
-        "label": "Firefly Aerospace, Blue Ghost Mission 1 updates",
-        "url": "https://fireflyspace.com/?p=3379"
-      },
-      "note": "Firefly gives the times as CST; they match UTC-5 (CDT). Example report (synthetic values).",
       "status": "pass"
     },
     {
       "id": "A3",
       "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
+      "source": {
+        "label": "Firefly Aerospace, end of Blue Ghost Mission 1 surface operations",
+        "url": "https://fireflyspace.com/news/firefly-aerospace-successfully-completes-14-days-of-surface-operations-on-the-moon"
+      },
+      "note": "Our sunset of the centre of the Sun, with the SLDEM2015 59 m horizon and the observer at 2 m, is at 18:53:55 UTC: 39 min after the end of the 18:00-18:15 UTC window inferred from Firefly's account, beyond the 30 min tolerance. Our horizon toward the setting Sun (azimuth 269.7 deg) is 0.62 deg; the window implies about 0.9 deg. Under review: the terrain crop, what Firefly calls sunset, and the observer height.",
       "rows": [
         {
           "label": "Sunset",
-          "predicted": "\u2014",
-          "observed": "18:00\u201318:15 UTC",
-          "ok": null
+          "predicted": "18:54 UTC",
+          "observed": "18:00–18:15 UTC",
+          "ok": false
         }
       ],
       "tolerance": "30 min",
-      "source": {
-        "label": "Firefly Aerospace, Blue Ghost Mission 1 updates",
-        "url": "https://fireflyspace.com/?p=3379"
-      },
-      "note": "Example report (synthetic values).",
-      "status": "skipped"
+      "status": "fail"
     },
     {
       "id": "A7B7",
       "title": "Our south pole maps vs NASA illumination and Earth visibility maps",
-      "rows": [],
-      "tolerance": "\u2014",
       "source": {
         "label": "NASA PGDA, south pole illumination products",
-        "url": ""
+        "url": "https://pgda.gsfc.nasa.gov/products/69"
       },
-      "note": "Example report (synthetic values).",
+      "note": "Not run in this build.",
+      "rows": [],
+      "tolerance": "A7: r > 0.9 and mean |diff| < 10 points; B7: r > 0.9",
       "status": "skipped"
     }
   ],
@@ -86,70 +86,2537 @@
       "id": "A1",
       "group": "A",
       "title": "Sun and Earth azimuth and elevation vs JPL Horizons",
-      "status": "pass",
-      "expected": "JPL Horizons, observer on the lunar surface",
-      "obtained": "max |error| 0.00004 deg over 256 comparisons",
+      "expected": "JPL Horizons, observer on the lunar surface, 8 sites x 8 instants",
       "tolerance": "0.02 deg",
       "source": {
         "label": "JPL Horizons",
         "url": "https://ssd.jpl.nasa.gov/horizons/"
       },
+      "status": "pass",
+      "obtained": "max |error| 2.5e-05 deg over 256 comparisons",
       "details": [
         {
+          "label": "apollo-11 sun az 2025-03-14T06:00Z",
+          "expected": 267.911307091,
+          "obtained": 267.911306758,
+          "abs_err": 1.1479029803666944e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
           "label": "apollo-11 sun el 2025-03-14T06:00Z",
-          "expected": 12.345678,
-          "obtained": 12.345671,
-          "abs_err": 7e-06,
+          "expected": 69.814328759,
+          "obtained": 69.814327949,
+          "abs_err": 8.096005075231005e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun az 2025-09-07T18:00Z",
+          "expected": 268.940136767,
+          "obtained": 268.94013762,
+          "abs_err": 3.936837232909639e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun el 2025-09-07T18:00Z",
+          "expected": 62.519671904,
+          "obtained": 62.519670793,
+          "abs_err": 1.110927712488774e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun az 2026-06-15T12:00Z",
+          "expected": 85.714504429,
+          "obtained": 85.714504458,
+          "abs_err": 1.3543216803488643e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun el 2026-06-15T12:00Z",
+          "expected": -62.175820756,
+          "obtained": -62.175821582,
+          "abs_err": 8.260388781877737e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun az 2027-01-01T00:00Z",
+          "expected": 269.219047546,
+          "obtained": 269.219047596,
+          "abs_err": 4.280864550733721e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun el 2027-01-01T00:00Z",
+          "expected": -30.364303986,
+          "obtained": -30.364303151,
+          "abs_err": 8.349433713306098e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun az 2027-10-20T03:30Z",
+          "expected": 268.407306251,
+          "obtained": 268.407306305,
+          "abs_err": 5.329978725450544e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun el 2027-10-20T03:30Z",
+          "expected": 6.365261006,
+          "obtained": 6.365261167,
+          "abs_err": 1.6099570121497209e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun az 2028-02-29T12:00Z",
+          "expected": 88.793786239,
+          "obtained": 88.79378624,
+          "abs_err": 5.779563937078747e-10,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun el 2028-02-29T12:00Z",
+          "expected": -16.051636747,
+          "obtained": -16.051637316,
+          "abs_err": 5.688891278055053e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun az 2029-06-26T03:00Z",
+          "expected": 267.913374842,
+          "obtained": 267.913375078,
+          "abs_err": 7.564620224088585e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun el 2029-06-26T03:00Z",
+          "expected": 71.321267941,
+          "obtained": 71.321266509,
+          "abs_err": 1.4322460657467673e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun az 2030-12-31T23:00Z",
+          "expected": 89.314053993,
+          "obtained": 89.314053998,
+          "abs_err": 5.013343739820705e-09,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sun el 2030-12-31T23:00Z",
+          "expected": 20.85026022,
+          "obtained": 20.850260582,
+          "abs_err": 3.6201155495518833e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth az 2025-03-14T06:00Z",
+          "expected": 266.901633952,
+          "obtained": 266.901633914,
+          "abs_err": 1.3458924707898317e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth el 2025-03-14T06:00Z",
+          "expected": 69.300617328,
+          "obtained": 69.300615349,
+          "abs_err": 1.979044142785824e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth az 2025-09-07T18:00Z",
+          "expected": 269.555069729,
+          "obtained": 269.555070097,
+          "abs_err": 1.7099693041442875e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth el 2025-09-07T18:00Z",
+          "expected": 62.325815819,
+          "obtained": 62.325813742,
+          "abs_err": 2.0767001487342895e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth az 2026-06-15T12:00Z",
+          "expected": 253.401131369,
+          "obtained": 253.401132679,
+          "abs_err": 5.171218988882182e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth el 2026-06-15T12:00Z",
+          "expected": 66.748663047,
+          "obtained": 66.748659784,
+          "abs_err": 3.2630035775582655e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth az 2027-01-01T00:00Z",
+          "expected": 288.478552685,
+          "obtained": 288.478550586,
+          "abs_err": 6.199758622566611e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth el 2027-01-01T00:00Z",
+          "expected": 72.822102494,
+          "obtained": 72.822108066,
+          "abs_err": 5.572276705834156e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth az 2027-10-20T03:30Z",
+          "expected": 258.619424378,
+          "obtained": 258.619425171,
+          "abs_err": 3.675497454114845e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth el 2027-10-20T03:30Z",
+          "expected": 62.370480877,
+          "obtained": 62.370489121,
+          "abs_err": 8.244289766423663e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth az 2028-02-29T12:00Z",
+          "expected": 255.362145699,
+          "obtained": 255.362146221,
+          "abs_err": 2.627844128528669e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth el 2028-02-29T12:00Z",
+          "expected": 59.793904515,
+          "obtained": 59.793893407,
+          "abs_err": 1.110768025824882e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth az 2029-06-26T03:00Z",
+          "expected": 267.977724954,
+          "obtained": 267.977725647,
+          "abs_err": 2.251905173260381e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth el 2029-06-26T03:00Z",
+          "expected": 71.03461499,
+          "obtained": 71.03461306,
+          "abs_err": 1.9295577260436403e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth az 2030-12-31T23:00Z",
+          "expected": 249.36631814,
+          "obtained": 249.366320579,
+          "abs_err": 7.204547655246783e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 earth el 2030-12-31T23:00Z",
+          "expected": 72.820627411,
+          "obtained": 72.820617818,
+          "abs_err": 9.592903182920054e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun az 2025-03-14T06:00Z",
+          "expected": 258.871284246,
+          "obtained": 258.871284269,
+          "abs_err": 1.9828153561162447e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun el 2025-03-14T06:00Z",
+          "expected": 29.650198017,
+          "obtained": 29.650197649,
+          "abs_err": 3.6778838108375567e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun az 2025-09-07T18:00Z",
+          "expected": 261.973870794,
+          "obtained": 261.973871303,
+          "abs_err": 4.6916017792691536e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun el 2025-09-07T18:00Z",
+          "expected": 22.89326258,
+          "obtained": 22.893261963,
+          "abs_err": 6.165186050566263e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun az 2026-06-15T12:00Z",
+          "expected": 80.544551983,
+          "obtained": 80.544551914,
+          "abs_err": 6.399250237550858e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun el 2026-06-15T12:00Z",
+          "expected": -22.109920118,
+          "obtained": -22.109920467,
+          "abs_err": 3.4861534459196264e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun az 2027-01-01T00:00Z",
+          "expected": 307.597407994,
+          "obtained": 307.597406333,
+          "abs_err": 7.616821516497661e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun el 2027-01-01T00:00Z",
+          "expected": -62.709219954,
+          "obtained": -62.709219031,
+          "abs_err": 9.225499013609806e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun az 2027-10-20T03:30Z",
+          "expected": 279.59906952,
+          "obtained": 279.599069268,
+          "abs_err": 2.1671197924029223e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun el 2027-10-20T03:30Z",
+          "expected": -30.655106437,
+          "obtained": -30.655105724,
+          "abs_err": 7.131877026722577e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun az 2028-02-29T12:00Z",
+          "expected": 96.445543003,
+          "obtained": 96.445543028,
+          "abs_err": 2.344436632830769e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun el 2028-02-29T12:00Z",
+          "expected": 21.383344143,
+          "obtained": 21.383344173,
+          "abs_err": 2.993308712007092e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun az 2029-06-26T03:00Z",
+          "expected": 258.2891922,
+          "obtained": 258.289192502,
+          "abs_err": 2.5867415948410027e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun el 2029-06-26T03:00Z",
+          "expected": 31.070979735,
+          "obtained": 31.070978926,
+          "abs_err": 8.092251739810763e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun az 2030-12-31T23:00Z",
+          "expected": 116.800395934,
+          "obtained": 116.800396687,
+          "abs_err": 4.321784988249969e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sun el 2030-12-31T23:00Z",
+          "expected": 54.975592447,
+          "obtained": 54.975593118,
+          "abs_err": 6.70756861609334e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth az 2025-03-14T06:00Z",
+          "expected": 258.647936368,
+          "obtained": 258.647936829,
+          "abs_err": 4.034740156304343e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth el 2025-03-14T06:00Z",
+          "expected": 28.916324972,
+          "obtained": 28.91632394,
+          "abs_err": 1.0316642722330016e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth az 2025-09-07T18:00Z",
+          "expected": 262.289831129,
+          "obtained": 262.289831573,
+          "abs_err": 4.0931970681174985e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth el 2025-09-07T18:00Z",
+          "expected": 22.673205114,
+          "obtained": 22.673203837,
+          "abs_err": 1.2766652588425131e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth az 2026-06-15T12:00Z",
+          "expected": 253.803009578,
+          "obtained": 253.803010151,
+          "abs_err": 5.184180190828269e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth el 2026-06-15T12:00Z",
+          "expected": 25.274510314,
+          "obtained": 25.274506636,
+          "abs_err": 3.6779104028994425e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth az 2027-01-01T00:00Z",
+          "expected": 264.067303459,
+          "obtained": 264.067303842,
+          "abs_err": 3.1277158638969826e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth el 2027-01-01T00:00Z",
+          "expected": 35.176959321,
+          "obtained": 35.176978511,
+          "abs_err": 1.918984543891611e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth az 2027-10-20T03:30Z",
+          "expected": 257.020461185,
+          "obtained": 257.020461679,
+          "abs_err": 4.601496742661786e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth el 2027-10-20T03:30Z",
+          "expected": 21.366943414,
+          "obtained": 21.366962827,
+          "abs_err": 1.9413174292992608e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth az 2028-02-29T12:00Z",
+          "expected": 255.871351647,
+          "obtained": 255.871351954,
+          "abs_err": 2.9065123200890273e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth el 2028-02-29T12:00Z",
+          "expected": 18.563133459,
+          "obtained": 18.563115374,
+          "abs_err": 1.8085271122458835e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth az 2029-06-26T03:00Z",
+          "expected": 258.390457169,
+          "obtained": 258.390457775,
+          "abs_err": 5.214230231515869e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth el 2029-06-26T03:00Z",
+          "expected": 30.660543979,
+          "obtained": 30.660542957,
+          "abs_err": 1.0216051151701322e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth az 2030-12-31T23:00Z",
+          "expected": 251.415459614,
+          "obtained": 251.415460385,
+          "abs_err": 6.601856210918571e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 earth el 2030-12-31T23:00Z",
+          "expected": 31.133993507,
+          "obtained": 31.133970402,
+          "abs_err": 2.3105211891305544e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun az 2025-03-14T06:00Z",
+          "expected": 329.327327306,
+          "obtained": 329.327326967,
+          "abs_err": 3.21887272427767e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun el 2025-03-14T06:00Z",
+          "expected": 18.027046609,
+          "obtained": 18.027046647,
+          "abs_err": 3.8034698945921264e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun az 2025-09-07T18:00Z",
+          "expected": 321.874715761,
+          "obtained": 321.874715471,
+          "abs_err": 2.7806213688157035e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun el 2025-09-07T18:00Z",
+          "expected": 16.381262676,
+          "obtained": 16.381262332,
+          "abs_err": 3.4401006487883024e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun az 2026-06-15T12:00Z",
+          "expected": 141.248721917,
+          "obtained": 141.248722196,
+          "abs_err": 2.655615230629787e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun el 2026-06-15T12:00Z",
+          "expected": -17.797157491,
+          "obtained": -17.797157471,
+          "abs_err": 2.0382987742095793e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun az 2027-01-01T00:00Z",
+          "expected": 232.350880955,
+          "obtained": 232.350881521,
+          "abs_err": 5.541538863939392e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun el 2027-01-01T00:00Z",
+          "expected": -11.891949141,
+          "obtained": -11.891949019,
+          "abs_err": 1.2223657464005555e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun az 2027-10-20T03:30Z",
+          "expected": 267.166364798,
+          "obtained": 267.166365076,
+          "abs_err": 2.7818493450453975e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun el 2027-10-20T03:30Z",
+          "expected": 0.544350264,
+          "obtained": 0.544350322,
+          "abs_err": 5.8032230021431985e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun az 2028-02-29T12:00Z",
+          "expected": 96.420357111,
+          "obtained": 96.420357448,
+          "abs_err": 3.359175492581354e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun el 2028-02-29T12:00Z",
+          "expected": -3.449143105,
+          "obtained": -3.449143206,
+          "abs_err": 1.0102985514848228e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun az 2029-06-26T03:00Z",
+          "expected": 330.897971458,
+          "obtained": 330.897970905,
+          "abs_err": 5.250754520368063e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun el 2029-06-26T03:00Z",
+          "expected": 18.233927488,
+          "obtained": 18.233927077,
+          "abs_err": 4.1147896467919054e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun az 2030-12-31T23:00Z",
+          "expected": 61.637021351,
+          "obtained": 61.637021175,
+          "abs_err": 1.7396432376786103e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 sun el 2030-12-31T23:00Z",
+          "expected": 9.210478705,
+          "obtained": 9.210478774,
+          "abs_err": 6.927471041251465e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth az 2025-03-14T06:00Z",
+          "expected": 328.832755105,
+          "obtained": 328.832754068,
+          "abs_err": 9.860975205832653e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth el 2025-03-14T06:00Z",
+          "expected": 18.083054121,
+          "obtained": 18.083054218,
+          "abs_err": 9.688608670899157e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth az 2025-09-07T18:00Z",
+          "expected": 321.863626009,
+          "obtained": 321.863625265,
+          "abs_err": 7.154917848309726e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth el 2025-09-07T18:00Z",
+          "expected": 15.830668794,
+          "obtained": 15.830668117,
+          "abs_err": 6.766718119166626e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth az 2026-06-15T12:00Z",
+          "expected": 325.996517834,
+          "obtained": 325.996516583,
+          "abs_err": 1.1515996989963457e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth el 2026-06-15T12:00Z",
+          "expected": 23.012136071,
+          "obtained": 23.012133433,
+          "abs_err": 2.6377899544627326e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth az 2027-01-01T00:00Z",
+          "expected": 334.343753864,
+          "obtained": 334.343753148,
+          "abs_err": 6.993488084684021e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth el 2027-01-01T00:00Z",
+          "expected": 12.426117488,
+          "obtained": 12.426141677,
+          "abs_err": 2.418906315249103e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth az 2027-10-20T03:30Z",
+          "expected": 321.249346017,
+          "obtained": 321.249345078,
+          "abs_err": 8.778502793276202e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth el 2027-10-20T03:30Z",
+          "expected": 20.856875068,
+          "obtained": 20.856895215,
+          "abs_err": 2.0146548720845203e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth az 2028-02-29T12:00Z",
+          "expected": 318.435342561,
+          "obtained": 318.43534122,
+          "abs_err": 1.2404150240037025e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth el 2028-02-29T12:00Z",
+          "expected": 22.377503366,
+          "obtained": 22.37748687,
+          "abs_err": 1.649606420528471e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth az 2029-06-26T03:00Z",
+          "expected": 330.692091975,
+          "obtained": 330.692091184,
+          "abs_err": 7.52760333709719e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth el 2029-06-26T03:00Z",
+          "expected": 17.933309987,
+          "obtained": 17.933309771,
+          "abs_err": 2.1593301724465164e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth az 2030-12-31T23:00Z",
+          "expected": 332.719947768,
+          "obtained": 332.719946549,
+          "abs_err": 1.1166749865751177e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "chandrayaan-3 earth el 2030-12-31T23:00Z",
+          "expected": 23.635856214,
+          "obtained": 23.635832674,
+          "abs_err": 2.3539713652098726e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun az 2025-03-14T06:00Z",
+          "expected": 334.009177116,
+          "obtained": 334.009176992,
+          "abs_err": 1.2364201489274606e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun el 2025-03-14T06:00Z",
+          "expected": 4.772199345,
+          "obtained": 4.772199439,
+          "abs_err": 9.402298051242042e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun az 2025-09-07T18:00Z",
+          "expected": 326.699169577,
+          "obtained": 326.699169466,
+          "abs_err": 1.1078394146886036e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun el 2025-09-07T18:00Z",
+          "expected": 4.247755404,
+          "obtained": 4.247755121,
+          "abs_err": 2.827929170834409e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun az 2026-06-15T12:00Z",
+          "expected": 146.348483066,
+          "obtained": 146.348483129,
+          "abs_err": 6.27453684115116e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun el 2026-06-15T12:00Z",
+          "expected": -5.744780709,
+          "obtained": -5.74478063,
+          "abs_err": 7.881572372525625e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun az 2027-01-01T00:00Z",
+          "expected": 233.958170073,
+          "obtained": 233.95817048,
+          "abs_err": 4.071279938241945e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun el 2027-01-01T00:00Z",
+          "expected": -2.05395708,
+          "obtained": -2.053957084,
+          "abs_err": 4.1674192985396985e-09,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun az 2027-10-20T03:30Z",
+          "expected": 270.524193103,
+          "obtained": 270.524193372,
+          "abs_err": 2.685565740295384e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun el 2027-10-20T03:30Z",
+          "expected": 1.561366076,
+          "obtained": 1.561366063,
+          "abs_err": 1.2888391243137676e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun az 2028-02-29T12:00Z",
+          "expected": 100.215115234,
+          "obtained": 100.215115559,
+          "abs_err": 3.2521603053650113e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun el 2028-02-29T12:00Z",
+          "expected": -1.903586412,
+          "obtained": -1.903586414,
+          "abs_err": 2.0403203571106587e-09,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun az 2029-06-26T03:00Z",
+          "expected": 335.521338732,
+          "obtained": 335.521338401,
+          "abs_err": 3.301292234438794e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun el 2029-06-26T03:00Z",
+          "expected": 4.772194867,
+          "obtained": 4.772194502,
+          "abs_err": 3.65443151295608e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun az 2030-12-31T23:00Z",
+          "expected": 63.45667439,
+          "obtained": 63.456674332,
+          "abs_err": 5.760478226138368e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 sun el 2030-12-31T23:00Z",
+          "expected": 1.448544679,
+          "obtained": 1.448544699,
+          "abs_err": 1.9547276908227218e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth az 2025-03-14T06:00Z",
+          "expected": 333.583584246,
+          "obtained": 333.583583633,
+          "abs_err": 6.102825106578696e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth el 2025-03-14T06:00Z",
+          "expected": 4.880420981,
+          "obtained": 4.880421224,
+          "abs_err": 2.4331386594411697e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth az 2025-09-07T18:00Z",
+          "expected": 326.639276583,
+          "obtained": 326.639276216,
+          "abs_err": 3.6576472157480856e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth el 2025-09-07T18:00Z",
+          "expected": 3.693507281,
+          "obtained": 3.693506754,
+          "abs_err": 5.266772640233341e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth az 2026-06-15T12:00Z",
+          "expected": 331.681043412,
+          "obtained": 331.681042654,
+          "abs_err": 7.45867915284497e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth el 2026-06-15T12:00Z",
+          "expected": 10.142272285,
+          "obtained": 10.142269677,
+          "abs_err": 2.6079741264339873e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth az 2027-01-01T00:00Z",
+          "expected": 338.111741095,
+          "obtained": 338.1117408,
+          "abs_err": 2.953096275475011e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth el 2027-01-01T00:00Z",
+          "expected": -1.417407085,
+          "obtained": -1.41738227,
+          "abs_err": 2.481504820561753e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth az 2027-10-20T03:30Z",
+          "expected": 326.922113933,
+          "obtained": 326.922113393,
+          "abs_err": 5.332648083571811e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth el 2027-10-20T03:30Z",
+          "expected": 8.740915536,
+          "obtained": 8.740937007,
+          "abs_err": 2.147108668637543e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth az 2028-02-29T12:00Z",
+          "expected": 324.58438092,
+          "obtained": 324.584380017,
+          "abs_err": 8.876859931133042e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth el 2028-02-29T12:00Z",
+          "expected": 10.702171817,
+          "obtained": 10.70215457,
+          "abs_err": 1.724703973415842e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth az 2029-06-26T03:00Z",
+          "expected": 335.320468599,
+          "obtained": 335.320468239,
+          "abs_err": 3.590575719828018e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth el 2029-06-26T03:00Z",
+          "expected": 4.486212527,
+          "obtained": 4.486212456,
+          "abs_err": 7.095790888200781e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth az 2030-12-31T23:00Z",
+          "expected": 337.96667711,
+          "obtained": 337.966676368,
+          "abs_err": 7.306400483747882e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "im-2 earth el 2030-12-31T23:00Z",
+          "expected": 9.885020257,
+          "obtained": 9.884995137,
+          "abs_err": 2.512033899293442e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun az 2025-03-14T06:00Z",
+          "expected": 239.905529665,
+          "obtained": 239.905529627,
+          "abs_err": 3.762154954225487e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun el 2025-03-14T06:00Z",
+          "expected": -0.51465626,
+          "obtained": -0.51465616,
+          "abs_err": 1.0005741890584119e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun az 2025-09-07T18:00Z",
+          "expected": 232.606038025,
+          "obtained": 232.606037994,
+          "abs_err": 3.1195737384320304e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun el 2025-09-07T18:00Z",
+          "expected": -0.838572872,
+          "obtained": -0.83857315,
+          "abs_err": 2.7832252524895296e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun az 2026-06-15T12:00Z",
+          "expected": 52.306978822,
+          "obtained": 52.306978799,
+          "abs_err": 2.3390039244077575e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun el 2026-06-15T12:00Z",
+          "expected": -0.669319126,
+          "obtained": -0.669319043,
+          "abs_err": 8.315179311768617e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun az 2027-01-01T00:00Z",
+          "expected": 139.723211663,
+          "obtained": 139.723212033,
+          "abs_err": 3.70012480402916e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun el 2027-01-01T00:00Z",
+          "expected": 0.098432944,
+          "obtained": 0.098432907,
+          "abs_err": 3.688732817808127e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun az 2027-10-20T03:30Z",
+          "expected": 176.460755914,
+          "obtained": 176.460756201,
+          "abs_err": 2.866820731512329e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun el 2027-10-20T03:30Z",
+          "expected": 0.309608311,
+          "obtained": 0.309608275,
+          "abs_err": 3.609804888338175e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun az 2028-02-29T12:00Z",
+          "expected": 6.138716243,
+          "obtained": 6.138716532,
+          "abs_err": 2.8895502765000104e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun el 2028-02-29T12:00Z",
+          "expected": 0.21977014,
+          "obtained": 0.219770167,
+          "abs_err": 2.7493463644612248e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun az 2029-06-26T03:00Z",
+          "expected": 241.412195911,
+          "obtained": 241.412195665,
+          "abs_err": 2.4629068920333225e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun el 2029-06-26T03:00Z",
+          "expected": -0.545491646,
+          "obtained": -0.545492008,
+          "abs_err": 3.624708957428169e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun az 2030-12-31T23:00Z",
+          "expected": 329.233164953,
+          "obtained": 329.233164916,
+          "abs_err": 3.733440309624989e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate sun el 2030-12-31T23:00Z",
+          "expected": 0.149468261,
+          "obtained": 0.149468277,
+          "abs_err": 1.5888803772678983e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth az 2025-03-14T06:00Z",
+          "expected": 239.489428949,
+          "obtained": 239.489428496,
+          "abs_err": 4.531761749048459e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth el 2025-03-14T06:00Z",
+          "expected": -0.398075206,
+          "obtained": -0.398074954,
+          "abs_err": 2.516486689030373e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth az 2025-09-07T18:00Z",
+          "expected": 232.536798838,
+          "obtained": 232.536798633,
+          "abs_err": 2.0519142420730954e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth el 2025-09-07T18:00Z",
+          "expected": -1.391152997,
+          "obtained": -1.391153499,
+          "abs_err": 5.0248801208852e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth az 2026-06-15T12:00Z",
+          "expected": 237.729742319,
+          "obtained": 237.729741746,
+          "abs_err": 5.704115256650321e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth el 2026-06-15T12:00Z",
+          "expected": 4.904883065,
+          "obtained": 4.904880445,
+          "abs_err": 2.620210522330524e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth az 2027-01-01T00:00Z",
+          "expected": 243.903712736,
+          "obtained": 243.903712601,
+          "abs_err": 1.3440745462619976e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth el 2027-01-01T00:00Z",
+          "expected": -6.776959768,
+          "obtained": -6.776935128,
+          "abs_err": 2.4640082355809056e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth az 2027-10-20T03:30Z",
+          "expected": 232.984783263,
+          "obtained": 232.984782887,
+          "abs_err": 3.747844952490002e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth el 2027-10-20T03:30Z",
+          "expected": 3.642124717,
+          "obtained": 3.642146404,
+          "abs_err": 2.168737543550847e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth az 2028-02-29T12:00Z",
+          "expected": 230.743218619,
+          "obtained": 230.743217886,
+          "abs_err": 7.295290541702574e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth el 2028-02-29T12:00Z",
+          "expected": 5.681765962,
+          "obtained": 5.681748539,
+          "abs_err": 1.742316046016157e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth az 2029-06-26T03:00Z",
+          "expected": 241.211645478,
+          "obtained": 241.211645286,
+          "abs_err": 1.9186502404440664e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth el 2029-06-26T03:00Z",
+          "expected": -0.828373459,
+          "obtained": -0.82837351,
+          "abs_err": 5.058012386705002e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth az 2030-12-31T23:00Z",
+          "expected": 243.930844754,
+          "obtained": 243.930844182,
+          "abs_err": 5.698294626288888e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-7-candidate earth el 2030-12-31T23:00Z",
+          "expected": 4.521681004,
+          "obtained": 4.521655605,
+          "abs_err": 2.5398885904692747e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun az 2025-03-14T06:00Z",
+          "expected": 3.301681793,
+          "obtained": 3.301681743,
+          "abs_err": 4.9797070972847444e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun el 2025-03-14T06:00Z",
+          "expected": 0.186941868,
+          "obtained": 0.186941971,
+          "abs_err": 1.0298514024897898e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun az 2025-09-07T18:00Z",
+          "expected": 355.99816642,
+          "obtained": 355.998166372,
+          "abs_err": 4.777189060638942e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun el 2025-09-07T18:00Z",
+          "expected": -0.009983855,
+          "obtained": -0.009984133,
+          "abs_err": 2.7766801190612367e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun az 2026-06-15T12:00Z",
+          "expected": 175.723954836,
+          "obtained": 175.723954825,
+          "abs_err": 1.1190097744306938e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun el 2026-06-15T12:00Z",
+          "expected": -1.502631949,
+          "obtained": -1.502631866,
+          "abs_err": 8.32636772862827e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun az 2027-01-01T00:00Z",
+          "expected": 263.113923095,
+          "obtained": 263.11392345,
+          "abs_err": 3.5494606190692394e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun el 2027-01-01T00:00Z",
+          "expected": 1.00192429,
+          "obtained": 1.001924258,
+          "abs_err": 3.1525685617594945e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun az 2027-10-20T03:30Z",
+          "expected": 299.857259369,
+          "obtained": 299.857259636,
+          "abs_err": 2.666297008931182e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun el 2027-10-20T03:30Z",
+          "expected": 1.557105113,
+          "obtained": 1.557105078,
+          "abs_err": 3.548195448566105e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun az 2028-02-29T12:00Z",
+          "expected": 129.538206507,
+          "obtained": 129.538206817,
+          "abs_err": 3.097029257591123e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun el 2028-02-29T12:00Z",
+          "expected": -1.037008586,
+          "obtained": -1.037008558,
+          "abs_err": 2.783138119966111e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun az 2029-06-26T03:00Z",
+          "expected": 4.807468059,
+          "obtained": 4.807467797,
+          "abs_err": 2.624067522101992e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun el 2029-06-26T03:00Z",
+          "expected": 0.128422246,
+          "obtained": 0.128421882,
+          "abs_err": 3.642989498953142e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun az 2030-12-31T23:00Z",
+          "expected": 92.62770961,
+          "obtained": 92.62770959,
+          "abs_err": 2.0457545446621336e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s sun el 2030-12-31T23:00Z",
+          "expected": -0.886213876,
+          "obtained": -0.88621386,
+          "abs_err": 1.596110987822641e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth az 2025-03-14T06:00Z",
+          "expected": 2.892262122,
+          "obtained": 2.892261648,
+          "abs_err": 4.7376870492073646e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth el 2025-03-14T06:00Z",
+          "expected": 0.311023245,
+          "obtained": 0.311023506,
+          "abs_err": 2.6089018861918944e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth az 2025-09-07T18:00Z",
+          "expected": 355.924257469,
+          "obtained": 355.924257236,
+          "abs_err": 2.328092338757228e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth el 2025-09-07T18:00Z",
+          "expected": -0.561448816,
+          "obtained": -0.561449318,
+          "abs_err": 5.017370946491795e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth az 2026-06-15T12:00Z",
+          "expected": 1.227758715,
+          "obtained": 1.227758118,
+          "abs_err": 5.941636639739596e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth el 2026-06-15T12:00Z",
+          "expected": 5.645037844,
+          "obtained": 5.645035239,
+          "abs_err": 2.6051740000809787e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth az 2027-01-01T00:00Z",
+          "expected": 7.184251919,
+          "obtained": 7.184251765,
+          "abs_err": 1.5353373749164177e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth el 2027-01-01T00:00Z",
+          "expected": -6.149074683,
+          "obtained": -6.14905001,
+          "abs_err": 2.4673134793928853e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth az 2027-10-20T03:30Z",
+          "expected": 356.455811553,
+          "obtained": 356.45581115,
+          "abs_err": 4.0222112224401003e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth el 2027-10-20T03:30Z",
+          "expected": 4.464053337,
+          "obtained": 4.464075013,
+          "abs_err": 2.167576703460128e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth az 2028-02-29T12:00Z",
+          "expected": 354.244847591,
+          "obtained": 354.244846835,
+          "abs_err": 7.509485862288807e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth el 2028-02-29T12:00Z",
+          "expected": 6.540199218,
+          "obtained": 6.540181835,
+          "abs_err": 1.738265368089742e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth az 2029-06-26T03:00Z",
+          "expected": 4.60664919,
+          "obtained": 4.606648975,
+          "abs_err": 2.145881654607667e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth el 2029-06-26T03:00Z",
+          "expected": -0.150770624,
+          "obtained": -0.150770672,
+          "abs_err": 4.824462229713333e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth az 2030-12-31T23:00Z",
+          "expected": 7.427121722,
+          "obtained": 7.42712113,
+          "abs_err": 5.89272972921438e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "val-899s earth el 2030-12-31T23:00Z",
+          "expected": 5.147543872,
+          "obtained": 5.147518508,
+          "abs_err": 2.536369789307713e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun az 2025-03-14T06:00Z",
+          "expected": 187.978611092,
+          "obtained": 187.978611989,
+          "abs_err": 6.432957209800319e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun el 2025-03-14T06:00Z",
+          "expected": -44.177581828,
+          "obtained": -44.177581634,
+          "abs_err": 1.939213802870654e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun az 2025-09-07T18:00Z",
+          "expected": 177.764979022,
+          "obtained": 177.764979867,
+          "abs_err": 6.012239794850958e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun el 2025-09-07T18:00Z",
+          "expected": -44.631692034,
+          "obtained": -44.631692372,
+          "abs_err": 3.378706665557729e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun az 2026-06-15T12:00Z",
+          "expected": 357.44650443,
+          "obtained": 357.446503501,
+          "abs_err": 6.78052698068181e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun el 2026-06-15T12:00Z",
+          "expected": 43.112025428,
+          "obtained": 43.11202549,
+          "abs_err": 6.24060305653984e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun az 2027-01-01T00:00Z",
+          "expected": 87.521149901,
+          "obtained": 87.521150104,
+          "abs_err": 2.027643086110024e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun el 2027-01-01T00:00Z",
+          "expected": 3.859130179,
+          "obtained": 3.859129951,
+          "abs_err": 2.282703257527885e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun az 2027-10-20T03:30Z",
+          "expected": 115.262384199,
+          "obtained": 115.262384703,
+          "abs_err": 4.708657363383849e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun el 2027-10-20T03:30Z",
+          "expected": -20.833261882,
+          "obtained": -20.833262295,
+          "abs_err": 4.1253317206724205e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun az 2028-02-29T12:00Z",
+          "expected": 303.29056917,
+          "obtained": 303.290569023,
+          "abs_err": 1.3048442111303036e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun el 2028-02-29T12:00Z",
+          "expected": 27.177225476,
+          "obtained": 27.177225425,
+          "abs_err": 5.054719665054108e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun az 2029-06-26T03:00Z",
+          "expected": 190.072527526,
+          "obtained": 190.072527977,
+          "abs_err": 3.2372176307913673e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun el 2029-06-26T03:00Z",
+          "expected": -44.069863781,
+          "obtained": -44.069864084,
+          "abs_err": 3.0257564276325866e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun az 2030-12-31T23:00Z",
+          "expected": 274.214684567,
+          "obtained": 274.214684494,
+          "abs_err": 7.314349078996688e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 sun el 2030-12-31T23:00Z",
+          "expected": 2.903611801,
+          "obtained": 2.903611764,
+          "abs_err": 3.65799546209189e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth az 2025-03-14T06:00Z",
+          "expected": 187.363455564,
+          "obtained": 187.363456554,
+          "abs_err": 7.116088698011159e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth el 2025-03-14T06:00Z",
+          "expected": -44.024026099,
+          "obtained": -44.024025905,
+          "abs_err": 1.9393854699956137e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth az 2025-09-07T18:00Z",
+          "expected": 177.649680992,
+          "obtained": 177.649682483,
+          "abs_err": 1.0521939857443388e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth el 2025-09-07T18:00Z",
+          "expected": -45.101958609,
+          "obtained": -45.101958928,
+          "abs_err": 3.1871000061300947e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth az 2026-06-15T12:00Z",
+          "expected": 184.635468167,
+          "obtained": 184.635469148,
+          "abs_err": 7.643979884623226e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth el 2026-06-15T12:00Z",
+          "expected": -38.835377509,
+          "obtained": -38.835379522,
+          "abs_err": 2.013095141251142e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth az 2027-01-01T00:00Z",
+          "expected": 194.843494792,
+          "obtained": 194.843496352,
+          "abs_err": 1.0059471087202043e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth el 2027-01-01T00:00Z",
+          "expected": -49.831234992,
+          "obtained": -49.831218873,
+          "abs_err": 1.6118738805914745e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth az 2027-10-20T03:30Z",
+          "expected": 178.528830214,
+          "obtained": 178.528831367,
+          "abs_err": 8.817554537871109e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth el 2027-10-20T03:30Z",
+          "expected": -40.107958378,
+          "obtained": -40.107941885,
+          "abs_err": 1.6493352518409665e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth az 2028-02-29T12:00Z",
+          "expected": 175.799003589,
+          "obtained": 175.799004201,
+          "abs_err": 4.826086313675393e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth el 2028-02-29T12:00Z",
+          "expected": -37.966078968,
+          "obtained": -37.966092672,
+          "abs_err": 1.3704347125553795e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth az 2029-06-26T03:00Z",
+          "expected": 189.797213625,
+          "obtained": 189.797215079,
+          "abs_err": 1.0406279954029658e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth el 2029-06-26T03:00Z",
+          "expected": -44.2976517,
+          "obtained": -44.297651545,
+          "abs_err": 1.549646881926492e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth az 2030-12-31T23:00Z",
+          "expected": 192.552805063,
+          "obtained": 192.552805867,
+          "abs_err": 6.275333284252586e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-4 earth el 2030-12-31T23:00Z",
+          "expected": -38.685149803,
+          "obtained": -38.685169578,
+          "abs_err": 1.977542133602128e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun az 2025-03-14T06:00Z",
+          "expected": 147.837992634,
+          "obtained": 147.837993523,
+          "abs_err": 6.450678196693574e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun el 2025-03-14T06:00Z",
+          "expected": -43.502151352,
+          "obtained": -43.502151422,
+          "abs_err": 7.006339330928313e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun az 2025-09-07T18:00Z",
+          "expected": 138.921945258,
+          "obtained": 138.921945756,
+          "abs_err": 3.7890633639683826e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun el 2025-09-07T18:00Z",
+          "expected": -40.420138312,
+          "obtained": -40.420138914,
+          "abs_err": 6.017600924224098e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun az 2026-06-15T12:00Z",
+          "expected": 319.569496039,
+          "obtained": 319.569495281,
+          "abs_err": 5.891568150427763e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun el 2026-06-15T12:00Z",
+          "expected": 38.966209194,
+          "obtained": 38.966208971,
+          "abs_err": 2.227568245416478e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun az 2027-01-01T00:00Z",
+          "expected": 67.507494479,
+          "obtained": 67.507494439,
+          "abs_err": 3.604866166982185e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun el 2027-01-01T00:00Z",
+          "expected": 24.684702473,
+          "obtained": 24.684702479,
+          "abs_err": 5.573035366523982e-09,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun az 2027-10-20T03:30Z",
+          "expected": 93.683140562,
+          "obtained": 93.683140761,
+          "abs_err": 1.9843043279969385e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun el 2027-10-20T03:30Z",
+          "expected": -1.869417692,
+          "obtained": -1.86941794,
+          "abs_err": 2.475182530048414e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun az 2028-02-29T12:00Z",
+          "expected": 279.807752258,
+          "obtained": 279.807752328,
+          "abs_err": 6.936906863265241e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun el 2028-02-29T12:00Z",
+          "expected": 9.408025277,
+          "obtained": 9.40802541,
+          "abs_err": 1.3251602482000635e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun az 2029-06-26T03:00Z",
+          "expected": 149.730806408,
+          "obtained": 149.730806478,
+          "abs_err": 5.0403216611507774e-08,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun el 2029-06-26T03:00Z",
+          "expected": -44.139183371,
+          "obtained": -44.139183988,
+          "abs_err": 6.166621062675404e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun az 2030-12-31T23:00Z",
+          "expected": 254.634152896,
+          "obtained": 254.634153069,
+          "abs_err": 1.6508233694403365e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 sun el 2030-12-31T23:00Z",
+          "expected": -17.868136183,
+          "obtained": -17.868135977,
+          "abs_err": 2.0632211672477752e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth az 2025-03-14T06:00Z",
+          "expected": 147.526384883,
+          "obtained": 147.526385738,
+          "abs_err": 6.236474121279494e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth el 2025-03-14T06:00Z",
+          "expected": -43.178481295,
+          "obtained": -43.178481436,
+          "abs_err": 1.4104704604278595e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth az 2025-09-07T18:00Z",
+          "expected": 138.654045492,
+          "obtained": 138.6540466,
+          "abs_err": 8.381635492893948e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth el 2025-09-07T18:00Z",
+          "expected": -40.833152884,
+          "obtained": -40.833153678,
+          "abs_err": 7.939414459201544e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth az 2026-06-15T12:00Z",
+          "expected": 148.322504797,
+          "obtained": 148.322505681,
+          "abs_err": 7.003555530730412e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth el 2026-06-15T12:00Z",
+          "expected": -37.636558073,
+          "obtained": -37.636560427,
+          "abs_err": 2.3538070053064075e-06,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth az 2027-01-01T00:00Z",
+          "expected": 149.612223975,
+          "obtained": 149.612225447,
+          "abs_err": 9.309251888144484e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth el 2027-01-01T00:00Z",
+          "expected": -50.77468418,
+          "obtained": -50.774668984,
+          "abs_err": 1.5196410899420698e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth az 2027-10-20T03:30Z",
+          "expected": 142.30812907,
+          "obtained": 142.308129912,
+          "abs_err": 6.749710920686323e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth el 2027-10-20T03:30Z",
+          "expected": -36.678896083,
+          "obtained": -36.678879092,
+          "abs_err": 1.6991002190991367e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth az 2028-02-29T12:00Z",
+          "expected": 141.101563728,
+          "obtained": 141.1015643,
+          "abs_err": 4.7540679142967557e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth el 2028-02-29T12:00Z",
+          "expected": -33.826499107,
+          "obtained": -33.826513717,
+          "abs_err": 1.461044758599428e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth az 2029-06-26T03:00Z",
+          "expected": 149.464981507,
+          "obtained": 149.46498288,
+          "abs_err": 9.834029200823307e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth el 2029-06-26T03:00Z",
+          "expected": -44.265940941,
+          "obtained": -44.265941313,
+          "abs_err": 3.7241067474269585e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth az 2030-12-31T23:00Z",
+          "expected": 155.48828798,
+          "obtained": 155.488288786,
+          "abs_err": 6.14764080337865e-07,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "change-6 earth el 2030-12-31T23:00Z",
+          "expected": -40.280304681,
+          "obtained": -40.280324279,
+          "abs_err": 1.959764968972877e-05,
           "unit": "deg",
           "ok": true
         }
       ],
-      "note": "Example report (synthetic values)."
+      "note": "Ephemeris table used by the web; azimuth error weighted by cos(elevation)."
+    },
+    {
+      "id": "A2",
+      "group": "A",
+      "title": "Sunrise and sunset in March 2025 vs JPL Horizons (smooth Moon)",
+      "expected": "0 deg crossings of the 1-minute Horizons series at 3 sites",
+      "tolerance": "5 min",
+      "source": {
+        "label": "JPL Horizons",
+        "url": "https://ssd.jpl.nasa.gov/horizons/"
+      },
+      "status": "pass",
+      "obtained": "max |dt| 0.5 s over 7 crossings",
+      "details": [
+        {
+          "label": "apollo-11 sunrise",
+          "expected": "2025-03-05T04:37:22.655474Z",
+          "obtained": "2025-03-05T04:37:23.000000Z",
+          "abs_err": 0.3445258140563965,
+          "unit": "s",
+          "ok": true
+        },
+        {
+          "label": "apollo-11 sunset",
+          "expected": "2025-03-19T23:49:58.053818Z",
+          "obtained": "2025-03-19T23:49:58.000000Z",
+          "abs_err": 0.0538182258605957,
+          "unit": "s",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sunrise",
+          "expected": "2025-03-02T01:27:51.792547Z",
+          "obtained": "2025-03-02T01:27:52.000000Z",
+          "abs_err": 0.20745301246643066,
+          "unit": "s",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sunset",
+          "expected": "2025-03-16T20:10:39.079561Z",
+          "obtained": "2025-03-16T20:10:39.000000Z",
+          "abs_err": 0.07956099510192871,
+          "unit": "s",
+          "ok": true
+        },
+        {
+          "label": "blue-ghost-1 sunrise",
+          "expected": "2025-03-31T14:11:56.238917Z",
+          "obtained": "2025-03-31T14:11:56.000000Z",
+          "abs_err": 0.23891687393188477,
+          "unit": "s",
+          "ok": true
+        },
+        {
+          "label": "change-3 sunrise",
+          "expected": "2025-03-08T17:50:01.543129Z",
+          "obtained": "2025-03-08T17:50:01.000000Z",
+          "abs_err": 0.5431292057037354,
+          "unit": "s",
+          "ok": true
+        },
+        {
+          "label": "change-3 sunset",
+          "expected": "2025-03-23T12:48:08.380552Z",
+          "obtained": "2025-03-23T12:48:08.000000Z",
+          "abs_err": 0.3805515766143799,
+          "unit": "s",
+          "ok": true
+        }
+      ],
+      "note": "Smooth Moon, observer at 0 m, centre of the Sun."
+    },
+    {
+      "id": "A3",
+      "group": "A",
+      "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
+      "expected": "Sunset between 18:00 and 18:15 UTC (last data 23:15 UTC, 5 hours into the lunar night)",
+      "tolerance": "30 min",
+      "source": {
+        "label": "Firefly Aerospace, end of Blue Ghost Mission 1 surface operations",
+        "url": "https://fireflyspace.com/news/firefly-aerospace-successfully-completes-14-days-of-surface-operations-on-the-moon"
+      },
+      "status": "fail",
+      "obtained": "Sunset 18:53:55 UTC (SLDEM2015 59 m, observer 2 m); disc fully set 19:28:03 UTC",
+      "details": [
+        {
+          "label": "Sunset",
+          "expected": "2025-03-16T18:00:00Z/2025-03-16T18:15:00Z",
+          "obtained": "2025-03-16T18:53:55Z",
+          "abs_err": 38.92,
+          "unit": "min",
+          "ok": false
+        },
+        {
+          "label": "Half of the disc set (fraction 0.5)",
+          "expected": null,
+          "obtained": "2025-03-16T18:53:55Z",
+          "abs_err": null,
+          "unit": "UTC",
+          "ok": null
+        },
+        {
+          "label": "Disc fully set (fraction 0)",
+          "expected": null,
+          "obtained": "2025-03-16T19:28:03Z",
+          "abs_err": null,
+          "unit": "UTC",
+          "ok": null
+        },
+        {
+          "label": "Horizon at azimuth 269.7 deg",
+          "expected": 0.9,
+          "obtained": 0.6182,
+          "abs_err": 0.2818,
+          "unit": "deg",
+          "ok": null
+        },
+        {
+          "label": "Sun elevation at 18:15 UTC (observer at 2 m)",
+          "expected": 0.924849952,
+          "obtained": 0.92484,
+          "abs_err": 1e-05,
+          "unit": "deg",
+          "ok": null
+        },
+        {
+          "label": "Smooth-Moon sunset, observer at 0 m",
+          "expected": "2025-03-16T20:10:39Z",
+          "obtained": "2025-03-16T20:10:39Z",
+          "abs_err": 0.0,
+          "unit": "s",
+          "ok": true
+        }
+      ],
+      "note": "Our sunset of the centre of the Sun, with the SLDEM2015 59 m horizon and the observer at 2 m, is at 18:53:55 UTC: 39 min after the end of the 18:00-18:15 UTC window inferred from Firefly's account, beyond the 30 min tolerance. Our horizon toward the setting Sun (azimuth 269.7 deg) is 0.62 deg; the window implies about 0.9 deg. Under review: the terrain crop, what Firefly calls sunset, and the observer height."
     },
     {
       "id": "A4",
       "group": "A",
-      "title": "Smooth sphere and synthetic hill",
-      "status": "pass",
+      "title": "Horizon of a smooth sphere and of a 3 km mountain, by hand",
       "expected": "-0.087, -0.615, -1.943 and 2.606 deg",
-      "obtained": "all within 0.001 deg",
       "tolerance": "0.005 deg",
       "source": {
-        "label": "Hand calculation, R = 1737.4 km",
+        "label": "Hand calculation with R = 1737.4 km",
         "url": ""
       },
+      "status": "skipped",
+      "obtained": "",
       "details": [],
-      "note": "Example report (synthetic values)."
+      "note": "Not run in this build."
     },
     {
       "id": "A5",
       "group": "A",
-      "title": "Terrain section vs QGIS profile",
-      "status": "manual",
-      "expected": "Same blocking point",
-      "obtained": "Signed off by A1",
-      "tolerance": "\u2014",
+      "title": "Horizon at three azimuths of Malapert massif vs a manual terrain profile",
+      "expected": "Our mask elevation at 0, 120 and 240 deg azimuth",
+      "tolerance": "0.1 deg",
       "source": {
-        "label": "QGIS",
+        "label": "Manual profile in QGIS (same terrain model)",
         "url": ""
       },
+      "status": "skipped",
+      "obtained": "",
       "details": [],
-      "note": "Example report (synthetic values)."
+      "note": "Manual check not done yet."
+    },
+    {
+      "id": "A6",
+      "group": "A",
+      "title": "Longest light near Shackleton crater vs published values",
+      "expected": "Continuous light of about 240 days; longest night about 1.5 days",
+      "tolerance": "Same order (factor 3)",
+      "source": {
+        "label": "Mazarico et al. (2011), Icarus 211",
+        "url": "https://doi.org/10.1016/j.icarus.2010.10.030"
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Not run in this build."
+    },
+    {
+      "id": "A7",
+      "group": "A",
+      "title": "Mean Sun and Earth visibility at 20 random south pole points vs NASA maps",
+      "expected": "NASA AVGVISIB maps at the same points",
+      "tolerance": "r > 0.9 and mean |diff| < 10 points",
+      "source": {
+        "label": "NASA PGDA, south pole illumination products",
+        "url": "https://pgda.gsfc.nasa.gov/products/69"
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Not run in this build."
+    },
+    {
+      "id": "A8",
+      "group": "A",
+      "title": "Geometric sanity checks, 2024-2044 (smooth Moon)",
+      "expected": "Chang'e 4: Earth always below the horizon. (0, 0): Earth always above 75 deg. South pole: |Sun elevation| < 1.6 deg and |Earth elevation| < 7.5 deg",
+      "tolerance": "Exact",
+      "source": {
+        "label": "Lunar orbital geometry",
+        "url": ""
+      },
+      "status": "pass",
+      "obtained": "Chang'e 4: highest Earth elevation (2024-09-25T03:00:00Z): -37.1212 deg; (0, 0): lowest Earth elevation (2033-10-14T15:00:00Z): 79.4856 deg; South pole: largest |Sun elevation| (2044-06-10T09:00:00Z): 1.5898 deg; South pole: largest |Earth elevation| (2038-01-13T05:00:00Z): 7.1087 deg",
+      "details": [
+        {
+          "label": "Chang'e 4: highest Earth elevation (2024-09-25T03:00:00Z)",
+          "expected": "< 0.0",
+          "obtained": -37.1212,
+          "abs_err": 37.1212,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "(0, 0): lowest Earth elevation (2033-10-14T15:00:00Z)",
+          "expected": "> 75.0",
+          "obtained": 79.4856,
+          "abs_err": 4.4856,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "South pole: largest |Sun elevation| (2044-06-10T09:00:00Z)",
+          "expected": "< 1.6",
+          "obtained": 1.5898,
+          "abs_err": 0.0102,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "South pole: largest |Earth elevation| (2038-01-13T05:00:00Z)",
+          "expected": "< 7.5",
+          "obtained": 7.1087,
+          "abs_err": 0.3913,
+          "unit": "deg",
+          "ok": true
+        }
+      ],
+      "note": "Smooth Moon, observer at 0 m, every hour from 2024-01-01T00:00:00Z to 2045-01-01T00:00:00Z (184105 instants)."
+    },
+    {
+      "id": "A9",
+      "group": "A",
+      "title": "Invariants of the horizon, the disc fraction and the ephemeris table",
+      "expected": "Disc fraction in [0, 1]; a taller mast never raises the horizon; table vs SPICE < 0.001 deg",
+      "tolerance": "Exact",
+      "source": {
+        "label": "Logical properties",
+        "url": ""
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Not run in this build."
+    },
+    {
+      "id": "A11",
+      "group": "A",
+      "title": "Demo pair: opposite results with a cause visible in the terrain",
+      "expected": "Opposite results for a visible reason",
+      "tolerance": "Qualitative",
+      "source": {
+        "label": "Manual profile in QGIS",
+        "url": ""
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Manual check not done yet."
     },
     {
       "id": "B1",
       "group": "B",
-      "title": "Sunrise and sunset in the web vs Python",
-      "status": "skipped",
-      "expected": "\u2014",
-      "obtained": "\u2014",
-      "tolerance": "1 min",
+      "title": "Interface figures vs the Python reference in five scenarios",
+      "expected": "Panel figures equal to the reference",
+      "tolerance": "0.01 deg and 1 min",
       "source": {
-        "label": "Python reference",
+        "label": "Python reference validated at checkpoint A",
         "url": ""
       },
+      "status": "skipped",
+      "obtained": "",
       "details": [],
-      "note": "Not run in the example data. Example report (synthetic values)."
+      "note": "Not run in this build."
+    },
+    {
+      "id": "B2",
+      "group": "B",
+      "title": "Blue Ghost 1 delayed by 14 and 29.5 days",
+      "expected": "+14 d: no go; +29.5 d: go",
+      "tolerance": "Correct traffic light",
+      "source": {
+        "label": "Lunar synodic period",
+        "url": ""
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Not run in this build."
+    },
+    {
+      "id": "B3",
+      "group": "B",
+      "title": "Total solar eclipse seen by Blue Ghost 1 (14 March 2025)",
+      "expected": "Partial 05:00-09:52 UTC, total 06:18-08:34 UTC",
+      "tolerance": "5 min",
+      "source": {
+        "label": "Firefly Aerospace, Blue Ghost Mission 1 updates",
+        "url": "https://fireflyspace.com/?p=3379"
+      },
+      "status": "pass",
+      "obtained": "Eclipse starts 05:00:46 UTC, Totality starts 06:17:27 UTC, Totality ends 08:34:27 UTC, Eclipse ends 09:51:13 UTC",
+      "details": [
+        {
+          "label": "Eclipse starts",
+          "expected": "2025-03-14T05:00:00.000000Z",
+          "obtained": "2025-03-14T05:00:46.000000Z",
+          "abs_err": 0.77,
+          "unit": "min",
+          "ok": true
+        },
+        {
+          "label": "Totality starts",
+          "expected": "2025-03-14T06:18:00.000000Z",
+          "obtained": "2025-03-14T06:17:27.000000Z",
+          "abs_err": 0.55,
+          "unit": "min",
+          "ok": true
+        },
+        {
+          "label": "Totality ends",
+          "expected": "2025-03-14T08:34:00.000000Z",
+          "obtained": "2025-03-14T08:34:27.000000Z",
+          "abs_err": 0.45,
+          "unit": "min",
+          "ok": true
+        },
+        {
+          "label": "Eclipse ends",
+          "expected": "2025-03-14T09:52:00.000000Z",
+          "obtained": "2025-03-14T09:51:13.000000Z",
+          "abs_err": 0.78,
+          "unit": "min",
+          "ok": true
+        }
+      ],
+      "note": "Largest difference 0.8 min. Observer at 0 m; the eclipse does not depend on the terrain."
+    },
+    {
+      "id": "B4",
+      "group": "B",
+      "title": "Eclipses at (0, 0) from 2025 to 2030 vs the NASA eclipse catalogue",
+      "expected": "Every detected interval contains a catalogue maximum; the 6 total eclipses are total",
+      "tolerance": "Same date",
+      "source": {
+        "label": "F. Espenak, NASA GSFC, Lunar Eclipses 2021-2030",
+        "url": "https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html"
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Not run in this build."
+    },
+    {
+      "id": "B5",
+      "group": "B",
+      "title": "Moon elevation from a ground station vs JPL Horizons",
+      "expected": "Horizons values with the station as observer",
+      "tolerance": "0.05 deg and 2 min",
+      "source": {
+        "label": "JPL Horizons",
+        "url": "https://ssd.jpl.nasa.gov/horizons/"
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Not run in this build."
+    },
+    {
+      "id": "B6",
+      "group": "B",
+      "title": "Horizon cube vs per-site masks at 10 cells",
+      "expected": "Same masks and same percentages",
+      "tolerance": "0.01 deg and 0.4 points",
+      "source": {
+        "label": "Two independent computation paths",
+        "url": ""
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Not run in this build."
+    },
+    {
+      "id": "B7",
+      "group": "B",
+      "title": "South pole visibility maps vs NASA maps (all cells)",
+      "expected": "Same pattern",
+      "tolerance": "r > 0.9",
+      "source": {
+        "label": "NASA PGDA, south pole illumination products",
+        "url": "https://pgda.gsfc.nasa.gov/products/69"
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Not run in this build."
+    },
+    {
+      "id": "B8",
+      "group": "B",
+      "title": "Three people outside the team, three tasks",
+      "expected": "Each task in under 60 s",
+      "tolerance": "2 of 3 people",
+      "source": {
+        "label": "Direct observation",
+        "url": ""
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Manual check not done yet."
+    },
+    {
+      "id": "B9",
+      "group": "B",
+      "title": "Keyboard, contrast, load time, phone and offline copy",
+      "expected": "Full checklist",
+      "tolerance": "Full checklist",
+      "source": {
+        "label": "Browser audit and manual test",
+        "url": ""
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Manual check not done yet."
+    },
+    {
+      "id": "B10",
+      "group": "B",
+      "title": "Submission checklist",
+      "expected": "Public link, English page, sources, AI statement, licence, video",
+      "tolerance": "Everything present",
+      "source": {
+        "label": "Official submission guide",
+        "url": ""
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Manual check not done yet."
+    },
+    {
+      "id": "B11",
+      "group": "B",
+      "title": "LROC image vs computed lighting (optional)",
+      "expected": "Same pattern of light and shadow",
+      "tolerance": "Visual",
+      "source": {
+        "label": "LROC",
+        "url": ""
+      },
+      "status": "skipped",
+      "obtained": "",
+      "details": [],
+      "note": "Manual check not done yet."
     }
   ]
 }

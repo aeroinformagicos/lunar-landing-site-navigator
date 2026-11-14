@@ -16,6 +16,7 @@ import math
 
 import pytest
 
+from pipeline.cli.report import FIREFLY
 from pipeline.common.constants import R_EARTH_KM, R_SUN_KM
 from pipeline.common.timeutil import iso_to_unix, unix_to_et, unix_to_iso
 from pipeline.ephem.interp import site_frame
@@ -74,15 +75,31 @@ def test_b3_events_against_the_plan_figures(timeline):
         assert abs(times[kind] - U(expected)) <= PLAN_TOL_S, (kind, unix_to_iso(times[kind]))
 
 
-def test_b3_events_against_firefly(timeline):
+# 09 §7: the labels of the headline rows of B3.
+B3_LABELS = {"eclipse_start": "Eclipse starts", "totality_start": "Totality starts",
+             "totality_end": "Totality ends", "eclipse_end": "Eclipse ends"}
+
+
+def test_b3_events_against_firefly(timeline, record_case):
     published = firefly_times()
     assert sorted(published) == sorted(KINDS)
     tol_s = 60.0 * TOL["B3_min"]
     worst = 0.0
+    details = []
     for e in timeline.events:
         d = abs(e.t_unix - published[e.kind])
-        assert d <= tol_s, (e.kind, unix_to_iso(e.t_unix))
+        details.append({"label": B3_LABELS[e.kind], "expected": unix_to_iso(published[e.kind]),
+                        "obtained": unix_to_iso(e.t_unix), "abs_err": round(d / 60.0, 2), "unit": "min",
+                        "ok": d <= tol_s})
         worst = max(worst, d)
+    ok = len(details) == len(KINDS) and all(x["ok"] for x in details)
+    record_case("B3", "pass" if ok else "fail", "Partial 05:00-09:52 UTC, total 06:18-08:34 UTC",
+                ", ".join(f"{x['label']} {x['obtained'][11:19]} UTC" for x in details),
+                f"{TOL['B3_min']} min", FIREFLY, details,
+                f"Largest difference {worst / 60.0:.1f} min. Observer at 0 m; the eclipse does not depend "
+                "on the terrain.")
+    for e in timeline.events:
+        assert abs(e.t_unix - published[e.kind]) <= tol_s, (e.kind, unix_to_iso(e.t_unix))
     print(f"\nB3 against Firefly: max |d t| = {worst:.0f} s (tolerance {tol_s:.0f} s)")
 
 
