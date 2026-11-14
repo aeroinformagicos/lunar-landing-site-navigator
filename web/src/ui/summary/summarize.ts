@@ -116,7 +116,10 @@ export function sentenceNext(input: SummaryInput): string {
   return s;
 }
 
-function reasonText(r: ReasonCode, input: SummaryInput): string {
+/** What the verdict needs (the comparison table shows only this sentence, 10 §8). */
+export type VerdictInput = Pick<SummaryInput, 'assessment' | 'missionDays' | 'sunPct' | 'earthPct' | 'maxNightHours' | 'marginalEarthMarginDeg'>;
+
+function reasonText(r: ReasonCode, input: VerdictInput): string {
   const night = formatHours(input.assessment.longestNightH);
   switch (r) {
     case 'no_sun_at_landing':
@@ -135,7 +138,7 @@ function reasonText(r: ReasonCode, input: SummaryInput): string {
 }
 
 /** Sentence 3: the verdict (10 §8, third table). Several reasons are joined with «and». */
-export function sentenceVerdict(input: SummaryInput): string {
+export function sentenceVerdict(input: VerdictInput): string {
   const a = input.assessment;
   const d = String(input.missionDays); // `14`, `3.5`
   const reasons = a.reasons.map((r) => reasonText(r, input)).join(' and ');

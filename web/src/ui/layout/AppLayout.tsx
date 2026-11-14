@@ -11,6 +11,7 @@ import { DataState } from '../common/DataState';
 import { useScenarioModel, type ScenarioModel } from '../common/model';
 import { MetricsPanel } from '../metrics/MetricsPanel';
 import { useMission, type MissionResult } from '../metrics/useMission';
+import { Compare } from '../compare/Compare';
 import { Panorama } from '../panorama/Panorama';
 import { CrossSection } from '../section/CrossSection';
 import { Timeline } from '../timeline/Timeline';
@@ -67,6 +68,8 @@ export function AppLayout() {
   const setMode = useAppStore((s) => s.setMode);
   const tab = useAppStore((s) => s.tab);
   const setTab = useAppStore((s) => s.setTab);
+  const comparing = useAppStore((s) => s.comparing);
+  const setComparing = useAppStore((s) => s.setComparing);
   const init = useAppStore((s) => s.init);
   const mobile = useIsMobile();
   const [help, setHelp] = useState(false);
@@ -116,7 +119,7 @@ export function AppLayout() {
               ))}
             </div>
             <section id="main-view" className="view" role="tabpanel" aria-labelledby={`tab-${tab}`} tabIndex={-1}>
-              <ActiveView tab={tab} />
+              {comparing ? <Compare onClose={() => setComparing(false)} /> : <ActiveView tab={tab} />}
             </section>
           </main>
           <aside className="app__right" aria-label={t('panel.label')}>
