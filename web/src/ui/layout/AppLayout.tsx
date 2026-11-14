@@ -21,6 +21,9 @@ import { Dialog } from '../common/Dialog';
 import { togglePlay } from '../controls/TimeControls';
 import { ScenarioColumn } from '../scenario/ScenarioColumn';
 import { Header } from './Header';
+import { Button } from '../common/Button';
+import { WelcomeCard } from '../welcome/WelcomeCard';
+import { WELCOME_AT_START } from '../welcome/welcome';
 
 /** The map and its data load on demand, outside the main bundle (02_arquitectura.md §7). */
 const MapView = lazy(() => import('../map/MapView'));
@@ -79,6 +82,7 @@ export function AppLayout() {
   const init = useAppStore((s) => s.init);
   const mobile = useIsMobile();
   const [help, setHelp] = useState(false);
+  const [welcome, setWelcome] = useState(WELCOME_AT_START);
   useShortcuts(() => setHelp(true));
 
   const storyStep = useAppStore((s) => s.storyStep);
@@ -101,14 +105,15 @@ export function AppLayout() {
       {mobile && mode === 'plan' ? (
         <main className="app__plan-mobile">
           <p>{t('mobile.plan')}</p>
-          <button type="button" onClick={() => setMode('explore')}>
+          <Button variant="primary" onClick={() => setMode('explore')}>
             {t('mobile.back')}
-          </button>
+          </Button>
         </main>
       ) : (
         <div className="app__body">
           <ScenarioColumn />
           <main className="app__main">
+            {welcome && mode === 'explore' && <WelcomeCard onClose={() => setWelcome(false)} />}
             <div role="tablist" aria-label={t('tab.label')} className="tabs">
               {tabs.map((tb, i) => (
                 <button

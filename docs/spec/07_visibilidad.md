@@ -229,9 +229,9 @@ function assess(scenario, req):
 
 | Estado | Color e icono | Significado | Texto |
 | --- | --- | --- | --- |
-| `go` | Verde, ✓ | Cumple los tres requisitos con margen | `Still works` |
-| `marginal` | Ámbar, ! | Cumple los tres, pero con poco margen | `Works, low margin` |
-| `no_go` | Rojo, ✕ | Falla al menos uno | `Does not work` |
+| `go` | Verde, ✓ | Cumple los tres requisitos con margen | `Works` |
+| `marginal` | Ámbar, ! | Cumple los tres, pero con poco margen | `Tight` |
+| `no_go` | Rojo, ✕ | Falla al menos uno | `Doesn't work` |
 
 «Sigue valiendo» = estado distinto de `no_go`.
 

@@ -111,7 +111,7 @@ export function sentenceNext(input: SummaryInput): string {
   }
   const ne = input.nextEarth;
   if (ne?.tUnix != null && (ns?.tUnix == null || ne.tUnix < ns.tUnix)) {
-    s += ` Earth link ${ne.kind === 'earthset' ? 'is lost' : 'returns'} in ${formatCountdown(ne.tUnix - t)}.`;
+    s += ` Earth contact ${ne.kind === 'earthset' ? 'is lost' : 'returns'} in ${formatCountdown(ne.tUnix - t)}.`;
   }
   return s;
 }
@@ -125,7 +125,7 @@ function reasonText(r: ReasonCode, input: VerdictInput): string {
     case 'no_sun_at_landing':
       return 'no Sun at landing';
     case 'no_earth_at_landing':
-      return 'no Earth link at landing';
+      return 'no Earth contact at landing';
     case 'night_too_long':
       return `a night of ${night} exceeds the ${input.maxNightHours} h limit`;
     case 'sun_partly_hidden':
@@ -143,7 +143,7 @@ export function sentenceVerdict(input: VerdictInput): string {
   const d = String(input.missionDays); // `14`, `3.5`
   const reasons = a.reasons.map((r) => reasonText(r, input)).join(' and ');
   if (a.status === 'go') {
-    return `For a ${d}-day mission landing at this time, this site works: ${formatPct(input.sunPct)} sunlight, ${formatPct(input.earthPct)} Earth link, longest night ${formatHours(a.longestNightH)}.`;
+    return `For a ${d}-day mission landing at this time, this site works: ${formatPct(input.sunPct)} sunlight, ${formatPct(input.earthPct)} Earth contact, longest night ${formatHours(a.longestNightH)}.`;
   }
   if (a.status === 'marginal') return `This site works for a ${d}-day mission, but with little margin: ${reasons}.`;
   return `This site does not work for a ${d}-day mission landing at this time: ${reasons}.`;

@@ -6,6 +6,7 @@ import { DAY_S, HOUR_S } from '../../core/time';
 import { t } from '../../i18n/t';
 import { activeScenario, advanceCursor, cursorBounds, SLIDER_STEP_S, speedLabel } from '../../state/selectors';
 import { useAppStore } from '../../state/store';
+import { Button } from '../common/Button';
 import { formatMissionDay, formatUtc } from '../common/format';
 
 /** Advances the cursor with requestAnimationFrame while `playing`; stops at the end. */
@@ -68,18 +69,20 @@ export function TimeControls() {
 
   return (
     <div className="time-controls" role="group" aria-label={t('time.label')}>
-      <button type="button" onClick={() => setCursor(cursor - HOUR_S)} aria-label={t('time.back')} title={t('time.back')}>
-        ◀
-      </button>
-      <button type="button" onClick={() => setCursor(cursor + HOUR_S)} aria-label={t('time.forward')} title={t('time.forward')}>
-        ▶
-      </button>
-      <button type="button" className="time-controls__play" onClick={togglePlay} aria-pressed={playing}>
+      {/* Explore's one primary action is Play (14_ux_malaga.md §3). */}
+      <Button variant="primary" className="time-controls__play" onClick={togglePlay} aria-pressed={playing}>
+        <span aria-hidden="true">{playing ? '⏸' : '⏵'}</span>
         {playing ? t('time.pause') : t('time.play')}
-      </button>
-      <button type="button" onClick={cycleSpeed} aria-label={t('time.speed', { speed: speedLabel(speed) })}>
+      </Button>
+      <Button variant="secondary" onClick={() => setCursor(cursor - HOUR_S)} aria-label={t('time.back')} title={t('time.back')}>
+        −1 h
+      </Button>
+      <Button variant="secondary" onClick={() => setCursor(cursor + HOUR_S)} aria-label={t('time.forward')} title={t('time.forward')}>
+        +1 h
+      </Button>
+      <Button variant="secondary" className="time-controls__speed" onClick={cycleSpeed} aria-label={t('time.speed', { speed: speedLabel(speed) })}>
         {speedLabel(speed)}
-      </button>
+      </Button>
       <input
         className="time-controls__slider"
         type="range"

@@ -13,7 +13,7 @@ export const DELAY_STEPS = [
   { label: '2 days', s: 2 * 86_400 },
 ] as const;
 
-export const STATUS_TEXT: Record<Status, string> = { go: 'Still works', marginal: 'Works, low margin', no_go: 'Does not work' };
+export const STATUS_TEXT: Record<Status, string> = { go: 'Works', marginal: 'Tight', no_go: "Doesn't work" };
 export const STATUS_ICON: Record<Status, string> = { go: '✓', marginal: '!', no_go: '✕' };
 
 /** `12 d 7 h`, `6 h`, `3 d` (durations in sentences, 10 §7). */
@@ -44,12 +44,12 @@ export function cellDetail(c: Cell, maxNightHours: number): string {
   return `Landing ${formatUtc(c.landingUnix)} · Sun ${mark(c.sunAtLanding)} · Earth ${mark(c.earthAtLanding)} · Longest night ${night} h ${mark(c.longestNightH <= maxNightHours)}`;
 }
 
-/** Accessible name of a matrix cell: `Demo A, landing 2027-08-02 00:00 UTC: Still works`. */
+/** Accessible name of a matrix cell: `Demo A, landing 2027-08-02 00:00 UTC: Works`. */
 export function cellLabel(siteName: string, c: Cell): string {
   return `${siteName}, landing ${formatUtc(c.landingUnix)}: ${c.status ? STATUS_TEXT[c.status] : 'no data'}`;
 }
 
-/** `Best alternative: Malapert Massif — Still works, 88 % Sun + Earth.` */
+/** `Best alternative: Malapert Massif — Works, 88 % Sun + Earth.` */
 export function alternativeText(r: RankRow | null): string {
   if (!r) return 'No candidate region works for this landing.';
   return `Best alternative: ${r.name} — ${STATUS_TEXT[r.assessment.status]}, ${formatPct(r.assessment.bothPct)} Sun + Earth.`;

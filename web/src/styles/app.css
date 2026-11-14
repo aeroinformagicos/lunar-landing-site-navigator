@@ -1397,6 +1397,575 @@ input[aria-invalid='true'] {
   font-size: 13px;
 }
 
+/* ---- Console polish (T-53, T-54; 14_ux_malaga.md §3–§6) ----
+   Quiet, disciplined chrome so the panorama is the one memorable thing: three surface steps, 1 px
+   borders, a 4 / 8 px rhythm, tabular numerals, one filled primary action per screen. */
+body {
+  background: var(--c-bg);
+  font-feature-settings: 'tnum' 1;
+}
+
+/* One Button, three variants (14 §3), 44 × 44 px minimum and 8 px apart (14 §6). */
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 var(--s4);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.btn--primary {
+  background: var(--c-accent);
+  border: 1px solid var(--c-accent);
+  color: var(--c-on-accent);
+  font-weight: 650;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--c-accent-hover);
+  border-color: var(--c-accent-hover);
+}
+
+.btn--secondary {
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border-strong);
+  color: var(--c-text);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--c-text-muted);
+}
+
+.btn--ghost {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--c-text-muted);
+  padding: 0 var(--s3);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  color: var(--c-text);
+  background: rgb(255 255 255 / 4%);
+}
+
+.btn[aria-pressed='true'] {
+  border-color: var(--c-text);
+}
+
+.btn--primary[aria-pressed='true'] {
+  border-color: var(--c-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}
+
+/* Every other control: same height and 8 px apart. */
+button,
+.button-link,
+input,
+select {
+  min-height: 44px;
+  background-color: var(--c-surface-2);
+  border-color: var(--c-border-strong);
+}
+
+.segmented,
+.tabs,
+.scenario-actions,
+.best__actions,
+.story__controls,
+.welcome__actions,
+.time-controls,
+.pano__toolbar,
+.section__toolbar {
+  gap: var(--s2);
+}
+
+/* Header: brand and purpose line, then the controls (14 §1). */
+.app__header {
+  gap: var(--s2);
+  padding: var(--s2) var(--s4);
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.header__row {
+  gap: var(--s3);
+}
+
+.header__brand {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 360px;
+}
+
+.app__title {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.app__tagline {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--c-text-muted);
+  max-width: 68ch;
+}
+
+/* Mode and view selectors: the active one is underlined and aria-selected, not only coloured (14 §2). */
+.segmented [role='tab'],
+.tabs [role='tab'] {
+  position: relative;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+  color: var(--c-text-muted);
+  font-weight: 500;
+  padding: 0 var(--s4);
+}
+
+.segmented [role='tab']:hover,
+.tabs [role='tab']:hover {
+  color: var(--c-text);
+}
+
+.segmented [role='tab'][aria-selected='true'],
+.tabs [role='tab'][aria-selected='true'] {
+  color: var(--c-text);
+  font-weight: 650;
+  border-color: transparent;
+}
+
+.segmented [role='tab'][aria-selected='true']::after,
+.tabs [role='tab'][aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: var(--s2);
+  right: var(--s2);
+  bottom: 2px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--c-accent);
+}
+
+.tabs {
+  border-bottom: 1px solid var(--c-border);
+}
+
+/* Time bar: Play is Explore's primary action; numbers in the mono face. */
+.time-controls__play {
+  min-width: 104px;
+}
+
+.time-controls__speed,
+.time-controls__readout {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.time-controls__readout {
+  color: var(--c-text-muted);
+}
+
+/* Body: three compact columns. */
+.app__body {
+  gap: var(--s3);
+  padding: var(--s3) var(--s4) var(--s2);
+}
+
+.app__left h2,
+.now h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-text-muted);
+}
+
+/* Scenario cards: compact, the active one marked by a moonlight edge as well as its surface. */
+.scenario-card {
+  position: relative;
+  padding: var(--s2) var(--s2) var(--s1) var(--s3);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+}
+
+.scenario-card--active {
+  border: 1px solid var(--c-border-strong);
+  background: var(--c-surface-2);
+  box-shadow: inset 3px 0 0 var(--c-accent);
+}
+
+.scenario-card__select {
+  min-height: 44px;
+  gap: var(--s2);
+  font-size: 16px;
+  background: none;
+}
+
+.scenario-card p {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--c-text-muted);
+}
+
+.scenario-card p.scenario-card__coords,
+.scenario-card p.scenario-card__date {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.scenario-card p.warn {
+  color: var(--c-warn-text);
+}
+
+/* Ghost actions sit flush with the card text; 44 px tall, 8 px apart. */
+.scenario-card__actions {
+  margin: var(--s1) 0 0 calc(-1 * var(--s3));
+  gap: var(--s2);
+}
+
+.scenario-card__actions .btn {
+  min-height: 44px;
+  padding: 0 var(--s3);
+  font-size: 14px;
+}
+
+.scenario-actions {
+  margin-top: var(--s2);
+}
+
+/* Main view: the panorama is the protagonist. */
+.view {
+  margin-top: 0;
+  padding: var(--s3);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.app__main {
+  position: relative;
+  min-width: 0;
+}
+
+.pano__view,
+.pano__strip,
+.pano__zoom svg {
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius);
+}
+
+.pano__sky {
+  fill: var(--c-sky-top);
+}
+
+.pano__sky--strip {
+  fill: var(--c-sky-low);
+}
+
+.pano__sky-top {
+  stop-color: var(--c-sky-top);
+}
+
+.pano__sky-low {
+  stop-color: var(--c-sky-low);
+}
+
+.pano__ground-top {
+  stop-color: var(--c-ground-top);
+}
+
+.pano__ground-low {
+  stop-color: var(--c-ground-low);
+}
+
+.pano__horizon {
+  stroke: var(--c-terrain-line);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.pano__grid {
+  stroke: rgb(220 229 240 / 9%);
+}
+
+.pano__body-label {
+  font-size: 13px;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: var(--c-sky-top);
+  stroke-width: 3px;
+}
+
+.pano__body-label--sun {
+  fill: var(--c-sun);
+}
+
+.pano__body-label--earth {
+  fill: var(--c-earth);
+}
+
+.pano__side {
+  width: 200px;
+}
+
+.pano__readout,
+.timeline__readout {
+  font-variant-numeric: tabular-nums;
+}
+
+.pano__effect {
+  background: var(--c-surface-2);
+}
+
+/* Right panel: big figures, verdict card, compact Now block (T-54). */
+.app__right {
+  gap: var(--s2);
+}
+
+.figures {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s2);
+}
+
+.figure {
+  position: relative;
+  padding: var(--s2) var(--s3);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+}
+
+.figure--longest_night {
+  grid-column: 1 / -1;
+}
+
+.figure__head {
+  gap: var(--s2);
+  padding-right: 40px;
+  min-height: 24px;
+  font-size: 14px;
+}
+
+.figure__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.figure--longest_night .figure__icon {
+  color: var(--c-text-muted);
+}
+
+.figure__help {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--c-text-muted);
+  background: none;
+  border: none;
+}
+
+.figure__value {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.figure__sub {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--c-text-muted);
+}
+
+.figure__helptext {
+  font-size: 14px;
+  color: var(--c-text-muted);
+}
+
+.verdict {
+  padding: var(--s3);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border-strong);
+  border-left: 4px solid var(--c-border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.verdict--go {
+  border-left-color: var(--c-go);
+}
+
+.verdict--marginal {
+  border-left-color: var(--c-marginal);
+}
+
+.verdict--no_go {
+  border-left-color: var(--c-nogo);
+}
+
+.verdict .status-chip {
+  display: block;
+  margin: 0 0 var(--s2);
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.verdict .status-chip--marginal {
+  color: var(--c-marginal);
+}
+
+.verdict .checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s3);
+}
+
+.check {
+  font-size: 14px;
+}
+
+.check__mark {
+  font-weight: 700;
+}
+
+.check--ok .check__mark {
+  color: var(--c-go);
+}
+
+.now {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px var(--s3);
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+}
+
+.now h3,
+.now .countdown,
+.now .eclipse-notice,
+.now .visually-hidden {
+  grid-column: 1 / -1;
+}
+
+.now p {
+  margin: 0;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary {
+  border-left: 2px solid var(--c-border-strong);
+}
+
+.app__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s4);
+  padding: var(--s1) var(--s4);
+}
+
+/* Welcome card over the main view (14 §1): the demo pair stays visible behind it. */
+.welcome {
+  position: absolute;
+  inset: 45px 0 0;
+  z-index: 6;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--s6) var(--s4);
+  background: rgb(13 19 32 / 78%);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.welcome__card {
+  width: min(520px, 100%);
+  padding: var(--s6);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 45%);
+}
+
+.welcome__title {
+  margin: 0 0 var(--s2);
+  font-size: 24px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.welcome__body {
+  margin: 0 0 var(--s4);
+  font-size: 16px;
+  color: var(--c-text-muted);
+  max-width: 60ch;
+}
+
+.welcome__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Guided story bar. */
+.story {
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.story__count {
+  font-variant-numeric: tabular-nums;
+  padding: 0 var(--s1);
+}
+
+/* Desktop ≥ 1280 × 720: one screen, no inner scroll bars (T-54). */
+@media (min-width: 1280px) and (min-height: 720px) {
+  .app__left,
+  .app__right,
+  .view {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+  .view {
+    padding: var(--s3);
+  }
+}
+
+/* Phones keep T-20's three figure columns (rules below); the night tile does not span them. */
+@media (max-width: 767px) {
+  .figure--longest_night {
+    grid-column: auto;
+  }
+  .figure__sub {
+    font-size: 13px;
+  }
+  .welcome {
+    inset: 45px 0 auto;
+  }
+}
+
 /* ---- Mobile and accessibility review (T-20, 10 §3.2, §12) ---- */
 /* Chromium focuses the inner fields of a date input, so :focus-visible never reaches the host. */
 input[type='datetime-local']:focus-within {

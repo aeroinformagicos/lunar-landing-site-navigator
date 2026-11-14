@@ -21,6 +21,7 @@ import {
   stripBracket,
   unproject,
   viewCentre,
+  zoomView,
   type View,
 } from './geometry';
 import { bodyTrace, pointerReadout, ridgeLabel, shiftText, signedHours, terrainEffectLines } from './texts';
@@ -132,7 +133,7 @@ describe('texts (F3, F4)', () => {
     expect(terrainEffectLines({ ...fx, firstSunEventShiftS: null }, null, 'sunset').firstEvent).toBe('Sunset: only on a smooth Moon');
     expect(terrainEffectLines({ ...fx, firstSunEventShiftS: null }, null, null).firstEvent).toBe('Sunset: no change');
     expect(terrainEffectLines(fx, 'sunset', 'sunset').sunlight).toBe('Sunlight: −1.0 h');
-    expect(terrainEffectLines(fx, 'sunset', 'sunset').earthLink).toBe('Earth link: 0 h');
+    expect(terrainEffectLines(fx, 'sunset', 'sunset').earthLink).toBe('Earth contact: 0 h');
   });
 
   it('terrain above the smooth horizon makes the sunset earlier (F4, on the example table)', () => {
@@ -163,5 +164,29 @@ describe('texts (F3, F4)', () => {
     const tr = bodyTrace(table, frameFor(-85, 30, smoothMask(2)), 'sun', t0, t0 + 2 * DAY_S);
     expect(tr).toHaveLength(49);
     expect(tr.filter((p) => p.daily).map((p) => p.t)).toEqual([t0, t0 + DAY_S, t0 + 2 * DAY_S]);
+  });
+});
+
+describe('horizon zoom always shows terrain and disc (T-54)', () => {
+  const sun = (elDeg: number) => ({ azDeg: 100, elDeg, radiusDeg: 0.27 });
+  it('close to the horizon: the 4° × 2° zoom (×10, grid 0.5°)', () => {
+    const z = zoomView(sun(0.3), 0, 236);
+    expect(z.factor).toBe(10);
+    expect(z.gridDeg).toBe(0.5);
+    expect(z.view.h).toBe(118);
+  });
+  it('far from the horizon: widened until both fit, same scale on both axes', () => {
+    for (const el of [3, 9, 25, -6]) {
+      const hz = 1.2;
+      const z = zoomView(sun(el), hz, 236);
+      const top = z.view.el + z.view.heightDeg / 2;
+      const bottom = z.view.el - z.view.heightDeg / 2;
+      for (const y of [el + 0.27, el - 0.27, hz]) {
+        expect(y).toBeLessThan(top);
+        expect(y).toBeGreaterThan(bottom);
+      }
+      expect(z.view.widthDeg / z.view.heightDeg).toBe(z.view.w / z.view.h);
+      expect(z.factor).toBeLessThan(10);
+    }
   });
 });

@@ -1,8 +1,8 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Guided story overlay (10_interfaz.md §11, F15): bottom bar with the step text, `Back`, `Next`
-// (also ← → and the space bar) and `1 / 7`. Each step writes its exact state to the store; at the end,
-// `Explore it yourself` and `Restart`. Works without the heavy origin (step 6 variant).
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+// (also ← → and the space bar), `1 / 7` and `Exit tour` (14_ux_malaga.md §2). Each step writes its exact
+// state to the store; the last step offers `Try it yourself` and `Restart`. Works without the heavy origin (step 6 variant).
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { findSegment } from '../../core/ephemeris';
 import { skyAt } from '../../core/frames';
 import { blockerAt } from '../../core/horizon';
@@ -10,6 +10,7 @@ import { isoToUnix } from '../../core/time';
 import { t } from '../../i18n/t';
 import { useAppStore, type Scenario } from '../../state/store';
 import { useBoot } from '../common/data';
+import { Button } from '../common/Button';
 import { useScenarioModel } from '../common/model';
 import { exploreState, STORY_LENGTH, storySteps, type StoryContext } from './storySteps';
 
@@ -43,7 +44,6 @@ export function StoryOverlay() {
   const step = useAppStore((s) => s.storyStep);
   const mode = useAppStore((s) => s.mode);
   const blockerDistM = useBlockerDist();
-  const [finished, setFinished] = useState(false);
   const applied = useRef<number | null>(null);
   const ctx: StoryContext = { defaults: sites.defaults, sites: sites.sites, hasMap: HAS_MAP_VIEW, blockerDistM };
 
@@ -55,7 +55,6 @@ export function StoryOverlay() {
       const view = s.view(c);
       if (reducedMotion()) state.playing = false; // no automatic motion (§11)
       applied.current = i;
-      setFinished(false);
       useAppStore.setState(state);
       const hash = view.route === 'validation' ? '#/validation' : '';
       if (location.hash !== hash) location.hash = hash;
@@ -82,7 +81,6 @@ export function StoryOverlay() {
   const next = useCallback(() => {
     if (step === null) return;
     if (step < STORY_LENGTH - 1) go(step + 1);
-    else setFinished(true);
   }, [step, go]);
   const back = useCallback(() => {
     if (step !== null && step > 0) go(step - 1);
@@ -111,9 +109,17 @@ export function StoryOverlay() {
   function explore() {
     useAppStore.setState(exploreState({ defaults: sites.defaults, sites: sites.sites, hasMap: HAS_MAP_VIEW, blockerDistM: null }));
     applied.current = null;
-    setFinished(false);
     if (location.hash) location.hash = '';
   }
+
+  /** `Exit tour`: back to Explore, keeping what the current step shows. */
+  function exit() {
+    useAppStore.getState().setMode('explore');
+    applied.current = null;
+    if (location.hash) location.hash = '';
+  }
+
+  const last = step === STORY_LENGTH - 1;
 
   return (
     <div className="story" role="region" aria-label={t('story.label')}>
@@ -121,27 +127,28 @@ export function StoryOverlay() {
         {storySteps[step].text(ctx)}
       </p>
       <div className="story__controls">
-        {finished ? (
+        <Button variant="ghost" onClick={exit}>
+          {t('story.exit')}
+        </Button>
+        <Button variant="secondary" onClick={back} disabled={step === 0}>
+          {t('story.back')}
+        </Button>
+        <span className="story__count" data-testid="story-count">
+          {step + 1} / {STORY_LENGTH}
+        </span>
+        {last ? (
           <>
-            <button type="button" onClick={explore}>
-              {t('story.explore')}
-            </button>
-            <button type="button" onClick={() => go(0)}>
+            <Button variant="secondary" onClick={() => go(0)}>
               {t('story.restart')}
-            </button>
+            </Button>
+            <Button variant="primary" onClick={explore}>
+              {t('story.explore')}
+            </Button>
           </>
         ) : (
-          <>
-            <button type="button" onClick={back} disabled={step === 0}>
-              {t('story.back')}
-            </button>
-            <span className="story__count" data-testid="story-count">
-              {step + 1} / {STORY_LENGTH}
-            </span>
-            <button type="button" className="story__next" onClick={next}>
-              {t('story.next')}
-            </button>
-          </>
+          <Button variant="primary" className="story__next" onClick={next}>
+            {t('story.next')}
+          </Button>
         )}
       </div>
     </div>
