@@ -148,6 +148,16 @@ const tasks = {
   ephem() {
     cli('ephem', ...(envVar('SAMPLE') === '1' ? ['--write-sample'] : []));
   },
+  // Site masks, profiles and sites.json in the batch order of 04_catalogo_sitios.md §6, published to
+  // web/public/data after each site (T-09; run by I3 in T-21). Sites whose files already exist are
+  // kept. SITES=<id,id> computes only those; FORCE=1 recomputes; NO_PUBLISH=1 leaves web/public/data.
+  sites() {
+    const extra = [];
+    if (envVar('SITES')) extra.push('--sites', envVar('SITES'));
+    if (envVar('FORCE') === '1') extra.push('--force');
+    if (envVar('NO_PUBLISH') === '1') extra.push('--no-publish');
+    cli('sites', ...extra);
+  },
   // Cost of the horizon cube with 4 chunks (08_mapa_polar.md §4). Optional: LAW=full|fast,
   // RING=<samples per block>, PTS_BATCH=<points per batch>; the device comes from LLSN_DEVICE.
   'cube-bench'() {
