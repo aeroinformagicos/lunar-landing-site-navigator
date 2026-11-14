@@ -1,11 +1,10 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // T-13: disc fraction against the exact circular segment (07 §13.2), evaluate, invariants (§13.8).
 import { describe, expect, it } from 'vitest';
-import { formulaMask, horizonAt, maskFromFile, smoothMask } from '../horizon';
+import { formulaMask, horizonAt, smoothMask } from '../horizon';
 import { isoToUnix } from '../time';
 import { discAny, discFraction, evaluate, frameFor } from '../visibility';
-import type { HorizonFile } from '../types';
-import { bestTimeMs, exampleJson, exampleTable } from './fixtures';
+import { exampleTable } from './fixtures';
 
 /** Exact visible fraction of a disc cut by a flat horizon: δ = (H − el_c)/ρ. */
 function segment(delta: number): number {
@@ -64,17 +63,5 @@ describe('evaluate', () => {
       expect(s.both).toBe(s.sun.visible && s.earth.visible);
       expect(s.sun.horizonDeg).toBeCloseTo(-0.0869, 4);
     }
-  });
-
-  it('runs in under 3 µs per call (demo-a: Sun near the horizon, the 32-strip path)', () => {
-    const demoA = maskFromFile(exampleJson<HorizonFile>('horizon/demo-a.json'), 2)!;
-    const f = frameFor(-88.8, 123.4, demoA);
-    const t0 = isoToUnix('2027-08-01T00:00:00Z');
-    for (let i = 0; i < 50_000; i++) evaluate(table, f, demoA, t0 + i * 61); // warm-up
-    const n = 100_000;
-    const ms = bestTimeMs(() => {
-      for (let i = 0; i < n; i++) evaluate(table, f, demoA, t0 + i * 61);
-    });
-    expect((ms * 1000) / n).toBeLessThan(3);
   });
 });

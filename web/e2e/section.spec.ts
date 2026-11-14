@@ -3,6 +3,7 @@
 // the line of sight, horizon line and blocking point; ranges; the cursor changes the azimuth; smooth
 // Moon; site without profile; profile download error with Retry.
 import { expect, test, type Page } from '@playwright/test';
+import { re, sitesInfo } from './data';
 
 async function openSection(page: Page) {
   await page.goto('/');
@@ -49,11 +50,17 @@ test('smooth Moon draws only the sphere', async ({ page }) => {
   await expect(page.getByTestId('blocker')).toHaveCount(0);
 });
 
-test('a site without a profile and a download error', async ({ page }) => {
+test('a site without a profile and a download error', async ({ page, request }) => {
+  const info = await sitesInfo(request);
   await openSection(page);
-  await page.getByRole('article', { name: 'Scenario B' }).locator('.scenario-card__select').click();
-  await expect(page.getByText('Terrain profile unavailable.')).toBeVisible({ timeout: 20_000 }); // demo-b has no profile
-  await page.route('**/profile/demo-a.bin.gz', (route) => route.abort());
+  if (info.maskWithoutProfile) {
+    await page.getByRole('article', { name: 'Scenario A' }).getByRole('button', { name: 'Change site' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: new RegExp(`^${re(info.maskWithoutProfile.name)}`) }).click();
+    await expect(page.getByText('Terrain profile unavailable.')).toBeVisible({ timeout: 20_000 });
+  }
+  // Scenario A of the demo pair has a profile; a failed download shows the message with Retry.
+  test.skip(!info.pair[0].has_profile, 'the first demo site has no profile');
+  await page.route(`**/profile/${info.pair[0].id}.bin.gz`, (route) => route.abort());
   await page.goto('/?fresh');
   await page.getByRole('tab', { name: 'Cross-section' }).click();
   await expect(page.getByText('Terrain profile unavailable.')).toBeVisible({ timeout: 20_000 });

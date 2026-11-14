@@ -10,6 +10,7 @@ import { loader } from '../../core/loaders';
 import { t, type TextKey } from '../../i18n/t';
 import { activeScenario, parseSiteRef } from '../../state/selectors';
 import { useAppStore, type MapLayer } from '../../state/store';
+import { BestSite } from '../optimal/BestSite';
 import { useBoot } from '../common/data';
 import { DataState, useResource } from '../common/DataState';
 import {
@@ -73,9 +74,11 @@ function MapCanvas({ data }: { data: MapData }) {
   const fit = useMemo(() => fitView(w, h), [w, h]);
   const [view, setView] = useState<ViewState>({ zoom: 1, tx: fit.tx, ty: fit.ty });
   const [opacity, setOpacity] = useState(0.75);
-  const [readout, setReadout] = useState<string | null>(null);
+  // Cell under the pointer; the readout is derived so it updates when the period's layer arrives.
+  const [hover, setHover] = useState<{ i: number; j: number } | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
+  const [highlight, setHighlight] = useState<{ i: number; j: number } | null>(null);
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: boolean } | null>(null);
 
   useEffect(() => setView({ zoom: 1, tx: fit.tx, ty: fit.ty }), [fit]);
@@ -90,6 +93,7 @@ function MapCanvas({ data }: { data: MapData }) {
   const bandIndex = layer === 'none' ? -1 : data.layers.bands.indexOf(layer as Band);
   const [bands] = useResource(`layer:${data.base}/${period.file}`, () => loadLayer(loader, data.base, period));
   const bandBytes = bands.status === 'ready' ? bands.data : null;
+  const readout = hover ? cellReadout(hover.i, hover.j, data.dem, bandBytes, data.layers.bands) : null;
 
   // The coloured layer is built once per period and band (10 §13), not on every frame.
   const layerCanvas = useMemo(() => {
@@ -170,6 +174,12 @@ function MapCanvas({ data }: { data: MapData }) {
       g.lineWidth = 2;
       g.stroke();
     }
+    if (highlight) {
+      const p = toScreen(highlight.i, highlight.j);
+      g.strokeStyle = '#f0e442';
+      g.lineWidth = 2;
+      g.strokeRect(p.x - 3, p.y - 3, Math.max(6, s) + 6, Math.max(6, s) + 6);
+    }
     // Centre cross (keyboard selection).
     g.strokeStyle = 'rgba(232,234,237,0.7)';
     g.lineWidth = 1;
@@ -179,7 +189,7 @@ function MapCanvas({ data }: { data: MapData }) {
     g.moveTo(w / 2, h / 2 - 8);
     g.lineTo(w / 2, h / 2 + 8);
     g.stroke();
-  }, [w, h, view, s, img, layerCanvas, opacity, data.regions, markers, activeWorld, toScreen]);
+  }, [w, h, view, s, img, layerCanvas, opacity, data.regions, markers, activeWorld, highlight, toScreen]);
 
   const select = useCallback(
     async (i: number, j: number) => {
@@ -207,7 +217,7 @@ function MapCanvas({ data }: { data: MapData }) {
   function onPointerMove(e: React.PointerEvent) {
     const p = local(e);
     const { i, j } = cellAtScreen(view, fit.base, p.x, p.y);
-    setReadout(inGrid(i, j) ? cellReadout(i, j, data.dem, bandBytes, data.layers.bands) : null);
+    setHover(inGrid(i, j) ? { i, j } : null);
     const d = drag.current;
     if (!d) return;
     if (Math.abs(p.x - d.x) + Math.abs(p.y - d.y) > 4) d.moved = true;
@@ -343,7 +353,7 @@ function MapCanvas({ data }: { data: MapData }) {
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
-          onPointerLeave={() => setReadout(null)}
+          onPointerLeave={() => setHover(null)}
           onKeyDown={onKeyDown}
         />
         <div className="map__legend">
@@ -371,6 +381,20 @@ function MapCanvas({ data }: { data: MapData }) {
       <p className="map__readout" data-testid="map-readout">
         {readout ?? ' '}
       </p>
+      <BestSite
+        data={data}
+        layer={bandBytes}
+        periodLabel={period.label}
+        onFocus={(i, j) => {
+          // Centre the map on the cell (zoom at least 4×) and mark it (10 §6.4).
+          setHighlight({ i, j });
+          setView((v) => {
+            const zoom = Math.max(v.zoom, 4);
+            const sc = fit.base * zoom;
+            return { zoom, tx: w / 2 - (i + 0.5) * sc, ty: h / 2 - (j + 0.5) * sc };
+          });
+        }}
+      />
       {message && (
         <p className="map__message" role="status">
           {message}

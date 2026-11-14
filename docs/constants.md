@@ -340,7 +340,7 @@ Constantes nuevas (`pipeline/tests/test_a3_blueghost_sunset.py`, `test_a8_sanity
 | A10 con relieve: observador | 2 m (máscara LOLA polar) | `07_visibilidad.md` §1 (alturas de las máscaras) |
 | Informe: titulares y su orden; figuras de `A7B7` | B3, A3, A7B7; `validation/a7b7_scatter.png`, `validation/a7b7_diff_map.png` | `09_contrato_datos.md` §7 y §7.1 |
 | Informe: casos manuales | A5, A11, B8, B9, B10, B11 | `11` §7.1 |
-| Informe: hora de los titulares | Redondeada al minuto (medio minuto hacia arriba) | Elegido (D-91 d) |
+| Informe: hora de los titulares | Redondeada al minuto (medio minuto hacia arriba) | Elegido (D-92 d) |
 
 Medido (tabla publicada, máscaras publicadas de T-21, cuatro núcleos):
 

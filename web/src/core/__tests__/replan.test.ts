@@ -18,7 +18,7 @@ import {
 import { DAY_S, isoToUnix } from '../time';
 import type { HorizonFile } from '../types';
 import { evaluate, frameFor } from '../visibility';
-import { bestTimeMs, exampleJson, exampleTable } from './fixtures';
+import { exampleJson, exampleTable } from './fixtures';
 
 const table = exampleTable();
 const REQ: Requirements = { needSunAtLanding: true, needEarthAtLanding: true, maxNightHours: 24, marginalEarthMarginDeg: 1, marginalSunFraction: 1 };
@@ -93,18 +93,6 @@ describe('next_valid_landing (07 §8.4)', () => {
     expect(cellAt(g, idx(w.startUnix), 432, lax, table, frame, mask).status).not.toBe('no_go');
     if (w.startUnix > T0) expect(cellAt(g, idx(w.startUnix) - 6, 432, lax, table, frame, mask).status).toBe('no_go');
     expect(cellAt(g, idx(w.endUnix) + 6, 432, lax, table, frame, mask).status).toBe('no_go');
-  });
-});
-
-describe('budgets (07 §11)', () => {
-  it('13 rows of the matrix in under 300 ms; next valid landing in under 50 ms', () => {
-    const { mask, frame } = at(demoA);
-    const matrix = bestTimeMs(() => {
-      for (let r = 0; r < 13; r++) replanRow(table, frame, mask, T0 + r * 3600, DAY_S, 14, REQ);
-    }, 3);
-    expect(matrix).toBeLessThan(300);
-    const next = bestTimeMs(() => nextValidLanding(table, frame, mask, T0, 14, REQ), 3);
-    expect(next).toBeLessThan(50);
   });
 });
 

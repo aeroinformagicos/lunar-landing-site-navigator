@@ -3,6 +3,7 @@
 // keyboard navigation through header and cards, site picker, 4-scenario limit, date validation,
 // custom coordinates in Plan, playback.
 import { expect, test } from '@playwright/test';
+import { sitesInfo } from './data';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -12,8 +13,9 @@ test.beforeEach(async ({ page }) => {
 test('opens with the demo pair; the example banner follows the manifest', async ({ page, request }) => {
   const manifest = await (await request.get('/data/manifest.json')).json();
   await expect(page.getByText('Example data — not for use')).toHaveCount(manifest.ephemeris.synthetic ? 1 : 0);
-  await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText('Demo A');
-  await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText('Demo B');
+  const { pair } = await sitesInfo(request);
+  await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText(pair[0].short_name);
+  await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText(pair[1].short_name);
   await expect(page.getByLabel('Landing (UTC)')).toHaveValue('2027-08-01T00:00');
   await expect(page.getByLabel('Mission', { exact: true })).toHaveValue('14');
   await expect(page.getByText('Day 0, 00:00 · 2027-08-01 00:00 UTC')).toBeVisible();
@@ -62,7 +64,8 @@ test('slider: arrows ±10 min, PageUp +1 day; ±1 hour buttons', async ({ page }
   await expect(page.getByText('Day 1, 01:10')).toBeVisible();
 });
 
-test('site picker: groups, search, no results, change site', async ({ page }) => {
+test('site picker: groups, search, no results, change site', async ({ page, request }) => {
+  const bg = (await sitesInfo(request)).byId('blue-ghost-1');
   await page.getByRole('article', { name: 'Scenario B' }).getByRole('button', { name: 'Change site' }).click();
   const dialog = page.getByRole('dialog', { name: 'Choose a site' });
   await expect(dialog.getByRole('heading', { name: 'Landed missions' })).toBeVisible();
@@ -75,8 +78,8 @@ test('site picker: groups, search, no results, change site', async ({ page }) =>
   const card = page.getByRole('article', { name: 'Scenario B' });
   await expect(card).toContainText('Blue Ghost 1');
   await expect(card).toContainText('18.56° N, 61.81° E');
-  await expect(card).toContainText('Smooth Moon (no terrain)');
-  await expect(card).toContainText('No terrain data here — smooth Moon.');
+  await expect(card).toContainText(bg.relief === 'smooth' ? 'Smooth Moon (no terrain)' : bg.relief_label);
+  if (bg.relief === 'smooth') await expect(card).toContainText('No terrain data here — smooth Moon.');
 });
 
 test('at most 4 scenarios', async ({ page }) => {
