@@ -29,6 +29,18 @@ fuente (CLAUDE.md §2).
 | `PROFILE_BINS`; `PROFILE_NODATA`; `PROFILE_HEIGHT_MIN_M`, `PROFILE_HEIGHT_MAX_M` | 512; −32768; −32767, 32767 | —; m; m | `06_horizonte.md` §8; `09_contrato_datos.md` §6 | `pipeline/horizon/profile.py` |
 | Tolerancias de las pruebas sintéticas: depresión 0,0005°; monte 0,005°; depresión circular 0,001°; invariantes 10⁻⁹° | — | ° | `06_horizonte.md` §10.1–§10.5 | `pipeline/tests/test_horizon_synthetic.py` |
 | `CARTESIAN_TOL_DEG`; `CARTESIAN_TOL_NEAR_DEG`, `CARTESIAN_NEAR_M` (fórmula cerrada frente a la geometría 3D literal) | 10⁻⁹; 5·10⁻⁹ por debajo de 100 | °; °, m | `06_horizonte.md` §10.5 y decisión D-51 | `pipeline/tests/test_horizon_synthetic.py` |
+| Malla del mapa: `CELL_M`, `NX`, `NY`, `X_MIN_M`, `Y_MAX_M` | 500; 752; 672; −200.000; 184.000 | m; —; —; m; m | `08_mapa_polar.md` §1.2 (D-13); `09_contrato_datos.md` §8.1 | `pipeline/horizon/cube.py` |
+| Trozos: `CHUNK`, `N_CHUNK_COLS`, `N_CHUNK_ROWS` (1.974 trozos de 256 puntos) | 16; 47; 42 | — | `08` §2; `09` §8.1 | `pipeline/horizon/cube.py` |
+| Fichero de trozo: `CUBE_MAGIC`, versión, `LAW_IDS`, `CHUNK_BYTES`, `HEIGHT_NODATA` | `LLSNCUB1`; 1.0; `full` = 1, `fast` = 2; 553.504 B; −32768 | — | `09` §10.2 | `pipeline/horizon/cube.py` |
+| Codificación del cubo: `EL_SCALE_DEG`, `EL_Q_MAX`; `DIST_CODE_BASE_M`, `DIST_CODE_RATIO` | 0,01; 32767; 20; 1,04 | °; —; m; — | `09` §10.1 y §10.2 | `pipeline/horizon/cube.py` |
+| `GZIP_LEVEL` (compresión de los trozos; el contrato solo pide gzip estándar de un miembro) | 6 | — | Valor por defecto de zlib; `09` (convenios) | `pipeline/horizon/cube.py` |
+| Plan del cubo: `REGION_MARGIN_M`, `LEVEL2_LAT_DEG`, `LEVEL3_LAT_DEG` | 2.000; −88; −85 | m; °; ° | `08` §2 | `pipeline/horizon/cube.py` |
+| `REGIONS`: centro y lado de las 9 regiones candidatas (copia temporal, D-52) | Tabla | °; km | `04_catalogo_sitios.md` §3 (PENDIENTE DE VERIFICAR, A2) | `pipeline/horizon/cube.py` |
+| `BENCH_CHUNKS` (trozos de la medida de coste, fila y columna) | (23, 25), (4, 36), (14, 2), (41, 0) | — | `08` §4 | `pipeline/horizon/cube.py` |
+| `BENCH_SWEEP_RINGS`, `BENCH_SWEEP_POINTS` (comparación de tamaños de bloque en la medida) | 128, 64, 32, 16; 64 | — | D-53 | `pipeline/horizon/cube.py` |
+| Motor del cubo: `DEFAULT_PTS_BATCH`, `DEFAULT_RING`, `DEFAULT_OBSERVER_HEIGHT_M` | 64; 32; 2,0 | —; —; m | `08` §3.2 (`ring`: D-53, medido) | `pipeline/horizon/engine_torch.py` |
+| `EL_TOL_DEG` (motor del cubo frente al de referencia) | 0,002 | ° | `08` §3.3 y §3.5 | `pipeline/tests/test_cube_engine.py` |
+| Luna lisa a 2 m (pruebas): elevación y distancia de tangencia | −0,0869; 2.636 | °; m | `06_horizonte.md` §9; `08` §3.5 | `pipeline/tests/test_cube_engine.py` |
 | Shackleton, centro (pruebas) | −89,67; 129,78 | ° | Gazetteer of Planetary Nomenclature, ficha 5450 (`03` §4.4) | `pipeline/tests/test_dem_read.py`, `test_grids.py` |
 | SLIM, sitio y cota publicada (prueba) | −13,3160; 25,2510; −912 | °; °; m | LROC, «JAXA SLIM Landing» (`03` §5.4) | `pipeline/tests/test_dem_read.py` |
 
@@ -82,3 +94,26 @@ ejecuciones, un núcleo, alturas de observador 2 m y 10 m en la misma pasada).
 El motor de referencia cumple con margen el coste previsto. La cifra con los DEM reales (P1 + P2 mapeados
 en memoria) la mide T-09 con `time python -m pipeline.cli site-mask --site <id>`, que es la orden que fija
 `06_horizonte.md` §11; con la velocidad de muestreo de T-07 (6,4·10⁶ muestras/s) se esperan 0,7–0,9 s.
+
+### T-24 · Motor del cubo (2026-11-14)
+
+Medido en el portátil de I1 (RTX 4060 Laptop de 8 GB, PyTorch 2.15.0+cu132, 10 hilos de CPU) con
+**relieve sintético en memoria**, sin ficheros de `$LLSN_DATA_DIR`. La velocidad con los DEM reales es
+la de `make cube-bench` (`$LLSN_DATA_DIR/out/cube/bench.json`), que lanza I3: **PENDIENTE**.
+
+| Qué | Valor medido | Esperado | Fuente del esperado |
+| --- | --- | --- | --- |
+| `engine_torch` (CPU) frente a `engine_ref`: 16 puntos, ley `full`, 72 acimuts por punto, terreno de la prueba (rejillas de 40 m y 120 m) | max \|Δ elevación\| = 7,2·10⁻⁶°; muestra `i*` distinta en el 0,17 % de los rayos, siempre empates | < 0,002° | `08_mapa_polar.md` §3.5 |
+| Ídem en la GPU | 7,9·10⁻⁶°; 0,17 % | < 0,002° | `08` §3.5 |
+| Ídem con la ley `fast` (CPU; GPU) | 7,0·10⁻⁶°; 7,2·10⁻⁶° | < 0,002° | `08` §3.5 |
+| Transcripción literal en `float32` del pseudocódigo de `08` §3.2 (posiciones y cotas absolutas), mismo terreno | 0,0039° (`full`); 0,0023° (`fast`): no cumple | < 0,002° | `08` §3.3 (ver D-54) |
+| Esfera lisa, observador a 2 m | −0,0869° en los 720 acimuts; código −9; distancia 2.640 m | −0,0869°; −9; 2.636 m ± 40 m | `08` §3.5; `06` §9 |
+| Velocidad en la GPU, trozo completo (256 puntos), `pts_batch` 64: `ring` 128; 64; 32; 16 | 2,7·10⁸; 3,8·10⁸; 5,6·10⁸; 6,0·10⁸ muestras/s | 2·10⁸–5·10⁸ (supuesto) | `08` §4 |
+| Velocidad en CPU (10 hilos), 64 puntos, `pts_batch` 64: `ring` 128; 32; 8 | 3,8·10⁷; 6,0·10⁷; 7,1·10⁷ muestras/s | 5·10⁷ (supuesto, «muchos núcleos») | `08` §4 |
+| Memoria máxima de la GPU sin contar los DEM: 64 × 128; 64 × 32; 256 × 128 | 642; 220; 2.312 MB | < 400 MB | `08` §3.2 |
+| Plan: trozos de los niveles 1, 2, 3 y 4 | 113; 200; 931; 730 (28.928; 51.200; 238.336; 186.880 puntos) | ~90; ~180; ~900; ~800 | `08` §2 |
+
+La rejilla sintética de la medida de velocidad (40 m, 6.000 px; 120 m, 2.200 px) ocupa 80 MB; P1 y P2
+ocupan 578 MB, así que con los DEM reales la lectura de vecinos tendrá más fallos de caché y la cifra
+puede ser menor. Extrapolación **provisional** con 5,6·10⁸ muestras/s: cubo completo con la ley `full`
+en unos 40 min; no sustituye a la medida.
