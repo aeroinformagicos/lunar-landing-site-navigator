@@ -49,5 +49,5 @@
     "r_sun_km": 695700.0,
     "r_earth_km": 6378.137
   },
-  "synthetic": true
+  "synthetic": false
 }

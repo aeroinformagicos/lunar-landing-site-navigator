@@ -6,7 +6,7 @@
   "ephemeris": {
     "file": "ephemeris.bin",
     "bytes": 5260176,
-    "synthetic": true
+    "synthetic": false
   },
   "has_validation_report": true
 }
