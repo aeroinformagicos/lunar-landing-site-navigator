@@ -147,5 +147,19 @@
   "validation.abs_err": "Difference",
   "validation.ok": "OK",
   "validation.no_details": "No detailed values for this check.",
-  "validation.footer": "Generated from the automated test report · commit {commit}"
+  "validation.footer": "Generated from the automated test report · commit {commit}",
+  "pano.centre_on": "Centre on",
+  "pano.centre_sun": "Centre on Sun",
+  "pano.centre_earth": "Centre on Earth",
+  "pano.compare_smooth": "Compare with smooth Moon",
+  "pano.view_label": "40° view of the horizon centred on the {body}",
+  "pano.horizon_arrow": "Horizon {deg}° {dir}",
+  "pano.below": "{body} is below the horizon",
+  "pano.zoom_label": "Horizon zoom around the focus body",
+  "pano.zoom_caption": "Horizon zoom ×10 · grid 0.5°",
+  "pano.disc_visible": "Solar disc visible: {pct}",
+  "pano.margin": "Margin: {margin}",
+  "pano.terrain_effect": "Terrain effect",
+  "pano.strip_label": "360° horizon strip: choose the direction of the 40° view",
+  "pano.unavailable": "Panorama unavailable."
 }
