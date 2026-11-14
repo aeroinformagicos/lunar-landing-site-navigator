@@ -50,11 +50,12 @@ def _round_half_up(x: float) -> int:
 
 
 def find_crossings(
-    f: Callable[[float], float], t_a: float, t_b: float, step: float = SCAN_STEP_S
+    f: Callable[[float], float], t_a: float, t_b: float, step: float = SCAN_STEP_S, first: bool = False
 ) -> tuple[list[Crossing], bool]:
     """Sign changes of ``f`` (positive = the condition holds) in [``t_a``, ``t_b``] (07 §6.1).
 
     The interval is scanned every ``step`` seconds and each change is bisected down to 1 s.
+    ``first = True`` stops at the first crossing (the countdowns of 07 §7, like ``findCrossings``).
     Returns the crossings, in time order, and the initial state ``f(t_a) > 0``.
     """
     out: list[Crossing] = []
@@ -73,6 +74,8 @@ def find_crossings(
                 else:
                     lo = mid
             out.append({"t": _round_half_up((lo + hi) / 2), "rising": up})
+            if first:
+                break
         t0 = t1
         m0 = m1
     return out, initial_state
