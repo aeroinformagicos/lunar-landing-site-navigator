@@ -4,6 +4,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
+import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -90,6 +91,34 @@ function listFiles(dir) {
 
 const mb = (bytes) => `${(bytes / 1e6).toFixed(1)} MB`;
 
+// Size budgets, gzip (02_arquitectura.md §7: main JavaScript ≤ 350 kB; 16_vista_3d.md §12.3: the 3D
+// view's extra JavaScript ≤ 1.5 MB). Decimal kB and MB, the stricter reading.
+const MAIN_JS_BUDGET = 350_000;
+const VIEW3D_BUDGET = 1_500_000;
+const VIEW3D_ENTRY = 'src/ui/stage3d/index.tsx';
+
+// Gzip sizes of the built web from Vite's manifest (`dist/.vite/manifest.json`): `main` = the entry
+// chunk of index.html and every chunk it imports statically; `view3d` = the dynamic chunk of the 3D
+// view and its static imports that are not already in `main`, plus the mesh worker's own file.
+function bundleSizes(dist) {
+  const manifest = JSON.parse(readFileSync(join(dist, '.vite', 'manifest.json'), 'utf8'));
+  const gz = (file) => gzipSync(readFileSync(join(dist, file))).length;
+  const closure = (key, into) => {
+    const c = manifest[key];
+    if (!c || into.has(key)) return into;
+    into.add(key);
+    for (const k of c.imports ?? []) closure(k, into);
+    return into;
+  };
+  const entry = Object.keys(manifest).find((k) => manifest[k].isEntry);
+  const main = closure(entry, new Set());
+  const sum = (keys) => [...keys].reduce((s, k) => s + gz(manifest[k].file), 0);
+  if (!manifest[VIEW3D_ENTRY]) return { main: sum(main), view3d: 0 };
+  const view = [...closure(VIEW3D_ENTRY, new Set())].filter((k) => !main.has(k));
+  const workers = readdirSync(join(dist, 'assets')).filter((f) => /^mesh\.worker-.*\.js$/.test(f));
+  return { main: sum(main), view3d: sum(view) + workers.reduce((s, f) => s + gz(`assets/${f}`), 0) };
+}
+
 // Set heavy_base_url in a config.json of the web, keeping its other keys (09_contrato_datos.md §1).
 function writeHeavyBaseUrl(path, url) {
   const config = existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : { data_base_url: 'data' };
@@ -128,6 +157,24 @@ const tasks = {
     run(venvPython(), ['-m', 'ruff', 'check', 'pipeline']);
     run('npx', ['tsc', '--noEmit', '-p', 'tsconfig.json'], { cwd: WEB });
     if (hasContract()) cli('check-contract');
+    tasks['check-size']();
+  },
+  // Size budgets of the web (02_arquitectura.md §7, 16_vista_3d.md §12.3, T-73): builds the web with
+  // its manifest (a few seconds) and checks the gzip size of the main JavaScript and of the 3D chunk.
+  'check-size'() {
+    run('npx', ['vite', 'build', '--manifest', '--logLevel', 'warn'], { cwd: WEB });
+    const r = bundleSizes(join(WEB, 'dist'));
+    const kb = (b) => `${(b / 1000).toFixed(1)} kB`;
+    console.log(`Main JavaScript (entry and its static imports), gzip: ${kb(r.main)} (budget ${kb(MAIN_JS_BUDGET)})`);
+    console.log(`3D view (three.js, the stage3d chunk and the mesh worker), gzip: ${kb(r.view3d)} (budget ${kb(VIEW3D_BUDGET)})`);
+    const over = [];
+    if (r.main > MAIN_JS_BUDGET) over.push(`main JavaScript ${kb(r.main)} > ${kb(MAIN_JS_BUDGET)}`);
+    if (r.view3d > VIEW3D_BUDGET) over.push(`3D view ${kb(r.view3d)} > ${kb(VIEW3D_BUDGET)}`);
+    if (r.view3d === 0) over.push('the 3D chunk (src/ui/stage3d/index.tsx) is missing from the build');
+    if (over.length) {
+      console.error(`Size budget exceeded: ${over.join('; ')}`);
+      process.exit(1);
+    }
   },
   dev() {
     run('npx', ['vite'], { cwd: WEB });

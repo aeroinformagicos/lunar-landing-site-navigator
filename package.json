@@ -8,6 +8,7 @@
     "test": "node ops/tasks.mjs test",
     "test-all": "node ops/tasks.mjs test-all",
     "check": "node ops/tasks.mjs check",
+    "check-size": "node ops/tasks.mjs check-size",
     "dev": "node ops/tasks.mjs dev",
     "build": "node ops/tasks.mjs build",
     "deploy": "node ops/tasks.mjs deploy",
