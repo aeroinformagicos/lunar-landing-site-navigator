@@ -776,3 +776,130 @@ input[aria-invalid='true'] {
 .case__status {
   white-space: nowrap;
 }
+
+/* ---- Panorama (10 §6.1) ---- */
+.pano__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap);
+  margin-bottom: 8px;
+}
+
+.pano__view,
+.pano__strip {
+  display: block;
+  touch-action: none;
+  cursor: grab;
+  border-radius: var(--radius);
+}
+
+.pano__strip {
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.pano__sky {
+  fill: #05070b;
+}
+
+.pano__terrain {
+  fill: var(--c-terrain);
+}
+
+.pano__horizon {
+  fill: none;
+  stroke: var(--c-terrain-line);
+  stroke-width: 1.5;
+}
+
+.pano__smooth {
+  fill: none;
+  stroke: var(--c-smooth);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+
+.pano__grid {
+  stroke: rgb(255 255 255 / 12%);
+  stroke-width: 1;
+}
+
+.pano__label {
+  fill: var(--c-text-muted);
+  font-size: 12px;
+}
+
+.pano__label--ridge,
+.pano__label--arrow {
+  fill: var(--c-text);
+}
+
+.pano__trace {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-dasharray: 1 4;
+  stroke-linecap: round;
+}
+
+.pano__ridge {
+  fill: none;
+  stroke: var(--c-text);
+  stroke-width: 1.5;
+}
+
+.pano__bracket {
+  fill: rgb(255 255 255 / 8%);
+  stroke: var(--c-text);
+  stroke-width: 1.5;
+}
+
+.pano__readout {
+  margin: 4px 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--c-text-muted);
+  min-height: 1.4em;
+}
+
+.pano__note {
+  margin: 0 0 6px;
+  color: var(--c-marginal);
+  font-size: 14px;
+}
+
+.pano__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  align-items: flex-start;
+}
+
+.pano__zoom {
+  margin: 0;
+}
+
+.pano__label-text {
+  font-size: 12px;
+  color: var(--c-text-muted);
+}
+
+.pano__zoom-readout p,
+.pano__effect p {
+  margin: 2px 0;
+  font-size: 14px;
+}
+
+.pano__effect {
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  min-width: 220px;
+}
+
+.pano__effect h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: var(--c-text-muted);
+}

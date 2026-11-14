@@ -41,7 +41,7 @@ EPHEMERIS_BYTES = 5_260_176
 APOLLO_OFFSET = 4_418_568
 # 05 §8.3: tolerance of the table (sky_at) against Horizons; 05 §8.4: table against spkcpo.
 TABLE_TOL_DEG = 0.001
-# 05 §8.4 on the hourly grid, raised from 0.00002° by decision D-74: stellar aberration is applied
+# 05 §8.4 on the hourly grid, raised from 0.00002° by decision D-75: stellar aberration is applied
 # at the Moon's centre and carried to the site with V − p, which leaves up to ~0.000028° for the Earth.
 GRID_TOL_DEG = 0.00003
 # 05 §8.7: bounds of the moduli, km; libration bound, degrees; relative error of sample k = 1.

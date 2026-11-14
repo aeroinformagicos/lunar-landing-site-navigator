@@ -307,7 +307,7 @@ def test_examples_are_up_to_date(tmp_path):
 
 
 def test_examples_do_not_overwrite_real_data(tmp_path):
-    """D-76: with ``ephemeris.synthetic = false`` in the manifest, the copy to web/public/data is refused."""
+    """D-77: with ``ephemeris.synthetic = false`` in the manifest, the copy to web/public/data is refused."""
     spec = importlib.util.spec_from_file_location("make_examples", MAKE_EXAMPLES)
     make_examples = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(make_examples)
