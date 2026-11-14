@@ -2,7 +2,7 @@
 // T-53 (14_ux_malaga.md §9): the welcome card shows on a first visit without state in the URL and
 // not with a shared link; the demo flow of §2 never shows `undefined`, `NaN`, `null`, `lorem` or `TODO`,
 // and every button in it is at least 44 × 44 px.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './v1';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 

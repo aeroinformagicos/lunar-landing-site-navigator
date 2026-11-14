@@ -2,7 +2,7 @@
 // T-35 end to end (F32, 10_interfaz.md §6.4): «Most Sun + Earth in a period» lists 10 points and can
 // add one as a scenario; «Longest continuous Sun + Earth from a date» runs in the worker, can be
 // cancelled, and the interface keeps responding meanwhile.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './v1';
 
 async function openBest(page: Page) {
   await page.goto('/');

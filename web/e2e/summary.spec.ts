@@ -1,7 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // T-17 end to end (F18): the plain summary shows three sentences in the panel and its numbers are the
 // panel's.
-import { expect, test } from '@playwright/test';
+import { expect, test } from './v1';
 
 test('three plain sentences with the panel numbers', async ({ page }) => {
   await page.goto('/');

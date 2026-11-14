@@ -2,7 +2,7 @@
 // T-27 end to end (F10, 10_interfaz.md §6.5): matrix of the scenarios × 31 dates, keyboard in the
 // matrix, a click sets the landing and shows the detail, delay steps, editable requirements, next
 // valid window, ranking message, full status chip, and the Replan tab only in Plan.
-import { expect, test } from '@playwright/test';
+import { expect, test } from './v1';
 import { DAY, re, sitesInfo, utc } from './data';
 
 test.beforeEach(async ({ page }) => {
