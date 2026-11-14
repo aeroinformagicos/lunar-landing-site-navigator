@@ -38,12 +38,16 @@ import { bodyTrace, pointerReadout, ridgeLabel, terrainEffectLines } from './tex
 
 const BODIES: FocusBody[] = ['sun', 'earth'];
 const COLOR = { sun: 'var(--c-sun)', earth: 'var(--c-earth)' } as const;
-const ZOOM_W = 200;
+const ZOOM_W = 184;
 const STRIP_H = 56;
 /** The 40° view keeps the same scale on both axes; its height is capped so the page fits 1280 × 720. */
-const VIEW_MAX_H = 240;
-/** Zoom, readouts and `Terrain effect` sit beside the 40° view when there is room. */
-const SIDE_W = 200;
+const VIEW_MAX_H = 330;
+/** Fixed star field (azimuth, elevation, radius, opacity): the airless sky is black even by day. */
+const STARS = (() => {
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  return Array.from({ length: 900 }, () => ({ az: rnd() * 360, el: rnd() * 40 - 6, r: rnd() < 0.08 ? 1.3 : 0.7, o: 0.25 + rnd() * 0.55 }));
+})();
 
 function useWidth(): [React.RefObject<HTMLDivElement | null>, number] {
   const ref = useRef<HTMLDivElement>(null);
@@ -64,6 +68,9 @@ function useWidth(): [React.RefObject<HTMLDivElement | null>, number] {
  * the two discs: a soft halo behind, visible part filled, outline always and, in the large view, a label.
  */
 function Scene({ v, model, sky, showSmooth, idp, labels = false }: { v: View; model: ScenarioModel; sky: SkyState; showSmooth: boolean; idp: string; labels?: boolean }) {
+  const stars = labels
+    ? STARS.map((s) => ({ ...s, p: project(v, s.az, s.el) })).filter((s) => s.p.x >= 0 && s.p.x <= v.w && s.p.y >= 0 && s.p.y <= v.h)
+    : [];
   const line = horizonLine(v, model.mask.elDeg);
   const smoothY = smoothHorizon(model.mask.observerHeightM).elDeg;
   return (
@@ -88,9 +95,14 @@ function Scene({ v, model, sky, showSmooth, idp, labels = false }: { v: View; mo
         ))}
       </defs>
       <rect width={v.w} height={v.h} className="pano__sky" style={{ fill: `url(#${idp}-skyfill)` }} />
+      <g clipPath={`url(#${idp}-sky)`} aria-hidden="true">
+        {stars.map((s, i) => (
+          <circle key={i} cx={s.p.x} cy={s.p.y} r={s.r} className="pano__star" opacity={s.o} />
+        ))}
+      </g>
       {BODIES.map((b) => {
         const d = discOf(v, sky[b]);
-        const glow = Math.max(d.r * 3, 7);
+        const glow = b === 'sun' ? Math.max(d.r * 7, 26) : Math.max(d.r * 2.2, 12);
         return (
           <g key={b} data-body={b}>
             <circle cx={d.cx} cy={d.cy} r={glow} fill={`url(#${idp}-halo-${b})`} clipPath={`url(#${idp}-sky)`} className="pano__halo" aria-hidden="true" />
@@ -150,8 +162,7 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
   if (!sky) return <p className="data-state data-state--empty">{t('error.range')}</p>;
 
   const body = sky[focus];
-  const side = width >= 2 * VIEW_MAX_H + SIDE_W + 12;
-  const viewW = Math.min(side ? width - SIDE_W - 12 : width, 2 * VIEW_MAX_H);
+  const viewW = Math.min(width, 2 * VIEW_MAX_H);
   const centre = viewCentre(model.mask.elDeg, body, panAz);
   const v: View = { az: centre.az, el: centre.el, widthDeg: VIEW_WIDTH_DEG, heightDeg: VIEW_HEIGHT_DEG, w: viewW, h: viewW / 2 };
   const grid = gridLines(v, 5);
@@ -210,73 +221,66 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
         </label>
       </div>
 
-      <div className="pano__main">
-      <div className="pano__left">
-      {/* 1. 40° view */}
-      <svg
-        className="pano__view"
-        width={v.w}
-        height={v.h}
-        role="img"
-        tabIndex={0}
-        aria-label={t('pano.view_label', { body: bodyName })}
-        aria-describedby={`${idp}-desc ${CHART_DESCRIBEDBY}`}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={() => (drag.current = null)}
-        onPointerLeave={() => setHover(null)}
-        onKeyDown={onKeyDown}
-      >
-        <Scene v={v} model={model} sky={sky} showSmooth={showSmooth} idp={`${idp}-v`} labels />
-        {grid.az.map((g) => (
-          <g key={`a${g.label}`}>
-            <line x1={g.x} x2={g.x} y1={0} y2={v.h} className="pano__grid" />
-            <text x={g.x + 3} y={v.h - 4} className="pano__label">
-              {g.label}
+      <div className="pano__stage" style={{ width: v.w, height: v.h }}>
+        {/* 1. 40° view */}
+        <svg
+          className="pano__view"
+          width={v.w}
+          height={v.h}
+          role="img"
+          tabIndex={0}
+          aria-label={t('pano.view_label', { body: bodyName })}
+          aria-describedby={`${idp}-desc ${CHART_DESCRIBEDBY}`}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={() => (drag.current = null)}
+          onPointerLeave={() => setHover(null)}
+          onKeyDown={onKeyDown}
+        >
+          <Scene v={v} model={model} sky={sky} showSmooth={showSmooth} idp={`${idp}-v`} labels />
+          {grid.az.map((g) => (
+            <g key={`a${g.label}`}>
+              <line x1={g.x} x2={g.x} y1={0} y2={v.h} className="pano__grid" />
+              <text x={g.x + 3} y={v.h - 6} className="pano__label">
+                {g.label}
+              </text>
+            </g>
+          ))}
+          {grid.el.map((g) => (
+            <g key={`e${g.label}`}>
+              <line x1={0} x2={v.w} y1={g.y} y2={g.y} className="pano__grid" />
+              <text x={6} y={g.y - 4} className="pano__label">
+                {g.label}
+              </text>
+            </g>
+          ))}
+          <path
+            d={pathOf(trace.filter((p) => Math.abs(((p.azDeg - v.az + 540) % 360) - 180) < VIEW_WIDTH_DEG / 2 + 2).map((p) => project(v, p.azDeg, p.elDeg)))}
+            className="pano__trace"
+            stroke={COLOR[focus]}
+          />
+          {trace
+            .filter((p) => p.daily && Math.abs(((p.azDeg - v.az + 540) % 360) - 180) < VIEW_WIDTH_DEG / 2)
+            .map((p) => {
+              const q = project(v, p.azDeg, p.elDeg);
+              return <circle key={p.t} cx={q.x} cy={q.y} r={2.5} fill={COLOR[focus]} className="pano__daily" />;
+            })}
+          {ridge && ridgeAt.x > 0 && ridgeAt.x < v.w && (
+            <g>
+              <circle cx={ridgeAt.x} cy={ridgeAt.y} r={3.5} className="pano__ridge" />
+              <text x={ridgeAt.x + 8} y={ridgeAt.y - 8} className="pano__label pano__label--ridge">
+                {ridge}
+              </text>
+            </g>
+          )}
+          {centre.arrow && (
+            <text x={v.w / 2} y={centre.arrow.dir === 'below' ? v.h - 22 : 22} textAnchor="middle" className="pano__label pano__label--arrow">
+              {centre.arrow.dir === 'below' ? '↓' : '↑'} {t('pano.horizon_arrow', { deg: centre.arrow.deg, dir: centre.arrow.dir })}
             </text>
-          </g>
-        ))}
-        {grid.el.map((g) => (
-          <g key={`e${g.label}`}>
-            <line x1={0} x2={v.w} y1={g.y} y2={g.y} className="pano__grid" />
-            <text x={4} y={g.y - 3} className="pano__label">
-              {g.label}
-            </text>
-          </g>
-        ))}
-        <path
-          d={pathOf(trace.filter((p) => Math.abs(((p.azDeg - v.az + 540) % 360) - 180) < VIEW_WIDTH_DEG / 2 + 2).map((p) => project(v, p.azDeg, p.elDeg)))}
-          className="pano__trace"
-          stroke={COLOR[focus]}
-        />
-        {trace
-          .filter((p) => p.daily && Math.abs(((p.azDeg - v.az + 540) % 360) - 180) < VIEW_WIDTH_DEG / 2)
-          .map((p) => {
-            const q = project(v, p.azDeg, p.elDeg);
-            return <circle key={p.t} cx={q.x} cy={q.y} r={2.5} fill={COLOR[focus]} className="pano__daily" />;
-          })}
-        {ridge && ridgeAt.x > 0 && ridgeAt.x < v.w && (
-          <g>
-            <circle cx={ridgeAt.x} cy={ridgeAt.y} r={3} className="pano__ridge" />
-            <text x={ridgeAt.x + 6} y={ridgeAt.y - 6} className="pano__label pano__label--ridge">
-              {ridge}
-            </text>
-          </g>
-        )}
-        {centre.arrow && (
-          <text x={v.w / 2} y={centre.arrow.dir === 'below' ? v.h - 18 : 18} textAnchor="middle" className="pano__label pano__label--arrow">
-            {centre.arrow.dir === 'below' ? '↓' : '↑'} {t('pano.horizon_arrow', { deg: centre.arrow.deg, dir: centre.arrow.dir })}
-          </text>
-        )}
-      </svg>
-      <p id={`${idp}-desc`} className="pano__readout" aria-live="off">
-        {hover ?? ' '}
-      </p>
-      {!body.visible && <p className="pano__note">{t('pano.below', { body: bodyName })}</p>}
-      </div>
+          )}
+        </svg>
 
-      <div className="pano__side">
-        {/* 2. Horizon zoom */}
+        {/* 2. Horizon zoom, inset in the corner of the view */}
         <figure className="pano__zoom">
           <svg width={zv.w} height={zv.h} role="img" aria-label={t('pano.zoom_label')} aria-describedby={CHART_DESCRIBEDBY}>
             <Scene v={zv} model={model} sky={sky} showSmooth={showSmooth} idp={`${idp}-z`} />
@@ -289,11 +293,17 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
           </svg>
           <figcaption className="pano__label-text">{zoomCaption}</figcaption>
         </figure>
-        <div className="pano__zoom-readout">
+      </div>
+      <p id={`${idp}-desc`} className="pano__readout" aria-live="off">
+        {hover ?? ' '}
+      </p>
+
+      <div className="pano__facts">
+        <div className="pano__now">
+          {!body.visible && <p className="pano__note">{t('pano.below', { body: bodyName })}</p>}
           {focus === 'sun' && <p data-testid="disc-visible">{t('pano.disc_visible', { pct: formatPct(sky.sun.discFraction * 100) })}</p>}
           <p data-testid="margin">{t('pano.margin', { margin: formatMargin(body.marginDeg) })}</p>
         </div>
-
         {/* F4: Terrain effect */}
         <section className="pano__effect" aria-labelledby={`${idp}-fx`}>
           <h3 id={`${idp}-fx`}>{t('pano.terrain_effect')}</h3>
@@ -301,7 +311,6 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
           <p>{lines.earthLink}</p>
           <p data-testid="first-event-shift">{lines.firstEvent}</p>
         </section>
-      </div>
       </div>
 
       {/* 3. 360° strip */}

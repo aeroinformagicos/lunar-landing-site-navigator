@@ -31,8 +31,8 @@
   /* Panorama sky and ground (T-54). */
   --c-sky-top: #04060b;
   --c-sky-low: #121b2c;
-  --c-ground-top: #5d6676;
-  --c-ground-low: #2a303a;
+  --c-ground-top: #8d96a5;
+  --c-ground-low: #1a1f28;
   /* Focus outline (10_interfaz.md §12): 2 px #F0E442. */
   --c-focus: #f0e442;
   /* Small warning text: --c-warn (#D55E00) gives 4.4:1 on --c-surface, below 4.5:1 (D-71). */

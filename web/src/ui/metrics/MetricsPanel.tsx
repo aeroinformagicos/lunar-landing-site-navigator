@@ -30,7 +30,7 @@ function useThrottledLive(text: string, paused: boolean): string {
   return live;
 }
 
-function Figure({ id, icon, value }: { id: 'sunlight' | 'earth_link' | 'longest_night'; icon: string; value: string }) {
+function Figure({ id, icon, value, share }: { id: 'sunlight' | 'earth_link' | 'longest_night'; icon: string; value: string; share: number }) {
   const [help, setHelp] = useState(false);
   const name = t(`metrics.${id}` as TextKey);
   // `259 h · 77 %`: hours large (≥ 28 px, 14 §4), the share smaller; the text stays the same.
@@ -59,6 +59,10 @@ function Figure({ id, icon, value }: { id: 'sunlight' | 'earth_link' | 'longest_
         {main}
         {rest && <span className="figure__sub">{rest}</span>}
       </p>
+      {/* Share of the mission as a bar (T-54): what the number means at a glance. */}
+      <div className="figure__bar" aria-hidden="true">
+        <span style={{ width: `${Math.max(0, Math.min(100, share))}%` }} />
+      </div>
       {help && (
         <p id={`help-${id}`} className="figure__helptext">
           {t(`metrics.help.${id}` as TextKey)}
@@ -86,9 +90,14 @@ export function MetricsPanel({ model, mission, scenario }: { model: ScenarioMode
   return (
     <>
       <div className="figures">
-        <Figure id="sunlight" icon="☀" value={`${formatHours(metrics.sunHours)} · ${formatPct(metrics.sunPct)}`} />
-        <Figure id="earth_link" icon="◐" value={`${formatHours(metrics.earthHours)} · ${formatPct(metrics.earthPct)}`} />
-        <Figure id="longest_night" icon="☾" value={formatHours(metrics.longestNightH)} />
+        <Figure id="sunlight" icon="☀" value={`${formatHours(metrics.sunHours)} · ${formatPct(metrics.sunPct)}`} share={metrics.sunPct} />
+        <Figure id="earth_link" icon="◐" value={`${formatHours(metrics.earthHours)} · ${formatPct(metrics.earthPct)}`} share={metrics.earthPct} />
+        <Figure
+          id="longest_night"
+          icon="☾"
+          value={formatHours(metrics.longestNightH)}
+          share={(100 * metrics.longestNightH) / (24 * scenario.missionDays)}
+        />
       </div>
       {metrics.truncated && <p className="field__warn">{t('warn.truncated')}</p>}
 

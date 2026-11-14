@@ -16,6 +16,7 @@ import { meshPointLabel } from '../map/mapData';
 import { MESH_RELIEF } from '../common/model';
 import { SitePicker } from './SitePicker';
 import { Button } from '../common/Button';
+import { Icon } from '../common/Icon';
 
 /** What the picker is choosing for: a new scenario or the site of an existing one. */
 type PickerTarget = { kind: 'add' } | { kind: 'change'; id: ScenarioId };
@@ -133,14 +134,14 @@ export function ScenarioCard({ scenario, sites, onChangeSite }: CardProps) {
         </DataState>
       )}
       <div className="scenario-card__actions">
-        <Button variant="ghost" onClick={onChangeSite}>
-          {t('scenario.change')}
+        <Button variant="ghost" className="btn--icon" onClick={onChangeSite} aria-label={t('scenario.change')} title={t('scenario.change')}>
+          <Icon name="edit" />
         </Button>
-        <Button variant="ghost" onClick={() => duplicate(scenario.id)} disabled={count >= MAX_SCENARIOS}>
-          {t('scenario.duplicate')}
+        <Button variant="ghost" className="btn--icon" onClick={() => duplicate(scenario.id)} disabled={count >= MAX_SCENARIOS} aria-label={t('scenario.duplicate')} title={t('scenario.duplicate')}>
+          <Icon name="copy" />
         </Button>
-        <Button variant="ghost" onClick={() => remove(scenario.id)} disabled={count <= 1}>
-          {t('scenario.remove')}
+        <Button variant="ghost" className="btn--icon" onClick={() => remove(scenario.id)} disabled={count <= 1} aria-label={t('scenario.remove')} title={t('scenario.remove')}>
+          <Icon name="trash" />
         </Button>
       </div>
     </article>

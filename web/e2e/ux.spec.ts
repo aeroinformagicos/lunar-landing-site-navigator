@@ -45,7 +45,8 @@ test('Explore on my own closes the card; a shared link never shows it', async ({
   await page.getByRole('button', { name: 'Explore on my own' }).click();
   await expect(page.getByTestId('welcome')).toHaveCount(0);
   await expect(page.locator('.pano__view')).toBeVisible({ timeout: 20_000 });
-  await expect.poll(() => page.url()).toContain('#'); // the fragment now carries the state (F16)
+  await page.getByRole('button', { name: 'Forward 1 hour' }).click();
+  await expect.poll(() => page.url()).toMatch(/#.+/); // the fragment now carries the state (F16)
   const shared = page.url();
   await page.evaluate(() => localStorage.clear());
   await page.goto('about:blank');

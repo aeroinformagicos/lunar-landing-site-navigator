@@ -1953,6 +1953,196 @@ select {
   }
 }
 
+/* ---- Visual pass (T-54b): the panorama as a full-width scene ---- */
+.pano__stage {
+  position: relative;
+  max-width: 100%;
+}
+
+.pano__view {
+  display: block;
+  border-radius: var(--radius-lg);
+}
+
+.pano__star {
+  fill: #e4ebf7;
+}
+
+.pano__label {
+  font-size: 12px;
+  fill: rgb(220 229 240 / 62%);
+}
+
+.pano__label--ridge,
+.pano__label--arrow {
+  fill: var(--c-text);
+  font-size: 13px;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: var(--c-sky-top);
+  stroke-width: 3px;
+}
+
+.pano__ridge {
+  stroke: var(--c-text);
+  fill: var(--c-sky-top);
+  stroke-width: 2;
+}
+
+.pano__trace {
+  stroke-width: 2;
+  stroke-dasharray: 1 5;
+}
+
+/* Horizon zoom: inset in the top-right corner of the scene. */
+.pano__zoom {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  margin: 0;
+  padding: 4px 4px 2px;
+  background: rgb(13 19 32 / 82%);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 45%);
+}
+
+.pano__zoom svg {
+  display: block;
+  border: none;
+  border-radius: 4px;
+}
+
+.pano__zoom .pano__label-text {
+  display: block;
+  padding: 2px 2px 0;
+  font-size: 12px;
+  color: var(--c-text-muted);
+}
+
+.pano__readout {
+  margin: 4px 0 0;
+}
+
+/* Facts under the scene: what the focus body is doing, then the terrain effect. */
+.pano__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s1);
+}
+
+.pano__now,
+.pano__effect {
+  padding: var(--s2) var(--s3);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+}
+
+.pano__now {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 190px;
+}
+
+.pano__now p,
+.pano__effect p {
+  margin: 0;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pano__now .pano__note {
+  color: var(--c-marginal);
+  font-weight: 600;
+}
+
+.pano__effect {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--s4);
+}
+
+.pano__effect h3 {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.pano__strip {
+  margin-top: var(--s2);
+}
+
+/* Right panel: one figure per row, with the share of the mission as a bar. */
+.figures {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.figure--longest_night {
+  grid-column: auto;
+}
+
+.figure__head {
+  min-height: 22px;
+}
+
+.figure__bar {
+  height: 6px;
+  margin: 4px 0 2px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgb(220 229 240 / 9%);
+}
+
+.figure__bar span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--c-sun);
+}
+
+.figure--earth_link .figure__bar span {
+  background: var(--c-earth);
+}
+
+.figure--longest_night .figure__bar span {
+  background: var(--c-none);
+}
+
+/* Scenario cards: icon actions in one row, 44 px each and 8 px apart. */
+.btn--icon {
+  width: 44px;
+  padding: 0;
+}
+
+.icon {
+  display: block;
+}
+
+.scenario-card__actions {
+  margin: 2px 0 0 calc(-1 * var(--s2));
+  gap: var(--s2);
+}
+
+.scenario-card p.scenario-card__date {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--c-text);
+}
+
+.pano__horizon {
+  stroke: #eef2f7;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 3px rgb(238 242 247 / 35%));
+}
+
+.figure {
+  padding: 6px var(--s3);
+}
+
 /* Phones keep T-20's three figure columns (rules below); the night tile does not span them. */
 @media (max-width: 767px) {
   .figure--longest_night {

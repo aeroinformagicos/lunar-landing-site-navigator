@@ -2,7 +2,15 @@
 // T-23 end to end (F9, 10_interfaz.md §6.7) on the example report: three headline cards with
 // prediction, fact, tolerance, linked source and state; the full table unfolds and each row expands;
 // a mismatch is shown; without a report, the message.
+import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
+
+/** The example report of the contract: the published one is real data since T-22. */
+const EXAMPLE_REPORT = readFileSync(new URL('../../contract/examples/data/validation_report.json', import.meta.url), 'utf-8');
+
+async function useExampleReport(page: Page) {
+  await page.route('**/validation_report.json', (route) => route.fulfill({ contentType: 'application/json', body: EXAMPLE_REPORT }));
+}
 
 async function openValidation(page: Page) {
   await page.goto('/');
@@ -11,6 +19,7 @@ async function openValidation(page: Page) {
 }
 
 test('three headline cards with prediction, fact, tolerance, source and state', async ({ page }) => {
+  await useExampleReport(page);
   await openValidation(page);
   const b3 = page.getByRole('article', { name: /Total solar eclipse seen by Blue Ghost 1/ });
   await expect(b3).toContainText('Match');
@@ -27,6 +36,7 @@ test('three headline cards with prediction, fact, tolerance, source and state', 
 });
 
 test('the full table unfolds and each row expands with its details', async ({ page }) => {
+  await useExampleReport(page);
   await openValidation(page);
   await page.getByRole('button', { name: 'Show all checks (4)' }).click();
   const table = page.locator('#all-checks');
