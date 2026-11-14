@@ -2,8 +2,10 @@
 // T-30 end to end (F15, 10_interfaz.md §11): Learn walks the seven steps with `Next`, each showing its
 // view; keys ← → work; the end offers `Explore it yourself` and `Restart`.
 import { expect, test } from '@playwright/test';
+import { sitesInfo } from './data';
 
-test('the seven steps with Next, then Explore it yourself', async ({ page }) => {
+test('the seven steps with Next, then Explore it yourself', async ({ page, request }) => {
+  const { pair } = await sitesInfo(request);
   await page.goto('/');
   await expect(page.getByRole('article', { name: 'Scenario A' })).toBeVisible();
   await page.getByRole('tab', { name: 'Learn' }).click();
@@ -22,7 +24,7 @@ test('the seven steps with Next, then Explore it yourself', async ({ page }) => 
 
   await next();
   await expect(count).toHaveText('3 / 7');
-  // Example demo-b has no profile (the real sites will): the Cross-section tab is what matters here.
+  // Whether B has a profile depends on the data: the Cross-section tab with B active is what matters.
   await expect(page.getByRole('tab', { name: 'Cross-section' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('article', { name: 'Scenario B' })).toHaveAttribute('aria-current', 'true');
   await expect(text).toHaveText(/^Here is why: a ridge \d+ (m|km) away blocks the Sun\./);
@@ -50,7 +52,7 @@ test('the seven steps with Next, then Explore it yourself', async ({ page }) => 
   await next();
   await page.getByRole('button', { name: 'Explore it yourself' }).click();
   await expect(page.getByRole('tab', { name: 'Explore' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText('Demo B');
+  await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText(pair[1].short_name);
   await expect(page.getByTestId('story-count')).toHaveCount(0);
 });
 
