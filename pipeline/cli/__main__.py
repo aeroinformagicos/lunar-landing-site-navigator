@@ -33,7 +33,24 @@ def build_parser() -> argparse.ArgumentParser:
     bench.add_argument(
         "--in-memory", action="store_true", help="load P1 and P2 whole instead of mapping them"
     )
+    sub.add_parser("cube-plan", help="write the priority list of the cube chunks (out/cube/plan.json)")
+    cube = sub.add_parser("cube", help="horizon cube; with --bench, measure its cost with 4 chunks")
+    cube.add_argument("--bench", action="store_true", help="measure the cost and write out/cube/bench.json")
+    cube.add_argument("--law", choices=("both", "full", "fast"), default="both", help="laws to measure")
+    cube.add_argument(
+        "--device", choices=("auto", "cuda", "cpu"), default=None, help="default: $LLSN_DEVICE or auto"
+    )
+    cube.add_argument("--pts-batch", type=int, default=None, help="points per batch")
+    cube.add_argument("--ring", type=int, default=None, help="samples per block")
+    cube.add_argument(
+        "--points", type=int, default=None, help="quick check: only the first N points of each chunk"
+    )
     return parser
+
+
+def out_dir(args: argparse.Namespace) -> Path:
+    """Root of the derived outputs: --out-dir, else <data dir>/out (decision D-44)."""
+    return args.out_dir if args.out_dir is not None else args.data_dir / "out"
 
 
 def cmd_info(args: argparse.Namespace) -> int:
@@ -99,9 +116,70 @@ def cmd_bench_sampler(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_cube_plan(args: argparse.Namespace) -> int:
+    """Priority list of the 1974 chunks (08_mapa_polar.md §2)."""
+    from pipeline.horizon import cube
+
+    path = out_dir(args) / "cube" / "plan.json"
+    plan = cube.write_plan(path)
+    for lv in cube.plan_levels(plan):
+        print(f"level {lv['level']}: {lv['chunks']} chunks, {lv['points']} points")
+    print(f"{len(plan)} chunks written to {path}")
+    return 0
+
+
+def cmd_cube(args: argparse.Namespace) -> int:
+    """Cost of the cube measured with four fixed chunks (08_mapa_polar.md §4)."""
+    if not args.bench:
+        print("Only `cube --bench` exists so far; the resumable run of the cube arrives with T-25.")
+        return 2
+    try:
+        import torch  # noqa: F401
+    except ImportError:
+        print("PyTorch is not installed: run make setup-gpu (CUDA) or pip install torch==2.15.0 (CPU).")
+        return 1
+    from pipeline.dem.stack import DemDataMissing, lola_polar_stack
+    from pipeline.horizon import cube, engine_torch
+
+    if args.points is not None and not 1 <= args.points <= cube.POINTS_PER_CHUNK:
+        print(f"--points must be between 1 and {cube.POINTS_PER_CHUNK}")
+        return 2
+    device = engine_torch.pick_device(args.device)
+    t0 = time.perf_counter()
+    try:
+        dem = lola_polar_stack(args.data_dir, in_memory=True)
+    except DemDataMissing as exc:
+        print(f"cannot measure: {exc}")
+        return 1
+    stack = engine_torch.TorchStack.from_dem_stack(dem, device)
+    load_s = time.perf_counter() - t0
+    print(f"{' + '.join(stack.names)} loaded on {device.type} in {load_s:.1f} s")
+    bench = cube.run_bench(
+        stack,
+        laws=cube.BENCH_LAWS if args.law == "both" else (args.law,),
+        pts_batch=args.pts_batch,
+        ring=args.ring,
+        points=None if args.points is None else list(range(args.points)),
+        progress=print,
+    )
+    bench["load_s"] = load_s
+    # A partial run never replaces the measurement the decision rule uses.
+    path = out_dir(args) / "cube" / ("bench.json" if bench["complete"] else "bench_partial.json")
+    cube.write_bench(path, bench)
+    for line in cube.bench_summary_lines(bench):
+        print(line)
+    print(f"written to {path}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    handlers = {"info": cmd_info, "bench-sampler": cmd_bench_sampler}
+    handlers = {
+        "info": cmd_info,
+        "bench-sampler": cmd_bench_sampler,
+        "cube-plan": cmd_cube_plan,
+        "cube": cmd_cube,
+    }
     return handlers[args.command](args)
 
 

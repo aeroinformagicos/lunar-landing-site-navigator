@@ -89,6 +89,18 @@ const tasks = {
   info() {
     cli('info');
   },
+  // Cost of the horizon cube with 4 chunks (08_mapa_polar.md §4). Optional: LAW=full|fast,
+  // RING=<samples per block>, PTS_BATCH=<points per batch>; the device comes from LLSN_DEVICE.
+  'cube-bench'() {
+    const extra = [];
+    if (process.env.LAW) extra.push('--law', process.env.LAW);
+    if (process.env.RING) extra.push('--ring', process.env.RING);
+    if (process.env.PTS_BATCH) extra.push('--pts-batch', process.env.PTS_BATCH);
+    cli('cube', '--bench', ...extra);
+  },
+  'cube-plan'() {
+    cli('cube-plan');
+  },
 };
 
 const name = process.argv[2];
