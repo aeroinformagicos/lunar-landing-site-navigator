@@ -1,6 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Floating panels of the v2 shell (15_interfaz_v2.md §5.1, §5.2): Sites and Setup on the left,
 // Now at site on the right. They reuse the v1 controls and the same store.
+import { useState } from 'react';
 import { MAX_SCENARIOS } from '../../core/constants';
 import { t } from '../../i18n/t';
 import { useAppStore, DEFAULT_REQUIREMENTS } from '../../state/store';
@@ -12,6 +13,7 @@ import { MissionInput } from '../controls/MissionInput';
 import { countdownText, requirementChecks } from '../metrics/derive';
 import { ScenarioCard } from '../scenario/ScenarioColumn';
 import { FloatingPanel } from './FloatingPanel';
+import { HorizonDetail } from './HorizonDetail';
 import { useActive } from './useActive';
 
 const SitesIcon = (
@@ -120,6 +122,8 @@ export function SetupPanel({ open, onOpenChange }: LeftProps) {
 /** Now at site: telemetry, requirements, eclipse, focus and smooth Moon (15 §5.2). */
 export function NowPanel() {
   const { scenario, resource } = useActive();
+  // `Horizon detail` open: telemetry and requirements fold to one line so the panel still fits (15 §3.2).
+  const [detail, setDetail] = useState(false);
   const cursor = useAppStore((s) => s.cursorUnix);
   const requirements = useAppStore((s) => s.requirements);
   const focus = useAppStore((s) => s.focusBody);
@@ -144,7 +148,13 @@ export function NowPanel() {
 
   return (
     <FloatingPanel id="now" title={t('panel.now_at', { id: scenario.id })} side="right" defaultOpen={true} className="fp--now">
-      {now ? (
+      {detail && now ? (
+        <p className="v2-now-line">
+          <span className="v2-dl__v--sun">☀ {formatDeg(now.sky.sun.elDeg)}</span>
+          <span className="v2-dl__v--earth">◐ {formatDeg(now.sky.earth.elDeg)}</span>
+          {checks.some((c) => !c.ok) ? <span className="v2-check--fail">✕ {checks.filter((c) => !c.ok).length}</span> : <span>✓</span>}
+        </p>
+      ) : now ? (
         <dl className="v2-dl">
           {row(t('now.sun_elevation'), formatDeg(now.sky.sun.elDeg), 'sun')}
           {row(t('now.disc'), formatPct(now.sky.sun.discFraction * 100), 'sun')}
@@ -156,7 +166,7 @@ export function NowPanel() {
         <p className="v2-note">{resource.status === 'ready' ? t('metrics.outside') : t('metrics.loading')}</p>
       )}
 
-      {checks.length > 0 && (
+      {!detail && checks.length > 0 && (
         <ul className="v2-checks" aria-label={t('metrics.status')}>
           {checks.map((c) => (
             <li key={c.key} className={c.ok ? 'v2-check v2-check--ok' : 'v2-check v2-check--fail'}>
@@ -190,6 +200,7 @@ export function NowPanel() {
           {t('pano.compare_smooth')}
         </label>
       </div>
+      <HorizonDetail open={detail} setOpen={setDetail} />
     </FloatingPanel>
   );
 }

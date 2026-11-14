@@ -732,7 +732,7 @@
   inset: 0;
   /* Where lane I3 puts its camera controls (16_vista_3d.md §10.1): clear of the right panel's
      column, above the view tabs and the time bar. */
-  --stage3d-inset-right: calc(var(--gutter) + 220px);
+  --stage3d-inset-right: calc(var(--right-w) + 48px);
   --stage3d-inset-bottom: 160px;
 }
 
@@ -744,27 +744,6 @@
   margin: 0;
   color: var(--c-muted);
   font-size: 14px;
-}
-
-/* Provisional 2D view (T-61): the current panorama in the free area of the stage. */
-.ui-v2 .v2-stage2d {
-  position: absolute;
-  left: var(--left-clear);
-  right: calc(var(--right-w) + 48px);
-  top: calc(var(--top-pills) + 104px);
-  bottom: var(--bottom-h, 330px);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow: auto;
-}
-
-.ui-v2 .v2-stage2d .pano {
-  width: 100%;
-}
-
-.ui-v2 .v2-stage2d .pano__toolbar {
-  display: none;
 }
 
 /* Data views in the central sheet (15 §5.3). */
@@ -1275,5 +1254,524 @@
     height: 44px;
     min-height: 44px;
     min-width: 44px;
+  }
+}
+
+/* Full-width 2D view (15 §4.2, T-62): the scene fills the stage under every panel. */
+.ui-v2 .v2-stage2d {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.ui-v2 .v2-scene {
+  position: absolute;
+  inset: 0;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+}
+
+.ui-v2 .v2-scene:active {
+  cursor: grabbing;
+}
+
+.ui-v2 .v2-scene:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: -4px;
+}
+
+.ui-v2 .v2-scene__tick {
+  stroke: var(--c-muted);
+  stroke-opacity: 0.5;
+}
+
+.ui-v2 .v2-scene__axis {
+  font: 400 12px var(--font-v2-mono);
+  fill: var(--c-muted);
+}
+
+.ui-v2 .v2-scene__trace {
+  fill: none;
+}
+
+.ui-v2 .v2-scene__trace--sun {
+  stroke: var(--c-sun);
+  stroke-width: 1.4;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+}
+
+.ui-v2 .v2-scene__trace--earth {
+  stroke: var(--c-earth);
+  stroke-width: 1.2;
+  stroke-opacity: 0.75;
+}
+
+.ui-v2 .v2-scene__horizon {
+  fill: none;
+  stroke: var(--c-text);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.ui-v2 .v2-scene__contour path {
+  stroke: var(--c-muted);
+  stroke-opacity: 0.16;
+  stroke-width: 1;
+}
+
+.ui-v2 .v2-scene__smooth {
+  fill: none;
+  stroke: var(--c-muted);
+  stroke-width: 1.4;
+  stroke-dasharray: 6 4;
+}
+
+.ui-v2 .v2-scene__drop {
+  stroke: var(--c-earth);
+  stroke-width: 1;
+  stroke-dasharray: 1 5;
+}
+
+.ui-v2 .v2-scene__leader {
+  stroke: var(--c-text);
+  stroke-width: 1;
+}
+
+.ui-v2 .v2-scene__name {
+  font: 600 13px var(--font-v2-sans);
+  fill: var(--c-text);
+  paint-order: stroke;
+  stroke: var(--c-bg-0);
+  stroke-width: 3px;
+  stroke-opacity: 0.7;
+}
+
+.ui-v2 .v2-scene__data {
+  font: 400 12px var(--font-v2-mono);
+  paint-order: stroke;
+  stroke: var(--c-bg-0);
+  stroke-width: 3px;
+  stroke-opacity: 0.7;
+}
+
+.ui-v2 .v2-scene__data--sun {
+  fill: var(--c-sun);
+}
+
+.ui-v2 .v2-scene__data--earth {
+  fill: var(--c-earth);
+}
+
+.ui-v2 .v2-scene__data--eclipse {
+  fill: var(--c-eclipse);
+}
+
+.ui-v2 .v2-scene__hover {
+  position: absolute;
+  z-index: 2;
+  padding: 4px 8px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: rgba(17, 24, 39, 0.85);
+  font: 400 12px var(--font-v2-mono);
+  color: var(--c-text-2);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.ui-v2 .v2-strip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  cursor: pointer;
+  touch-action: none;
+  background: rgba(10, 14, 23, 0.6);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.ui-v2 .v2-strip__ground {
+  fill: var(--c-muted);
+  fill-opacity: 0.22;
+}
+
+.ui-v2 .v2-strip__bracket {
+  fill: rgba(255, 255, 255, 0.06);
+  stroke: var(--c-text);
+  stroke-opacity: 0.6;
+}
+
+/* With the strip on top, the header and the pills sit a little lower (mockup: rulers on top). */
+.ui-v2 .v2:not(.v2--sheet) {
+  --top-pills: clamp(40px, 6.5vh, 58px);
+}
+
+.ui-v2 .v2:not(.v2--sheet) .v2-brand {
+  top: clamp(38px, 6.2vh, 54px);
+}
+
+/* Horizon detail (right panel) */
+.ui-v2 .v2-detail {
+  margin: 16px -20px 0;
+  padding: 10px 20px 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.ui-v2 .v2-detail__h {
+  margin: 0;
+}
+
+.ui-v2 .v2-detail__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-text-2);
+  font: 600 13px var(--font-v2-sans);
+  cursor: pointer;
+}
+
+.ui-v2 .v2-zoom {
+  margin: 6px 0 8px;
+}
+
+.ui-v2 .v2-zoom svg {
+  display: block;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+
+.ui-v2 .v2-zoom__grid {
+  stroke: rgba(148, 163, 184, 0.16);
+}
+
+.ui-v2 .v2-zoom__caption {
+  margin-top: 4px;
+  font: 400 12px var(--font-v2-mono);
+  color: var(--c-muted);
+}
+
+.ui-v2 .v2-dl--tight {
+  gap: 4px;
+}
+
+.ui-v2 .v2-effect {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+}
+
+.ui-v2 .v2-effect__h {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-effect p {
+  margin: 0;
+  font: 400 12px var(--font-v2-mono);
+  color: var(--c-text-2);
+}
+
+/* K: minimap */
+/* Left of the right panel's column (the open panel would cover it under its own column). */
+.ui-v2 .v2-minimap {
+  position: absolute;
+  right: calc(var(--right-w) + 48px);
+  bottom: 140px;
+  z-index: 12;
+  width: 196px;
+  height: 196px;
+  min-height: 196px;
+  padding: 0;
+  border: 1px solid var(--c-line);
+  border-radius: 50%;
+  background: rgba(10, 14, 23, 0.8);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.ui-v2 .v2-minimap:hover {
+  border-color: var(--c-earth);
+}
+
+.ui-v2 .v2-minimap svg {
+  display: block;
+}
+
+.ui-v2 .v2-minimap__letter {
+  font: 500 12px var(--font-v2-mono);
+}
+
+.ui-v2 .v2-minimap__label {
+  font: 400 12px var(--font-v2-mono);
+  fill: var(--c-text-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-height: 800px) {
+  .ui-v2 .v2-minimap {
+    width: 156px;
+    height: 156px;
+    min-height: 156px;
+    bottom: 128px;
+  }
+  .ui-v2 .v2-minimap svg {
+    width: 154px;
+    height: 154px;
+  }
+}
+
+@media (max-width: 1279px) {
+  .ui-v2 .v2-minimap {
+    display: none;
+  }
+}
+
+/* Validation page with the v2 look (15 §5.4). */
+.ui-v2 .validation {
+  font-family: var(--font-v2-sans);
+}
+
+.ui-v2 .validation h1 {
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.ui-v2 .validation .headline {
+  border-color: var(--c-line);
+  border-radius: var(--radius-panel);
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.9), rgba(30, 41, 59, 0.9));
+}
+
+.ui-v2 .validation table {
+  font-family: var(--font-v2-mono);
+}
+
+.ui-v2:has(.validation) {
+  height: auto;
+  min-height: 100vh;
+  overflow: auto;
+  background: linear-gradient(180deg, #0a0e17 0%, #101827 48%, #162032 62%, #0a0e17 100%);
+}
+
+/* Story card (Learn) above the time bar. */
+.ui-v2 .story {
+  bottom: calc(var(--bottom-h, 200px) + 8px);
+}
+
+/* ---- Phones (< 768 px): one column, 2D, panels inline (15 §9, simplified, D-107) ---- */
+@media (max-width: 767px) {
+  .ui-v2 {
+    height: auto;
+    overflow: visible;
+  }
+  .ui-v2 .v2 {
+    position: relative;
+    inset: auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 16px calc(150px + env(safe-area-inset-bottom));
+    overflow: visible;
+  }
+  .ui-v2 .v2-brand,
+  .ui-v2 .v2-pills,
+  .ui-v2 .v2-modes,
+  .ui-v2 .v2-toggle,
+  .ui-v2 .v2-left,
+  .ui-v2 .v2-right,
+  .ui-v2 .v2-bottom {
+    position: static;
+    transform: none;
+    max-height: none;
+  }
+  .ui-v2 .v2-brand {
+    order: 1;
+  }
+  .ui-v2 .v2-brand .emblem {
+    width: 32px;
+    height: 32px;
+  }
+  .ui-v2 .v2-brand__name {
+    font-size: 16px;
+  }
+  .ui-v2 .v2-modes {
+    order: 2;
+    flex-wrap: wrap;
+  }
+  .ui-v2 .v2-pills {
+    order: 3;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .ui-v2 .v2-toggle {
+    order: 4;
+    align-self: flex-start;
+  }
+  .ui-v2 .v2-stage {
+    order: 5;
+    position: relative;
+    inset: auto;
+    height: 55svh;
+    min-height: 320px;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+  }
+  .ui-v2 .v2-sheet {
+    position: absolute;
+    inset: 0;
+    border-radius: 0;
+    border: 0;
+  }
+  .ui-v2 .v2-bottom {
+    order: 6;
+  }
+  .ui-v2 .v2-left {
+    order: 7;
+    width: 100%;
+  }
+  .ui-v2 .v2-right {
+    order: 8;
+    width: 100%;
+    align-items: stretch;
+  }
+  .ui-v2 .fp,
+  .ui-v2 .v2-left .fp {
+    width: 100%;
+    max-height: none;
+    margin-left: 0;
+  }
+  .ui-v2 .fp-tab,
+  .ui-v2 .fp-tab--right {
+    width: 100%;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-pill);
+  }
+  .ui-v2 .v2-cards {
+    max-height: none;
+  }
+  .ui-v2 .v2-mission {
+    margin-bottom: 8px;
+  }
+  .ui-v2 .v2-figs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    min-height: 0;
+  }
+  .ui-v2 .v2-fig__value {
+    font-size: 28px;
+  }
+  .ui-v2 .v2-fig__unit {
+    font-size: 14px;
+  }
+  .ui-v2 .v2-fig__label {
+    flex-wrap: wrap;
+  }
+  .ui-v2 .v2-tabs {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+  /* Time bar fixed at the bottom. */
+  .ui-v2 .v2-time {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin: 0;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+    background: rgba(10, 14, 23, 0.96);
+    border-top: 1px solid var(--c-line);
+  }
+  .ui-v2 .v2-track {
+    order: 9;
+    flex-basis: 100%;
+  }
+  .ui-v2 .v2-readout {
+    min-width: 0;
+    margin-left: auto;
+  }
+  .ui-v2 .v2-play {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+  }
+  .ui-v2 .v2-provenance {
+    flex-direction: column;
+  }
+  .ui-v2 .v2-welcome {
+    position: fixed;
+  }
+  .ui-v2 .v2-scene__axis {
+    font-size: 12px;
+  }
+  .ui-v2 .pill,
+  .ui-v2 .pill--small,
+  .ui-v2 .v2-toggle__opt,
+  .ui-v2 .v2-help,
+  .ui-v2 .tab {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Folded telemetry while `Horizon detail` is open. */
+.ui-v2 .v2-now-line {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  font: 400 13px var(--font-v2-mono);
+}
+
+/* Legibility of the figures over the scene: a soft dark pool behind the mission block. */
+.ui-v2 .v2:not(.v2--sheet) .v2-mission {
+  position: relative;
+}
+
+.ui-v2 .v2:not(.v2--sheet) .v2-mission::before {
+  content: '';
+  position: absolute;
+  inset: -70px -140px -50px -90px;
+  z-index: -1;
+  /* closest-side: fully transparent before any edge, so no box shows over the black 3D sky. */
+  background: radial-gradient(closest-side, rgba(10, 14, 23, 0.85) 0%, rgba(10, 14, 23, 0.6) 55%, rgba(10, 14, 23, 0) 100%);
+  pointer-events: none;
+}
+
+/* SVG scenes never paint outside their box (no horizontal page scroll on phones). */
+.ui-v2 .v2-scene,
+.ui-v2 .v2-strip,
+.ui-v2 .v2-minimap svg {
+  overflow: hidden;
+}
+
+/* The v1 footer is hidden in the v2 shell (credits live in the bottom line). */
+.ui-v2 .app__footer[hidden] {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  /* On phones the figures sit below the scene, not over it. */
+  .ui-v2 .v2:not(.v2--sheet) .v2-mission::before {
+    display: none;
+  }
+  .ui-v2 .v2 {
+    overflow-x: clip;
   }
 }
