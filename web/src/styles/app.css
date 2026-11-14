@@ -594,6 +594,10 @@ input[aria-invalid='true'] {
   font-size: 13px;
 }
 
+.figure__helptext p {
+  margin: 0 0 4px;
+}
+
 .checks {
   list-style: none;
   margin: 0;
@@ -686,8 +690,9 @@ input[aria-invalid='true'] {
   color: var(--c-warn-text);
 }
 
+/* Pending is neutral, not a warning (decision D-95): `Computed tonight` is not an error. */
 .status-chip--pending {
-  color: var(--c-marginal);
+  color: var(--c-text-muted);
 }
 
 .headline table,
@@ -746,6 +751,12 @@ input[aria-invalid='true'] {
 
 .validation__summary {
   margin: 16px 0 8px;
+}
+
+.validation__limits {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--c-text-muted);
 }
 
 .table-scroll {

@@ -45,6 +45,7 @@ test('panel: three figures with unit, help and source (F7)', async ({ page }) =>
   await expect(panel.getByText('Longest night')).toBeVisible();
   await panel.getByRole('button', { name: 'About Sunlight' }).click();
   await expect(panel.getByText(/Source: JPL DE440 ephemeris and LOLA terrain\./)).toBeVisible();
+  await expect(panel.getByText(/^Rise and set times are only as accurate as the terrain map\./)).toBeVisible();
   await expect(panel.getByText(/^Sun elevation -?\d+\.\d\d°$/)).toBeVisible();
   await expect(panel.getByText(/^Solar disc visible/)).toBeVisible();
   await expect(panel.getByText(/^Earth elevation .* \(margin [+−]\d+\.\d\d°\)$/)).toBeVisible();

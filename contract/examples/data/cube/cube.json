@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "grid": "map/grid.json",
   "law": "full",
   "observer_height_m": 2,

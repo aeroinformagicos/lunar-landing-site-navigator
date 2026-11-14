@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "generated_utc": "2026-11-14T00:00:00Z",
   "git_commit": "example",
   "summary": {
@@ -12,6 +12,31 @@
     "horizons_max_abs_err_deg": 4e-05
   },
   "headline": [
+    {
+      "id": "A1",
+      "title": "Sun and Earth positions vs JPL Horizons (8 sites, 8 dates)",
+      "rows": [
+        {
+          "label": "Earth azimuth, Blue Ghost 1, 2025-03-14 06:00 UTC",
+          "predicted": "258.6490\u00b0",
+          "observed": "258.6490\u00b0",
+          "ok": true
+        },
+        {
+          "label": "Earth elevation, Blue Ghost 1, 2025-03-14 06:00 UTC",
+          "predicted": "28.9167\u00b0",
+          "observed": "28.9167\u00b0",
+          "ok": true
+        }
+      ],
+      "tolerance": "0.02 deg",
+      "source": {
+        "label": "JPL Horizons",
+        "url": "https://ssd.jpl.nasa.gov/horizons/"
+      },
+      "note": "256 values: Sun and Earth, azimuth and elevation, 8 sites x 8 dates. Example report (synthetic values).",
+      "status": "pass"
+    },
     {
       "id": "B3",
       "title": "Total solar eclipse seen by Blue Ghost 1 (14 March 2025)",
@@ -50,25 +75,6 @@
       "status": "pass"
     },
     {
-      "id": "A3",
-      "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
-      "rows": [
-        {
-          "label": "Sunset",
-          "predicted": "\u2014",
-          "observed": "18:00\u201318:15 UTC",
-          "ok": null
-        }
-      ],
-      "tolerance": "30 min",
-      "source": {
-        "label": "Firefly Aerospace, Blue Ghost Mission 1 updates",
-        "url": "https://fireflyspace.com/?p=3379"
-      },
-      "note": "Example report (synthetic values).",
-      "status": "skipped"
-    },
-    {
       "id": "A7B7",
       "title": "Our south pole maps vs NASA illumination and Earth visibility maps",
       "rows": [],
@@ -77,7 +83,7 @@
         "label": "NASA PGDA, south pole illumination products",
         "url": ""
       },
-      "note": "Example report (synthetic values).",
+      "note": "Computed tonight: this comparison needs the full south pole terrain run. Example report (synthetic values).",
       "status": "skipped"
     }
   ],

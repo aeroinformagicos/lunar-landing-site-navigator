@@ -82,34 +82,62 @@ def test_without_results_every_case_is_skipped_and_the_headline_is_pending(dirs)
     assert doc["contract_version"] == (REPO_ROOT / "contract" / "VERSION").read_text(encoding="utf-8").strip()
     notes = {c["id"]: c["note"] for c in doc["cases"]}
     assert notes["A1"] == report.PENDING_NOTE and notes["B8"] == "Manual check not done yet."
+    a1, _, a7b7 = doc["headline"]
+    assert a1["rows"] == [] and a1["note"] == report.PENDING_NOTE
+    assert a7b7["note"] == report.TONIGHT_NOTE  # "computed tonight", not an error (decision D-95)
 
 
 def test_recorded_cases_fill_the_report_and_the_headline(dirs):
     results = dirs[0]
-    report.write_case(results, "A1", "pass", "e", "max 2e-05", "0.02 deg", SRC,
-                      [detail("a az", 10.0, 10.00001, 1e-5, "deg", True),
-                       detail("a el", 5.0, 5.00002, 2e-5, "deg", True)])
+    report.write_case(results, "A1", "pass", "e", "max 2.5e-05", "0.02 deg", SRC,
+                      [detail("apollo-11 sun az 2025-03-14T06:00Z", 10.0, 10.00001, 1e-5, "deg", True),
+                       detail("blue-ghost-1 sun az 2025-03-14T06:00Z", 258.871284246, 258.871285, 1e-6, "deg",
+                              True),
+                       detail("blue-ghost-1 earth el 2025-03-14T06:00Z", 28.916324972, 28.91635, 2.5e-5,
+                              "deg", True)])
     report.write_case(results, "B3", "pass", "e", "o", "5 min", SRC,
                       [detail("Eclipse starts", "2025-03-14T05:00:00Z", "2025-03-14T05:00:46Z", 0.77, "min",
                               True),
                        detail("Eclipse ends", "2025-03-14T09:52:00Z", "2025-03-14T09:51:13Z", 0.78, "min",
                               True)])
-    report.write_case(results, "A3", "fail", "e", "Sunset 18:53:55 UTC", "30 min", SRC,
-                      [detail("Sunset", "2025-03-16T18:00:00Z/2025-03-16T18:15:00Z", "2025-03-16T18:53:55Z",
-                              38.92, "min", False)], "Explained.")
     doc = build(dirs)
-    b3, a3, a7b7 = doc["headline"]
+    a1, b3, a7b7 = doc["headline"]
+    assert a1["status"] == "pass" and a1["tolerance"] == "0.02 deg"
+    # Blue Ghost 1 at 06:00 UTC on 14 March 2025, in the order Sun az, Sun el, Earth az, Earth el.
+    assert a1["rows"] == [
+        {"label": "Sun azimuth, Blue Ghost 1, 2025-03-14 06:00 UTC", "predicted": "258.8713°",
+         "observed": "258.8713°", "ok": True},
+        {"label": "Earth elevation, Blue Ghost 1, 2025-03-14 06:00 UTC", "predicted": "28.9164°",
+         "observed": "28.9163°", "ok": True},
+    ]
+    assert a1["note"] == ("3 values: Sun and Earth, azimuth and elevation, 8 sites x 8 dates; "
+                          "largest difference 0.000025°.")
     assert b3["status"] == "pass" and b3["rows"] == [
         {"label": "Eclipse starts", "predicted": "05:01 UTC", "observed": "05:00 UTC", "ok": True},
         {"label": "Eclipse ends", "predicted": "09:51 UTC", "observed": "09:52 UTC", "ok": True},
     ]
-    assert a3["status"] == "fail" and a3["note"] == "Explained."
-    assert a3["rows"] == [{"label": "Sunset", "predicted": "18:54 UTC", "observed": "18:00–18:15 UTC",
-                           "ok": False}]
     assert a7b7["status"] == "skipped" and a7b7["rows"] == [] and "figures" not in a7b7
     s = doc["summary"]
-    assert (s["passed"], s["failed"], s["skipped"]) == (2, 1, 18)
-    assert (s["horizons_comparisons"], s["horizons_max_abs_err_deg"]) == (2, 2e-5)
+    assert (s["passed"], s["failed"], s["skipped"]) == (2, 0, 19)
+    assert (s["horizons_comparisons"], s["horizons_max_abs_err_deg"]) == (3, 2.5e-5)
+
+
+def test_a3_is_retired_whatever_the_results_folder_holds(dirs):
+    # Decision D-95: A3 stays visible in the list of checks as retired, with its reason and figures.
+    report.write_case(dirs[0], "A3", "fail", "e", "Sunset 18:53:55 UTC", "30 min", SRC,
+                      [detail("Sunset", "w", "2025-03-16T18:53:55Z", 38.92, "min", False)], "stale")
+    doc = build(dirs)
+    assert "A3" not in [h["id"] for h in doc["headline"]]
+    a3 = next(c for c in doc["cases"] if c["id"] == "A3")
+    assert (a3["status"], a3["details"]) == ("skipped", [])
+    assert a3["note"].startswith("Retired (decision D-95)") and "18:54 UTC" in a3["note"]
+    assert a3["obtained"] == report.RETIRED_A3_OBTAINED
+    assert doc["summary"]["failed"] == 0
+
+
+def test_small_deg_matches_the_web_format():
+    assert [report.small_deg(x) for x in (4e-5, 2.5e-5, 7e-6, 0.0123, 0)] == [
+        "0.00004", "0.000025", "0.000007", "0.012", "0"]
 
 
 def test_parts_are_merged(dirs):

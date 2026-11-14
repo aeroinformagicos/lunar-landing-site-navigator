@@ -67,7 +67,7 @@ COMPACT_HEADER = struct.Struct("<8s2HIHHfH6x")
 COMPACT_MAGIC = b"LLSNCMP1"
 COMPACT_N_AZ = 180
 COMPACT_STEP_CDEG = 200
-HEADLINE_ORDER = ("B3", "A3", "A7B7")
+HEADLINE_ORDER = ("A1", "B3", "A7B7")  # 09 §7; A3 retired (decision D-95)
 VERSION_RULE = {"type": "string", "pattern": r"^1\.\d+\.\d+$"}  # 09 §14
 CHUNK_NAME = re.compile(r"^c_(\d{2})_(\d{2})\.bin\.gz$")
 # Layer files are often identical (example data, months without change): each distinct content

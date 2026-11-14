@@ -1,17 +1,54 @@
 {
-  "contract_version": "1.0.0",
-  "generated_utc": "2026-11-14T15:49:46Z",
-  "git_commit": "8250119",
+  "contract_version": "1.1.0",
+  "generated_utc": "2026-11-14T17:10:59Z",
+  "git_commit": "ce3aff4",
   "summary": {
     "total": 21,
     "passed": 4,
-    "failed": 1,
+    "failed": 0,
     "manual": 0,
-    "skipped": 16,
+    "skipped": 17,
     "horizons_comparisons": 256,
     "horizons_max_abs_err_deg": 2.5398885904692747e-05
   },
   "headline": [
+    {
+      "id": "A1",
+      "title": "Sun and Earth positions vs JPL Horizons (8 sites, 8 dates)",
+      "source": {
+        "label": "JPL Horizons",
+        "url": "https://ssd.jpl.nasa.gov/horizons/"
+      },
+      "note": "256 values: Sun and Earth, azimuth and elevation, 8 sites x 8 dates; largest difference 0.000025°.",
+      "rows": [
+        {
+          "label": "Sun azimuth, Blue Ghost 1, 2025-03-14 06:00 UTC",
+          "predicted": "258.8713°",
+          "observed": "258.8713°",
+          "ok": true
+        },
+        {
+          "label": "Sun elevation, Blue Ghost 1, 2025-03-14 06:00 UTC",
+          "predicted": "29.6502°",
+          "observed": "29.6502°",
+          "ok": true
+        },
+        {
+          "label": "Earth azimuth, Blue Ghost 1, 2025-03-14 06:00 UTC",
+          "predicted": "258.6479°",
+          "observed": "258.6479°",
+          "ok": true
+        },
+        {
+          "label": "Earth elevation, Blue Ghost 1, 2025-03-14 06:00 UTC",
+          "predicted": "28.9163°",
+          "observed": "28.9163°",
+          "ok": true
+        }
+      ],
+      "tolerance": "0.02 deg",
+      "status": "pass"
+    },
     {
       "id": "B3",
       "title": "Total solar eclipse seen by Blue Ghost 1 (14 March 2025)",
@@ -50,32 +87,13 @@
       "status": "pass"
     },
     {
-      "id": "A3",
-      "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
-      "source": {
-        "label": "Firefly Aerospace, end of Blue Ghost Mission 1 surface operations",
-        "url": "https://fireflyspace.com/news/firefly-aerospace-successfully-completes-14-days-of-surface-operations-on-the-moon"
-      },
-      "note": "Our sunset of the centre of the Sun, with the SLDEM2015 59 m horizon and the observer at 2 m, is at 18:53:55 UTC: 39 min after the end of the 18:00-18:15 UTC window inferred from Firefly's account, beyond the 30 min tolerance. Our horizon toward the setting Sun (azimuth 269.7 deg) is 0.62 deg; the window implies about 0.9 deg. Under review: the terrain crop, what Firefly calls sunset, and the observer height.",
-      "rows": [
-        {
-          "label": "Sunset",
-          "predicted": "18:54 UTC",
-          "observed": "18:00–18:15 UTC",
-          "ok": false
-        }
-      ],
-      "tolerance": "30 min",
-      "status": "fail"
-    },
-    {
       "id": "A7B7",
       "title": "Our south pole maps vs NASA illumination and Earth visibility maps",
       "source": {
         "label": "NASA PGDA, south pole illumination products",
         "url": "https://pgda.gsfc.nasa.gov/products/69"
       },
-      "note": "Not run in this build.",
+      "note": "Computed tonight: this comparison needs the full south pole terrain run. The result appears here when it finishes.",
       "rows": [],
       "tolerance": "A7: r > 0.9 and mean |diff| < 10 points; B7: r > 0.9",
       "status": "skipped"
@@ -2228,59 +2246,10 @@
         "label": "Firefly Aerospace, end of Blue Ghost Mission 1 surface operations",
         "url": "https://fireflyspace.com/news/firefly-aerospace-successfully-completes-14-days-of-surface-operations-on-the-moon"
       },
-      "status": "fail",
-      "obtained": "Sunset 18:53:55 UTC (SLDEM2015 59 m, observer 2 m); disc fully set 19:28:03 UTC",
-      "details": [
-        {
-          "label": "Sunset",
-          "expected": "2025-03-16T18:00:00Z/2025-03-16T18:15:00Z",
-          "obtained": "2025-03-16T18:53:55Z",
-          "abs_err": 38.92,
-          "unit": "min",
-          "ok": false
-        },
-        {
-          "label": "Half of the disc set (fraction 0.5)",
-          "expected": null,
-          "obtained": "2025-03-16T18:53:55Z",
-          "abs_err": null,
-          "unit": "UTC",
-          "ok": null
-        },
-        {
-          "label": "Disc fully set (fraction 0)",
-          "expected": null,
-          "obtained": "2025-03-16T19:28:03Z",
-          "abs_err": null,
-          "unit": "UTC",
-          "ok": null
-        },
-        {
-          "label": "Horizon at azimuth 269.7 deg",
-          "expected": 0.9,
-          "obtained": 0.6182,
-          "abs_err": 0.2818,
-          "unit": "deg",
-          "ok": null
-        },
-        {
-          "label": "Sun elevation at 18:15 UTC (observer at 2 m)",
-          "expected": 0.924849952,
-          "obtained": 0.92484,
-          "abs_err": 1e-05,
-          "unit": "deg",
-          "ok": null
-        },
-        {
-          "label": "Smooth-Moon sunset, observer at 0 m",
-          "expected": "2025-03-16T20:10:39Z",
-          "obtained": "2025-03-16T20:10:39Z",
-          "abs_err": 0.0,
-          "unit": "s",
-          "ok": true
-        }
-      ],
-      "note": "Our sunset of the centre of the Sun, with the SLDEM2015 59 m horizon and the observer at 2 m, is at 18:53:55 UTC: 39 min after the end of the 18:00-18:15 UTC window inferred from Firefly's account, beyond the 30 min tolerance. Our horizon toward the setting Sun (azimuth 269.7 deg) is 0.62 deg; the window implies about 0.9 deg. Under review: the terrain crop, what Firefly calls sunset, and the observer height."
+      "status": "skipped",
+      "obtained": "Sun starts to set 18:20 UTC, centre on the horizon 18:54 UTC, fully set 19:28 UTC",
+      "details": [],
+      "note": "Retired (decision D-95): the check was badly posed, not failed. Firefly published no sunset time, only that the final data arrived around 23:15 UTC, \"just over 5 hours into the lunar night\"; the 18:00-18:15 UTC window was our own deduction. With real terrain (SLDEM2015, observer 2 m) our model has the Sun start to set at 18:20 UTC, its centre on the horizon at 18:54 UTC and fully set at 19:28 UTC, against 20:11 UTC on a smooth Moon. The horizon there is an 11 m rise 800 m away: moving the site by one terrain pixel (59 m) moves the sunset by up to 51 minutes, more than any useful tolerance. The model is unchanged."
     },
     {
       "id": "A4",

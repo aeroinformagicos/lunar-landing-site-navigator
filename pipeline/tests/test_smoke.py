@@ -20,7 +20,7 @@ def test_core_dependencies_import():
 
 def test_contract_version_is_semver():
     version = (Path(__file__).resolve().parents[2] / "contract" / "VERSION").read_text().strip()
-    assert version == "1.0.0"
+    assert version == "1.1.0"  # 1.1.0: headline A1 replaces A3 (decision D-95)
 
 
 @pytest.mark.kernels

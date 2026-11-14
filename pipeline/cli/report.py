@@ -9,8 +9,10 @@ two tests writes one *part* each (``<case_id>.<part>.json``); :func:`merge_parts
 - cases without a file come out as ``skipped``;
 - the manual cases (A5, A11, B8, B9, B10, B11) are read from ``docs/manual_checks.json``
   (``{case_id, status, obtained, note, signed_by}``), which A1 and A3 edit;
-- the headline is B3, A3 and A7B7, in that order; A7B7 combines A7 and B7;
-- A10 is computed and recorded but not published (11 §4, A10).
+- the headline is A1 (JPL Horizons), B3 and A7B7, in that order; A7B7 combines A7 and B7;
+- A10 is computed and recorded but not published (11 §4, A10);
+- A3 is retired (decision D-95): it stays in the list of checks as ``skipped`` with the reason, and a
+  stale ``A3.json`` in the results folder is ignored.
 
 Nothing here decides whether a case passes: the status is the one the test recorded.
 """
@@ -18,6 +20,7 @@ Nothing here decides whether a case passes: the status is the one the test recor
 from __future__ import annotations
 
 import json
+import math
 import re
 import shutil
 import subprocess
@@ -30,12 +33,12 @@ MANUAL_CHECKS = REPO_ROOT / "docs" / "manual_checks.json"
 WEB_DATA_DIR = REPO_ROOT / "web" / "public" / "data"
 
 STATUSES = ("pass", "fail", "manual", "skipped")
-HEADLINE_ORDER = ("B3", "A3", "A7B7")
+HEADLINE_ORDER = ("A1", "B3", "A7B7")  # 09 §7 (decision D-95)
 CASE_ID = re.compile(r"^[AB][0-9]{1,2}$")
 PART = re.compile(r"^[a-z0-9_]+$")
 
 FIREFLY = {"label": "Firefly Aerospace, Blue Ghost Mission 1 updates", "url": "https://fireflyspace.com/?p=3379"}
-# Firefly's end-of-mission note: last data and "5 hours into the lunar night" (case A3).
+# Firefly's end-of-mission note: last data and "5 hours into the lunar night" (retired case A3).
 FIREFLY_END = {"label": "Firefly Aerospace, end of Blue Ghost Mission 1 surface operations",
                "url": "https://fireflyspace.com/news/"
                       "firefly-aerospace-successfully-completes-14-days-of-surface-operations-on-the-moon"}
@@ -56,7 +59,7 @@ CASES: list[dict] = [
      "tolerance": "5 min", "source": HORIZONS},
     {"id": "A3", "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
      "expected": "Sunset between 18:00 and 18:15 UTC (last data 23:15 UTC, 5 hours into the lunar night)",
-     "tolerance": "30 min", "source": FIREFLY_END},
+     "tolerance": "30 min", "source": FIREFLY_END, "retired": True},
     {"id": "A4", "title": "Horizon of a smooth sphere and of a 3 km mountain, by hand",
      "expected": "-0.087, -0.615, -1.943 and 2.606 deg", "tolerance": "0.005 deg",
      "source": {"label": "Hand calculation with R = 1737.4 km", "url": ""}},
@@ -121,13 +124,29 @@ CASES: list[dict] = [
 CASES_BY_ID = {c["id"]: c for c in CASES}
 
 HEADLINES = {
+    "A1": {"title": "Sun and Earth positions vs JPL Horizons (8 sites, 8 dates)", "source": HORIZONS,
+           "note": ""},
     "B3": {"title": "Total solar eclipse seen by Blue Ghost 1 (14 March 2025)", "source": FIREFLY,
            "note": "Firefly gives the times as CST; they match UTC-5 (CDT)."},
-    "A3": {"title": "Sunset seen by Blue Ghost 1 (16 March 2025)", "source": FIREFLY_END, "note": ""},
     "A7B7": {"title": "Our south pole maps vs NASA illumination and Earth visibility maps", "source": PGDA,
              "note": ""},
 }
 PENDING_NOTE = "Not run in this build."
+# A7B7 before the overnight run (decision D-95): a plain "computed tonight", not an error.
+TONIGHT_NOTE = ("Computed tonight: this comparison needs the full south pole terrain run. "
+                "The result appears here when it finishes.")
+# A3 retired (decision D-95). Figures: docs/handoff/A3-investigacion.md §2 (SLDEM2015, observer 2 m;
+# smooth Moon at 0 m; one 59 m pixel of site position moves the centre sunset from -51 to +33 min).
+RETIRED_A3_OBTAINED = "Sun starts to set 18:20 UTC, centre on the horizon 18:54 UTC, fully set 19:28 UTC"
+RETIRED_A3_NOTE = (
+    "Retired (decision D-95): the check was badly posed, not failed. Firefly published no sunset time, "
+    "only that the final data arrived around 23:15 UTC, \"just over 5 hours into the lunar night\"; the "
+    "18:00-18:15 UTC window was our own deduction. With real terrain (SLDEM2015, observer 2 m) our model "
+    "has the Sun start to set at 18:20 UTC, its centre on the horizon at 18:54 UTC and fully set at "
+    "19:28 UTC, against 20:11 UTC on a smooth Moon. The horizon there is an 11 m rise 800 m away: moving "
+    "the site by one terrain pixel (59 m) moves the sunset by up to 51 minutes, more than any useful "
+    "tolerance. The model is unchanged."
+)
 
 
 # ------------------------------------------------------------------------------- writing (tests)
@@ -263,6 +282,9 @@ def read_manual(path: Path) -> dict[str, dict]:
 def build_case(case: dict, recorded: list[dict] | None, manual: dict | None) -> dict:
     base = {"id": case["id"], "group": case["id"][0], "title": case["title"], "expected": case["expected"],
             "tolerance": case["tolerance"], "source": dict(case["source"])}
+    if case.get("retired"):
+        return {**base, "status": "skipped", "obtained": RETIRED_A3_OBTAINED, "details": [],
+                "note": RETIRED_A3_NOTE}
     if recorded:
         r = merge_parts(recorded)
         return {**base, "status": r["status"], "obtained": r["obtained"], "details": r["details"],
@@ -307,21 +329,45 @@ def _time_rows(case: dict, labels: list[str]) -> list[dict]:
 
 
 B3_ROWS = ["Eclipse starts", "Totality starts", "Totality ends", "Eclipse ends"]
-A3_ROWS = ["Sunset"]
+# A1 card: Blue Ghost 1 at 06:00 UTC on 14 March 2025, an instant of case A1 (11 §2.3) during the eclipse.
+A1_SITE, A1_SITE_NAME, A1_UTC = "blue-ghost-1", "Blue Ghost 1", "2025-03-14T06:00Z"
+A1_ROWS = [("sun", "az", "Sun azimuth"), ("sun", "el", "Sun elevation"),
+           ("earth", "az", "Earth azimuth"), ("earth", "el", "Earth elevation")]
+
+
+def _a1_rows(a1: dict) -> list[dict]:
+    by_label = {d["label"]: d for d in a1["details"]}
+    rows = []
+    for target, angle, name in A1_ROWS:
+        d = by_label.get(f"{A1_SITE} {target} {angle} {A1_UTC}")
+        if d is None or not isinstance(d["obtained"], (int, float)):
+            continue
+        rows.append({"label": f"{name}, {A1_SITE_NAME}, {A1_UTC[:10]} {A1_UTC[11:16]} UTC",
+                     "predicted": f"{d['obtained']:.4f}°", "observed": f"{float(d['expected']):.4f}°",
+                     "ok": d["ok"]})
+    return rows
+
+
+def small_deg(deg: float) -> str:
+    """Small angles without exponent notation, like ``formatSmallDeg`` of the web: 2.5e-05 -> 0.000025."""
+    if deg == 0:
+        return "0"
+    digits = min(12, max(2, math.ceil(-math.log10(abs(deg))) + 1))
+    return f"{deg:.{digits}f}".rstrip("0").rstrip(".")
 
 
 def build_headline(cases: dict[str, dict], results_dir: Path, web_dir: Path) -> list[dict]:
     out = []
+    a1 = cases["A1"]
+    n, worst = horizons_summary(a1)
+    note = (f"{n} values: Sun and Earth, azimuth and elevation, 8 sites x 8 dates; largest difference "
+            f"{small_deg(worst)}°." if n and worst is not None else a1["note"] or PENDING_NOTE)
+    out.append({"id": "A1", **HEADLINES["A1"], "rows": _a1_rows(a1), "tolerance": a1["tolerance"],
+                "status": a1["status"], "note": note})
     b3 = cases["B3"]
     out.append({"id": "B3", **HEADLINES["B3"], "rows": _time_rows(b3, B3_ROWS), "tolerance": b3["tolerance"],
                 "status": b3["status"],
                 "note": " ".join(x for x in (HEADLINES["B3"]["note"], b3["note"]) if x)})
-    a3 = cases["A3"]
-    rows = _time_rows(a3, A3_ROWS) or [{"label": "Sunset", "predicted": "—", "observed": "18:00–18:15 UTC",
-                                         "ok": None}]
-    out.append({"id": "A3", **HEADLINES["A3"], "rows": rows, "tolerance": a3["tolerance"],
-                "status": a3["status"],
-                "note": a3["note"] or (PENDING_NOTE if a3["status"] == "skipped" else "")})
     a7, b7 = cases["A7"], cases["B7"]
     statuses = {a7["status"], b7["status"]}
     status = "fail" if "fail" in statuses else ("pass" if statuses == {"pass"} else "skipped")
@@ -330,7 +376,7 @@ def build_headline(cases: dict[str, dict], results_dir: Path, web_dir: Path) -> 
     a7b7 = {"id": "A7B7", **HEADLINES["A7B7"], "rows": rows,
             "tolerance": f"A7: {a7['tolerance']}; B7: {b7['tolerance']}", "status": status,
             "note": " ".join(x for x in (a7["note"], b7["note"]) if x and x != PENDING_NOTE)
-            or (PENDING_NOTE if status == "skipped" else "")}
+            or (TONIGHT_NOTE if status == "skipped" else "")}
     figures = copy_figures(results_dir, web_dir)
     if figures:
         a7b7["figures"] = figures

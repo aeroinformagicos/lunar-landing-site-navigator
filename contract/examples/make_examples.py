@@ -314,7 +314,20 @@ def make_validation_report(out: Path) -> None:
     firefly = {"label": "Firefly Aerospace, Blue Ghost Mission 1 updates", "url": "https://fireflyspace.com/?p=3379"}
     horizons = {"label": "JPL Horizons", "url": "https://ssd.jpl.nasa.gov/horizons/"}
     sample = "Example report (synthetic values)."
+    # 09 §7: A1 (Horizons), B3 and A7B7. Values of the A1 rows: Earth from Blue Ghost 1, 05 §8.3.
     headline = [
+        {
+            "id": "A1", "title": "Sun and Earth positions vs JPL Horizons (8 sites, 8 dates)",
+            "rows": [
+                {"label": "Earth azimuth, Blue Ghost 1, 2025-03-14 06:00 UTC", "predicted": "258.6490°",
+                 "observed": "258.6490°", "ok": True},
+                {"label": "Earth elevation, Blue Ghost 1, 2025-03-14 06:00 UTC", "predicted": "28.9167°",
+                 "observed": "28.9167°", "ok": True},
+            ],
+            "tolerance": "0.02 deg", "source": horizons,
+            "note": "256 values: Sun and Earth, azimuth and elevation, 8 sites x 8 dates. " + sample,
+            "status": "pass",
+        },
         {
             "id": "B3", "title": "Total solar eclipse seen by Blue Ghost 1 (14 March 2025)",
             "rows": [
@@ -327,15 +340,11 @@ def make_validation_report(out: Path) -> None:
             "note": "Firefly gives the times as CST; they match UTC-5 (CDT). " + sample, "status": "pass",
         },
         {
-            "id": "A3", "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
-            "rows": [{"label": "Sunset", "predicted": "—", "observed": "18:00–18:15 UTC", "ok": None}],
-            "tolerance": "30 min", "source": firefly, "note": sample, "status": "skipped",
-        },
-        {
             "id": "A7B7", "title": "Our south pole maps vs NASA illumination and Earth visibility maps",
             "rows": [], "tolerance": "—",
             "source": {"label": "NASA PGDA, south pole illumination products", "url": ""},
-            "note": sample, "status": "skipped",
+            "note": "Computed tonight: this comparison needs the full south pole terrain run. " + sample,
+            "status": "skipped",
         },
     ]
     cases = [

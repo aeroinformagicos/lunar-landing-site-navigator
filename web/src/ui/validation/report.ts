@@ -5,7 +5,7 @@ import { contractMajor, DataError, joinUrl, type Loader } from '../../core/loade
 import { CONTRACT_MAJOR } from '../../core/constants';
 
 export type CaseStatus = 'pass' | 'fail' | 'manual' | 'skipped';
-export type HeadlineId = 'B3' | 'A3' | 'A7B7';
+export type HeadlineId = 'A1' | 'B3' | 'A7B7';
 
 export interface ReportSource {
   label: string;
@@ -101,9 +101,9 @@ export function headlineState(status: CaseStatus): HeadlineState {
   return status === 'pass' ? 'match' : status === 'fail' ? 'mismatch' : 'pending';
 }
 
-/** Headlines in the order of 09 §7 (B3, A3, A7B7), whatever the order of the file. */
+/** Headlines in the order of 09 §7 (A1, B3, A7B7; decision D-95), whatever the order of the file. */
 export function orderedHeadlines(report: ValidationReport): Headline[] {
-  const order: HeadlineId[] = ['B3', 'A3', 'A7B7'];
+  const order: HeadlineId[] = ['A1', 'B3', 'A7B7'];
   return [...report.headline].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
 }
 

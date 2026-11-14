@@ -60,9 +60,11 @@ function Figure({ id, icon, value }: { id: 'sunlight' | 'earth_link' | 'longest_
         {rest && <span className="figure__sub">{rest}</span>}
       </p>
       {help && (
-        <p id={`help-${id}`} className="figure__helptext">
-          {t(`metrics.help.${id}` as TextKey)}
-        </p>
+        <div id={`help-${id}`} className="figure__helptext">
+          <p>{t(`metrics.help.${id}` as TextKey)}</p>
+          {/* Limitation of every rise and set time (decision D-95). */}
+          <p>{t('limits.rise_set')}</p>
+        </div>
       )}
     </div>
   );

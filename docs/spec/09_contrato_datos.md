@@ -2,7 +2,7 @@
 
 Todos los ficheros que produce el pipeline y consume la web. **El contrato es ley**: solo I3 lo cambia, subiendo la versión, con esquema y ejemplo actualizados antes que el código (protocolo de cambios del plan).
 
-- Versión del contrato de esta especificación: **`1.0.0`** (fichero `contract/VERSION`).
+- Versión del contrato de esta especificación: **`1.1.0`** (fichero `contract/VERSION`). 1.1.0 (D-95): el titular `A3` de `validation_report.json` se sustituye por `A1`; el resto no cambia y los ficheros 1.0.0 siguen siendo válidos (misma versión mayor). Los ejemplos JSON de este documento conservan `1.0.0`, que es ilustrativo.
 - Esquemas: `contract/schemas/<nombre>.schema.json` (JSON Schema 2020-12). Ejemplos: `contract/examples/data/…`, con la misma estructura de rutas que los datos reales.
 - Regla de versiones (SemVer): cambio incompatible → mayor; campo nuevo opcional → menor; corrección de documentación → parche. La web comprueba al cargar cada fichero que la versión mayor es `1`; si no, muestra `Data format not supported by this version of the app. Reload the page.`
 - Convenios de `00_indice.md` §3 en todos los ficheros: grados, km o m indicados en el nombre de la clave, UTC ISO 8601 con `Z`, longitud este en (−180, 180], MOON_ME, radio 1.737,4 km.
@@ -254,7 +254,7 @@ El valor `[j][b]` es la cota, en metros enteros, de la muestra de mayor elevaci�
 ```
 
 - `status` ∈ `pass`, `fail`, `manual` (lo firma una persona), `skipped` (no ejecutado, con motivo en `note`).
-- `headline` contiene, por este orden, `B3`, `A3` y `A7B7` (las tres predicciones frente al hecho real que abren la página). Un `headline` con `status = "skipped"` se muestra como `Pending`.
+- `headline` contiene, por este orden, `A1`, `B3` y `A7B7` (las tres comprobaciones frente a una fuente independiente que abren la página; D-95, que retira `A3`). `A1` tiene como filas las posiciones del Sol y de la Tierra en Blue Ghost 1 el 2025-03-14 a las 06:00 UTC (nuestro valor frente a Horizons) y en la nota el número de valores y la diferencia máxima. Un `headline` con `status = "skipped"` se muestra como `Pending`; el de `A7B7`, antes de la corrida de la noche, lleva la nota `Computed tonight: …`.
 - Lo genera `python -m pipeline.cli report` a partir de `data/out/test_results/*.json`, que escriben las pruebas (`11_validacion.md` §7.1). No se edita a mano. Los valores numéricos del ejemplo son ilustrativos.
 
 ### 7.1 Figuras de la validación

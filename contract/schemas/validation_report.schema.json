@@ -46,7 +46,7 @@
       "additionalProperties": false,
       "required": ["id", "title", "rows", "tolerance", "source", "note", "status"],
       "properties": {
-        "id": { "enum": ["B3", "A3", "A7B7"] },
+        "id": { "enum": ["A1", "B3", "A7B7"] },
         "title": { "type": "string", "minLength": 1 },
         "rows": {
           "type": "array",
