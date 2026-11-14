@@ -231,11 +231,21 @@ def _worst_vs_spkcpo(real, lat, lon, times):
 
 
 @pytest.mark.kernels
-def test_table_against_spkcpo_random(real, kernels):
+def test_table_against_spkcpo_random(real, kernels, record_case):
     rng = np.random.default_rng(SEED)
     lat, lon, segs = _random_cases(real, rng, N_RANDOM)
     times = [rng.uniform(s.valid_from_unix, s.valid_to_unix) for s in segs]
-    assert _worst_vs_spkcpo(real, lat, lon, times) < TABLE_TOL_DEG
+    worst = _worst_vs_spkcpo(real, lat, lon, times)
+    # Case A9 (11 §4), table part, recorded before the assert.
+    ok = worst < TABLE_TOL_DEG
+    record_case("A9", "pass" if ok else "fail",
+                "Disc fraction in [0, 1]; a taller mast never raises the horizon; table vs SPICE < 0.001 deg",
+                f"table vs SPICE {worst:.2g} deg", "Exact", {"label": "Logical properties", "url": ""},
+                [{"label": f"Interpolated table vs SPICE spkcpo, {N_RANDOM} random (site, instant) pairs",
+                  "expected": f"< {TABLE_TOL_DEG}", "obtained": float(f"{worst:.3g}"),
+                  "abs_err": float(f"{worst:.3g}"), "unit": "deg", "ok": ok}],
+                "", part="table")
+    assert ok
 
 
 @pytest.mark.kernels

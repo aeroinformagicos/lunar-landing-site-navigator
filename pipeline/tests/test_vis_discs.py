@@ -20,6 +20,9 @@ RHO_SUN = 0.265
 RHO_EARTH = 0.95
 # 07 §13.2: tolerance of the 32 strips against the exact segment.
 SEGMENT_TOL = 0.003
+# 11 §4, A9: what the validation report shows (pipeline/cli/report.py, CASES).
+A9_EXPECTED = "Disc fraction in [0, 1]; a taller mast never raises the horizon; table vs SPICE < 0.001 deg"
+A9_SOURCE = {"label": "Logical properties", "url": ""}
 
 
 def exact_segment(delta: float) -> float:
@@ -46,14 +49,27 @@ def test_disc_fraction_table(mask_id, az_c, el_c, rho, expected, tol):
     assert disc_fraction(formula_mask(mask_id), az_c, el_c, rho) == pytest.approx(expected, abs=tol)
 
 
-def test_disc_fraction_follows_the_exact_segment_for_any_delta():
+def test_disc_fraction_follows_the_exact_segment_for_any_delta(record_case):
     flat = formula_mask("flat:0.5")
     worst = 0.0
+    fractions = []
     for i in range(-100, 101):
         delta = i / 100
         f = disc_fraction(flat, 123.4, 0.5 - delta * RHO_SUN, RHO_SUN)
-        assert 0.0 <= f <= 1.0
+        fractions.append(f)
         worst = max(worst, abs(f - exact_segment(delta)))
+    # Case A9 (11 §4), disc part, recorded before the asserts.
+    lo, hi = min(fractions), max(fractions)
+    in_range = 0.0 <= lo and hi <= 1.0
+    record_case("A9", "pass" if in_range and worst < SEGMENT_TOL else "fail", A9_EXPECTED,
+                "disc fraction in [0, 1]", "Exact", A9_SOURCE,
+                [{"label": "Sun disc fraction at 201 positions across a flat horizon", "expected": "[0, 1]",
+                  "obtained": f"[{lo:g}, {hi:g}]", "abs_err": 0.0, "unit": "", "ok": in_range},
+                 {"label": "32 strips vs the exact circular segment (07 §13.2)",
+                  "expected": f"< {SEGMENT_TOL}", "obtained": round(worst, 6), "abs_err": round(worst, 6),
+                  "unit": "", "ok": worst < SEGMENT_TOL}],
+                "", part="disc")
+    assert in_range
     assert worst < SEGMENT_TOL
 
 
