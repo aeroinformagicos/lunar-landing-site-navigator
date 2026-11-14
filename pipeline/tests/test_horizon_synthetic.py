@@ -33,6 +33,12 @@ D50_DEG = 1.64890  # 50 km of arc = 50 000 / 1 737 400 rad (06 §10.4)
 CARTESIAN_TOL_DEG = 1e-9
 CARTESIAN_TOL_NEAR_DEG = 5e-9
 CARTESIAN_NEAR_M = 100.0
+# 11 §4, A4 and A9: what the validation report shows for these cases (pipeline/cli/report.py, CASES).
+A4_EXPECTED = "-0.087, -0.615, -1.943 and 2.606 deg"
+A4_TOLERANCE_DEG = 0.005  # 11 §4, A4
+A4_SOURCE = {"label": "Hand calculation with R = 1737.4 km", "url": ""}
+A9_EXPECTED = "Disc fraction in [0, 1]; a taller mast never raises the horizon; table vs SPICE < 0.001 deg"
+A9_SOURCE = {"label": "Logical properties", "url": ""}
 
 
 def arc_m(u, centre):
@@ -153,7 +159,7 @@ def test_smooth_mask_and_stack_none():
 # ---------------------------------------------------------------- 06 §10.1: smooth sphere (A4)
 
 
-def test_flat_sphere_dip_of_the_horizon():
+def test_flat_sphere_dip_of_the_horizon(record_case):
     # h_obs: (expected elevation, distance to the tangent point, sampling step there).
     expected = {
         2.0: (-0.0869, 2636.0, 20.0),
@@ -161,6 +167,19 @@ def test_flat_sphere_dip_of_the_horizon():
         1000.0: (-1.9435, 58_933.0, 59.0),
     }
     mask = horizon_mask(0.0, 0.0, stack_of(lambda u: 0.0), list(expected))
+    # Case A4 (11 §4), recorded before the asserts: worst of the 720 azimuths at each height.
+    details = []
+    for m in mask.masks:
+        el = expected[m.observer_height_m][0]
+        k = int(np.argmax(np.abs(m.el_deg - el)))
+        err = abs(float(m.el_deg[k]) - el)
+        label = f"Smooth sphere, observer at {m.observer_height_m:g} m (worst of 720 azimuths)"
+        details.append({"label": label,
+                        "expected": el, "obtained": round(float(m.el_deg[k]), 4), "abs_err": round(err, 6),
+                        "unit": "deg", "ok": err <= A4_TOLERANCE_DEG})
+    record_case("A4", "pass" if all(d["ok"] for d in details) else "fail", A4_EXPECTED,
+                "Smooth sphere: " + ", ".join(f"{d['obtained']} deg" for d in details),
+                f"{A4_TOLERANCE_DEG} deg", A4_SOURCE, details, "Synthetic terrain, full law.", part="sphere")
     check_shape(mask, 3)
     assert mask.site_height_m == 0.0
     assert mask.law == "full" and mask.max_dist_m == pytest.approx(299_878.0, abs=5.0)
@@ -188,11 +207,20 @@ def test_flat_sphere_fast_law_gives_the_same_dip():
 # ---------------------------------------------------------------- 06 §10.2: 3 km mountain at 50 km (A4)
 
 
-def test_mountain_of_3_km_at_50_km():
+def test_mountain_of_3_km_at_50_km(record_case):
     peak = unit_vector(0.0, math.degrees(50_000.0 / R))  # 50 000 m east of the site, on the equator
     mask = horizon_mask(0.0, 0.0, stack_of(mountain(peak)), [0.0, 2.0])
     check_shape(mask, 2)
     m0, m2 = mask.masks
+    # Case A4 (11 §4), recorded before the asserts: the 3 km mountain at 50 km seen from 0 m.
+    el0 = float(m0.el_deg[180])
+    err = abs(el0 - 2.606)
+    record_case("A4", "pass" if err <= A4_TOLERANCE_DEG else "fail", A4_EXPECTED,
+                f"3 km mountain at 50 km: {el0:.4f} deg", f"{A4_TOLERANCE_DEG} deg", A4_SOURCE,
+                [{"label": "3 km mountain at 50 km, observer at 0 m, azimuth 90 deg", "expected": 2.606,
+                  "obtained": round(el0, 4), "abs_err": round(err, 6), "unit": "deg",
+                  "ok": err <= A4_TOLERANCE_DEG}],
+                "", part="mountain")
     # Azimuth 90° (j = 180): 2.606° from 0 m and 2.604° from 2 m; without curvature it would be 3.434°.
     assert m0.el_deg[180] == pytest.approx(2.606, abs=0.005)
     assert m2.el_deg[180] == pytest.approx(2.604, abs=0.005)
@@ -340,6 +368,34 @@ def test_taller_mast_never_raises_the_horizon(seed):
     assert (m2.observer_height_m, m10.observer_height_m) == (2.0, 10.0)
     assert np.all(m10.el_deg <= m2.el_deg + 1e-9)  # every azimuth (06 §7)
     assert np.any(m10.el_deg < m2.el_deg - 1e-6)  # and it does lower it somewhere
+
+
+def test_a9_horizon_invariants_are_recorded(record_case):
+    # Case A9 (11 §4), horizon part: the invariants of 06 §10.5 over the 20 random terrains. The runs are
+    # cached; the parametrized tests around this one assert them terrain by terrain.
+    worst_raise, worst_3d = -math.inf, 0.0
+    for seed in range(N_TERRAINS):
+        run = invariant_run(seed)
+        m2, m10 = run["mask"].masks
+        worst_raise = max(worst_raise, float((m10.el_deg - m2.el_deg).max()))
+        rays = run["rays"]
+        u0 = unit_vector(run["lat"], run["lon"])
+        el_3d = elevation_cartesian(u0, u0, rays.points, R + rays.site_height_m + 2.0, R + rays.height_m)
+        far = rays.dist_m >= CARTESIAN_NEAR_M
+        worst_3d = max(worst_3d, float(np.abs(np.degrees(el_3d - rays.el_rad))[:, far].max()))
+    ok_mast, ok_3d = worst_raise <= 1e-9, worst_3d < CARTESIAN_TOL_DEG
+    details = [
+        {"label": f"10 m mast minus 2 m mast, highest over {N_TERRAINS} random terrains", "expected": "<= 0",
+         "obtained": float(f"{worst_raise:.3g}"), "abs_err": float(f"{max(worst_raise, 0.0):.3g}"),
+         "unit": "deg", "ok": ok_mast},
+        {"label": "Closed form vs literal 3D geometry, samples from 100 m on (D-51)",
+         "expected": f"< {CARTESIAN_TOL_DEG:g}", "obtained": float(f"{worst_3d:.3g}"),
+         "abs_err": float(f"{worst_3d:.3g}"), "unit": "deg", "ok": ok_3d},
+    ]
+    record_case("A9", "pass" if ok_mast and ok_3d else "fail", A9_EXPECTED,
+                "a taller mast never raises the horizon", "Exact", A9_SOURCE, details,
+                f"{N_TERRAINS} random synthetic terrains (fixed seeds).", part="horizon")
+    assert ok_mast and ok_3d, details
 
 
 @pytest.mark.parametrize("seed", range(N_TERRAINS))

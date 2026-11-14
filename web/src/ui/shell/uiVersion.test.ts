@@ -5,12 +5,12 @@ import { can3d, defaultViewMode } from '../../state/viewMode';
 import { uiVersionOf } from './uiVersion';
 
 describe('interface version', () => {
-  it('defaults to v1 until T-63; ?ui=v1 and ?ui=v2 choose', () => {
-    expect(uiVersionOf('')).toBe('v1');
+  it('defaults to v2 since T-63; ?ui=v1 keeps the previous interface', () => {
+    expect(uiVersionOf('')).toBe('v2');
     expect(uiVersionOf('?ui=v2')).toBe('v2');
     expect(uiVersionOf('?vm=3d&ui=v1')).toBe('v1');
-    expect(uiVersionOf('?ui=v9')).toBe('v1');
-    expect(uiVersionOf('?ui=v9', 'v2')).toBe('v2');
+    expect(uiVersionOf('?ui=v9')).toBe('v2');
+    expect(uiVersionOf('?ui=v9', 'v1')).toBe('v1');
   });
 });
 

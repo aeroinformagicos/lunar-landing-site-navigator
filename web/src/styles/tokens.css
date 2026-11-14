@@ -70,6 +70,9 @@
   --c-panel-a: rgba(17, 24, 39, 0.72);
   --c-panel-b: rgba(30, 41, 59, 0.72);
   --c-panel: linear-gradient(180deg, var(--c-panel-a), var(--c-panel-b));
+  /* Panels that carry text (T-63): 88 % opaque, so muted text keeps ≥ 4.5:1 even over lit 3D terrain
+     up to #B0B0B0 (at 72 % it drops to 2.3–2.8:1 over light ground). The contract's --c-panel stays. */
+  --c-panel-text: linear-gradient(180deg, rgba(17, 24, 39, 0.88), rgba(30, 41, 59, 0.88));
   --c-line: #334155;
   --c-muted: #94a3b8;
   --c-text-2: #cbd5e1;

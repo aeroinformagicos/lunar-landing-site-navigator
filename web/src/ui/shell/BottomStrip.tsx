@@ -209,10 +209,10 @@ export function TimeBar() {
           {playing ? <path d="M1 0h3v12H1zM6 0h3v12H6z" fill="currentColor" /> : <path d="M1 0l9 6-9 6z" fill="currentColor" />}
         </svg>
       </button>
-      <button type="button" className="v2-step" onClick={() => setCursor(cursor - HOUR_S)} aria-label={t('time.back')} title={t('time.back')}>
+      <button type="button" className="v2-step" onClick={() => setCursor(cursor - HOUR_S)} aria-label={`−1 h, ${t('time.back')}`} title={t('time.back')}>
         −1 h
       </button>
-      <button type="button" className="v2-step" onClick={() => setCursor(cursor + HOUR_S)} aria-label={t('time.forward')} title={t('time.forward')}>
+      <button type="button" className="v2-step" onClick={() => setCursor(cursor + HOUR_S)} aria-label={`+1 h, ${t('time.forward')}`} title={t('time.forward')}>
         +1 h
       </button>
       <button type="button" className="pill pill--small v2-speed" onClick={cycleSpeed} aria-label={t('time.speed', { speed: speedLabel(speed) })}>

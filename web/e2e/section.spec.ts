@@ -2,7 +2,7 @@
 // T-18 end to end (F12, 10_interfaz.md §6.3) on the example data: profile toward the chosen body with
 // the line of sight, horizon line and blocking point; ranges; the cursor changes the azimuth; smooth
 // Moon; site without profile; profile download error with Retry.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './v1';
 import { re, sitesInfo } from './data';
 
 async function openSection(page: Page) {

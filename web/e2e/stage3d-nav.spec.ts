@@ -72,12 +72,22 @@ test('E7 · a click on a computed cell chooses that mesh point; elsewhere it say
   await stage(page).focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button', { name: /^Scenario A: Nearest mesh point: [\d.]+° S, [\d.]+° [EW] \(500 m grid\)$/ })).toBeVisible({ timeout: 20_000 });
-  // The pole is not computed in the served cube.
+  // The pole: «not computed» with the example cube; with the full published cube (T-39) it is computed
+  // and the scenario moves there instead (minimal change by T-63).
+  const pin = page.getByRole('button', { name: /^Scenario A: Nearest mesh point: / });
+  const before = await pin.getAttribute('aria-label');
   await hook(page, 'focusMap', 0, 0);
   await page.waitForTimeout(500);
   await stage(page).focus();
   await page.keyboard.press('Enter');
-  await expect(page.locator('.stage3d__controls').getByText('This area has not been computed yet.')).toBeVisible({ timeout: 20_000 });
+  await expect
+    .poll(
+      async () =>
+        (await page.locator('.stage3d__controls').getByText('This area has not been computed yet.').isVisible()) ||
+        ((await pin.count()) > 0 && (await pin.first().getAttribute('aria-label')) !== before),
+      { timeout: 20_000 },
+    )
+    .toBe(true);
 });
 
 test('Go to · a region flies there and shows its outline and name; the compass resets north', async ({ page }) => {

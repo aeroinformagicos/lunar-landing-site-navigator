@@ -286,7 +286,7 @@ Un único monte gaussiano (3.000 m, σ = 500 m) y se comprueba en qué índice a
 Con 20 terrenos sintéticos al azar (suma de 30 gaussianas de altura entre −2.000 y +4.000 m y σ entre 0,5 y 20 km, semilla fija):
 
 - `el(10 m)[j] ≤ el(2 m)[j] + 10⁻⁹` para todo j.
-- `elevation_cartesian` y la fórmula cerrada difieren menos de 10⁻⁹ grados en todas las muestras.
+- `elevation_cartesian` y la fórmula cerrada difieren menos de 10⁻⁹ grados en las muestras a 100 m o más del sitio, y menos de 5·10⁻⁹ grados en las cuatro más cercanas (20, 40, 60 y 80 m de la ley `full`): el redondeo de `float64` del vector unitario de la muestra (~3·10⁻¹⁰ m) visto a 20 m ya son ~10⁻⁹° (decisión D-51; llevado aquí en T-81).
 - La máscara no cambia si la longitud del sitio se da como λ o como λ ± 360°.
 
 ### 10.6 Bordes y huecos

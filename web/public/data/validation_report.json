@@ -1,13 +1,13 @@
 {
   "contract_version": "1.1.0",
-  "generated_utc": "2026-11-14T17:10:59Z",
-  "git_commit": "ce3aff4",
+  "generated_utc": "2026-11-14T23:04:25Z",
+  "git_commit": "f27ad3b",
   "summary": {
     "total": 21,
-    "passed": 4,
+    "passed": 11,
     "failed": 0,
-    "manual": 0,
-    "skipped": 17,
+    "manual": 1,
+    "skipped": 9,
     "horizons_comparisons": 256,
     "horizons_max_abs_err_deg": 2.5398885904692747e-05
   },
@@ -93,10 +93,69 @@
         "label": "NASA PGDA, south pole illumination products",
         "url": "https://pgda.gsfc.nasa.gov/products/69"
       },
-      "note": "Computed tonight: this comparison needs the full south pole terrain run. The result appears here when it finishes.",
-      "rows": [],
+      "note": "20 points with x, y uniform and r <= 150 km (seed 42), each with its own horizon (LOLA polar 40 m + 120 m, observer at 2 m); 'any part of the disc', 54384 hourly steps (one in three) from 2026-01-01 over 18.6 years. NASA: mean of 3 x 3 pixels of the 60 m maps (terrain up to 2013, surface observer); bias Sun +0.8, Earth +1.0 points. Our 18.6-year mean with the any-part-of-the-disc criterion (one hourly step in three from 2026-01-01, observer 2 m above the terrain, LOLA 40 m + 120 m terrain with data to 2017) against NASA AVGVISIB (any part of the disc, hourly, 18.6 years, ground level, LOLA 60 m terrain with data to 2013). NASA values are 3 x 3 pixel means at each 500 m cell centre: the 60 m maps (85° S, up to 151.7 km from the pole) and, beyond them, the 120 m maps. The 2 m observer makes our values slightly higher.",
+      "rows": [
+        {
+          "label": "A7: Sun, Pearson r (20 points)",
+          "predicted": "0.9967",
+          "observed": "> 0.9",
+          "ok": true
+        },
+        {
+          "label": "A7: Sun, mean |ours - NASA|",
+          "predicted": "0.92",
+          "observed": "< 10",
+          "ok": true
+        },
+        {
+          "label": "A7: Earth, Pearson r (20 points)",
+          "predicted": "0.9963",
+          "observed": "> 0.9",
+          "ok": true
+        },
+        {
+          "label": "A7: Earth, mean |ours - NASA|",
+          "predicted": "1.08",
+          "observed": "< 10",
+          "ok": true
+        },
+        {
+          "label": "B7: Sun, Pearson r over the 85° S maps (367236 cells)",
+          "predicted": "0.9922",
+          "observed": "> 0.9",
+          "ok": true
+        },
+        {
+          "label": "B7: Sun, mean |ours - NASA| over the 85° S maps",
+          "predicted": "0.98",
+          "observed": "None",
+          "ok": null
+        },
+        {
+          "label": "B7: Earth, Pearson r over the 85° S maps (367236 cells)",
+          "predicted": "0.9944",
+          "observed": "> 0.9",
+          "ok": true
+        },
+        {
+          "label": "B7: Earth, mean |ours - NASA| over the 85° S maps",
+          "predicted": "1.03",
+          "observed": "None",
+          "ok": null
+        }
+      ],
       "tolerance": "A7: r > 0.9 and mean |diff| < 10 points; B7: r > 0.9",
-      "status": "skipped"
+      "status": "pass",
+      "figures": [
+        {
+          "file": "validation/a7b7_scatter.png",
+          "alt": "Scatter plot of our mean visibility against NASA's, Sun and Earth panels, with the 1:1 line"
+        },
+        {
+          "file": "validation/a7b7_diff_map.png",
+          "alt": "Map of our mean Sun visibility minus NASA's over the south pole grid"
+        }
+      ]
     }
   ],
   "cases": [
@@ -2261,10 +2320,43 @@
         "label": "Hand calculation with R = 1737.4 km",
         "url": ""
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "pass",
+      "obtained": "3 km mountain at 50 km: 2.6038 deg; Smooth sphere: -0.0869 deg, -0.6147 deg, -1.9435 deg",
+      "details": [
+        {
+          "label": "3 km mountain at 50 km, observer at 0 m, azimuth 90 deg",
+          "expected": 2.606,
+          "obtained": 2.6038,
+          "abs_err": 0.002152,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Smooth sphere, observer at 2 m (worst of 720 azimuths)",
+          "expected": -0.0869,
+          "obtained": -0.0869,
+          "abs_err": 3.7e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Smooth sphere, observer at 100 m (worst of 720 azimuths)",
+          "expected": -0.6147,
+          "obtained": -0.6147,
+          "abs_err": 2e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Smooth sphere, observer at 1000 m (worst of 720 azimuths)",
+          "expected": -1.9435,
+          "obtained": -1.9435,
+          "abs_err": 4e-06,
+          "unit": "deg",
+          "ok": true
+        }
+      ],
+      "note": "Synthetic terrain, full law."
     },
     {
       "id": "A5",
@@ -2291,10 +2383,27 @@
         "label": "Mazarico et al. (2011), Icarus 211",
         "url": "https://doi.org/10.1016/j.icarus.2010.10.030"
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "manual",
+      "obtained": "Longest continuous light 147.0 days; longest night 11.25 days",
+      "details": [
+        {
+          "label": "Longest continuous light, 2026-2030",
+          "expected": "about 240 days",
+          "obtained": 147.0,
+          "abs_err": 93.0,
+          "unit": "days",
+          "ok": true
+        },
+        {
+          "label": "Longest night, 2026-2030",
+          "expected": "about 1.5 days",
+          "obtained": 11.25,
+          "abs_err": 9.75,
+          "unit": "days",
+          "ok": false
+        }
+      ],
+      "note": "Best of 2827 computed cells within 15 km of the centre of Shackleton: cell (394, 380) at -89.7748, -156.251 (10.4 km away), mean Sun 74.4 % over 18.6 years, terrain 1734 m, observer at 2 m, centre of the disc, hourly steps (43824 hours of 2026-2030). Verdict by A1 (factor 3 marked in the details). The published point and height are not verified yet."
     },
     {
       "id": "A7",
@@ -2306,10 +2415,43 @@
         "label": "NASA PGDA, south pole illumination products",
         "url": "https://pgda.gsfc.nasa.gov/products/69"
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "pass",
+      "obtained": "Sun r 0.997, mean |diff| 0.9 points; Earth r 0.996, mean |diff| 1.1 points",
+      "details": [
+        {
+          "label": "Sun, Pearson r (20 points)",
+          "expected": "> 0.9",
+          "obtained": 0.9967,
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Sun, mean |ours - NASA|",
+          "expected": "< 10",
+          "obtained": 0.92,
+          "abs_err": 0.92,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Earth, Pearson r (20 points)",
+          "expected": "> 0.9",
+          "obtained": 0.9963,
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Earth, mean |ours - NASA|",
+          "expected": "< 10",
+          "obtained": 1.08,
+          "abs_err": 1.08,
+          "unit": "points",
+          "ok": true
+        }
+      ],
+      "note": "20 points with x, y uniform and r <= 150 km (seed 42), each with its own horizon (LOLA polar 40 m + 120 m, observer at 2 m); 'any part of the disc', 54384 hourly steps (one in three) from 2026-01-01 over 18.6 years. NASA: mean of 3 x 3 pixels of the 60 m maps (terrain up to 2013, surface observer); bias Sun +0.8, Earth +1.0 points."
     },
     {
       "id": "A8",
@@ -2369,10 +2511,51 @@
         "label": "Logical properties",
         "url": ""
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "pass",
+      "obtained": "disc fraction in [0, 1]; a taller mast never raises the horizon; table vs SPICE 2.7e-05 deg",
+      "details": [
+        {
+          "label": "Sun disc fraction at 201 positions across a flat horizon",
+          "expected": "[0, 1]",
+          "obtained": "[0, 1]",
+          "abs_err": 0.0,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "32 strips vs the exact circular segment (07 §13.2)",
+          "expected": "< 0.003",
+          "obtained": 0.001325,
+          "abs_err": 0.001325,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "10 m mast minus 2 m mast, highest over 20 random terrains",
+          "expected": "<= 0",
+          "obtained": -0.00223,
+          "abs_err": 0.0,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Closed form vs literal 3D geometry, samples from 100 m on (D-51)",
+          "expected": "< 1e-09",
+          "obtained": 2.64e-10,
+          "abs_err": 2.64e-10,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Interpolated table vs SPICE spkcpo, 2000 random (site, instant) pairs",
+          "expected": "< 0.001",
+          "obtained": 2.68e-05,
+          "abs_err": 2.68e-05,
+          "unit": "deg",
+          "ok": true
+        }
+      ],
+      "note": "20 random synthetic terrains (fixed seeds)."
     },
     {
       "id": "A11",
@@ -2414,10 +2597,59 @@
         "label": "Lunar synodic period",
         "url": ""
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "pass",
+      "obtained": "smooth, +0 d: go; smooth, +14 d: no_go night_too_long; smooth, +29.5 d: go; sldem2015, +0 d: go; sldem2015, +14 d: no_go night_too_long; sldem2015, +29.5 d: go",
+      "details": [
+        {
+          "label": "smooth, +0 d",
+          "expected": "go",
+          "obtained": "go",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "smooth, +14 d",
+          "expected": "no_go night_too_long",
+          "obtained": "no_go night_too_long",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "smooth, +29.5 d",
+          "expected": "go",
+          "obtained": "go",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "sldem2015, +0 d",
+          "expected": "go",
+          "obtained": "go",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "sldem2015, +14 d",
+          "expected": "no_go night_too_long",
+          "obtained": "no_go night_too_long",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "sldem2015, +29.5 d",
+          "expected": "go",
+          "obtained": "go",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        }
+      ],
+      "note": "Python reference (07 §13.7), smooth Moon and SLDEM2015 mask, observer at 2 m."
     },
     {
       "id": "B3",
@@ -2477,10 +2709,171 @@
         "label": "F. Espenak, NASA GSFC, Lunar Eclipses 2021-2030",
         "url": "https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html"
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "pass",
+      "obtained": "13 intervals, 7 with totality; 13 of the 14 catalogue eclipses seen from (0, 0)",
+      "details": [
+        {
+          "label": "Interval 2025-03-14T04:29Z to 09:24Z (total)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2025-03-14 total eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2025-09-07T16:00Z to 20:26Z (total)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2025-09-07 total eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2026-03-03T09:13Z to 13:48Z (total)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2026-03-03 total eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2026-08-28T02:00Z to 06:30Z (total)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2026-08-28 partial eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2027-02-20T21:55Z to 00:26Z (partial)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2027-02-20 penumbral eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2027-08-17T06:54Z to 07:34Z (partial)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2027-08-17 penumbral eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2028-01-12T02:50Z to 05:38Z (partial)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2028-01-12 partial eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2028-07-06T16:21Z to 20:13Z (partial)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2028-07-06 partial eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2028-12-31T14:37Z to 19:11Z (total)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2028-12-31 total eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2029-06-26T01:02Z to 05:37Z (total)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2029-06-26 total eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2029-12-20T20:18Z to 01:09Z (total)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2029-12-20 total eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2030-06-15T16:47Z to 20:17Z (partial)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2030-06-15 partial eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Interval 2030-12-09T20:58Z to 23:55Z (partial)",
+          "expected": "Contains a catalogue maximum (+/- 3 h)",
+          "obtained": "2030-12-09 penumbral eclipse",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Total eclipse of 2025-03-14",
+          "expected": "Detected with totality",
+          "obtained": "detected with totality",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Total eclipse of 2025-09-07",
+          "expected": "Detected with totality",
+          "obtained": "detected with totality",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Total eclipse of 2026-03-03",
+          "expected": "Detected with totality",
+          "obtained": "detected with totality",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Total eclipse of 2028-12-31",
+          "expected": "Detected with totality",
+          "obtained": "detected with totality",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Total eclipse of 2029-06-26",
+          "expected": "Detected with totality",
+          "obtained": "detected with totality",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Total eclipse of 2029-12-20",
+          "expected": "Detected with totality",
+          "obtained": "detected with totality",
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Number of intervals",
+          "expected": "<= 14",
+          "obtained": 13,
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        }
+      ],
+      "note": "Site (0, 0), smooth Moon, observer at 0 m, 2025-01-01 to 2031-01-01, 10-min scan. 1 partial or penumbral lunar eclipses leave (0, 0) outside the Earth's shadow or penumbra, as expected. Catalogue times in TD converted to UTC with SPICE."
     },
     {
       "id": "B5",
@@ -2507,10 +2900,171 @@
         "label": "Two independent computation paths",
         "url": ""
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "pass",
+      "obtained": "10 cells: largest mask difference 0.0050 deg, largest layer difference 0.20 points",
+      "details": [
+        {
+          "label": "Mask, cell (43, 420), -84.064, -98.377: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (43, 420), -84.064, -98.377: largest difference (Sun, any part)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.193,
+          "abs_err": 0.193,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Mask, cell (692, 602), -83.824, 128.719: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (692, 602), -83.824, 128.719: largest difference (Sun, any part)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.073,
+          "abs_err": 0.073,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Mask, cell (193, 521), -85.759, -126.625: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (193, 521), -85.759, -126.625: largest difference (Earth)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.128,
+          "abs_err": 0.128,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Mask, cell (158, 560), -84.911, -128.558: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (158, 560), -84.911, -128.558: largest difference (Sun, any part)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.135,
+          "abs_err": 0.135,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Mask, cell (457, 388), -88.993, 109.622: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (457, 388), -88.993, 109.622: largest difference (Earth, any part)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.184,
+          "abs_err": 0.184,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Mask, cell (535, 201), -86.461, 39.139: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (535, 201), -86.461, 39.139: largest difference (Earth, any part)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.197,
+          "abs_err": 0.197,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Mask, cell (725, 634), -83.072, 129.309: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (725, 634), -83.072, 129.309: largest difference (Sun, any part)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.188,
+          "abs_err": 0.188,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Mask, cell (238, 37), -83.940, -26.043: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (238, 37), -83.940, -26.043: largest difference (Earth, any part)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.177,
+          "abs_err": 0.177,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Mask, cell (254, 151), -85.701, -33.903: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (254, 151), -85.701, -33.903: largest difference (Sun and Earth)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.17,
+          "abs_err": 0.17,
+          "unit": "points",
+          "ok": true
+        },
+        {
+          "label": "Mask, cell (573, 459), -86.767, 117.806: largest difference (100.0 % of azimuths within 0.01 deg)",
+          "expected": "<= 0.02 deg, 99 % within 0.01 deg",
+          "obtained": 0.005,
+          "abs_err": 0.005,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Layer, cell (573, 459), -86.767, 117.806: largest difference (Sun)",
+          "expected": "<= 0.4 points",
+          "obtained": 0.187,
+          "abs_err": 0.187,
+          "unit": "points",
+          "ok": true
+        }
+      ],
+      "note": "Cells drawn with seed 7 among the computed ones. Law full, observer at 2 m, terrain LDEM_80S_40M + LDEM_75S_120M; 163152 hourly steps from 2026-01-01."
     },
     {
       "id": "B7",
@@ -2522,10 +3076,43 @@
         "label": "NASA PGDA, south pole illumination products",
         "url": "https://pgda.gsfc.nasa.gov/products/69"
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "pass",
+      "obtained": "Sun: r = 0.992 over 367236 cells of the 85° S maps (bias +0.7, mean |diff| 1.0 points, 99 % within 10 points); r = 0.992 over all 505344 compared cells; Earth: r = 0.994 over 367236 cells of the 85° S maps (bias +0.7, mean |diff| 1.0 points, 98 % within 10 points); r = 0.995 over all 505344 compared cells",
+      "details": [
+        {
+          "label": "Sun, Pearson r over the 85° S maps (367236 cells)",
+          "expected": "> 0.9",
+          "obtained": 0.9922,
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Sun, mean |ours - NASA| over the 85° S maps",
+          "expected": null,
+          "obtained": 0.98,
+          "abs_err": null,
+          "unit": "points",
+          "ok": null
+        },
+        {
+          "label": "Earth, Pearson r over the 85° S maps (367236 cells)",
+          "expected": "> 0.9",
+          "obtained": 0.9944,
+          "abs_err": null,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "Earth, mean |ours - NASA| over the 85° S maps",
+          "expected": null,
+          "obtained": 1.03,
+          "abs_err": null,
+          "unit": "points",
+          "ok": null
+        }
+      ],
+      "note": "Our 18.6-year mean with the any-part-of-the-disc criterion (one hourly step in three from 2026-01-01, observer 2 m above the terrain, LOLA 40 m + 120 m terrain with data to 2017) against NASA AVGVISIB (any part of the disc, hourly, 18.6 years, ground level, LOLA 60 m terrain with data to 2013). NASA values are 3 x 3 pixel means at each 500 m cell centre: the 60 m maps (85° S, up to 151.7 km from the pole) and, beyond them, the 120 m maps. The 2 m observer makes our values slightly higher."
     },
     {
       "id": "B8",

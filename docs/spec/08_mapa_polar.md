@@ -115,6 +115,7 @@ Memoria del bloque mayor: 64 × 720 × 128 × 3 × 4 B = 71 MB para `P`, y unas 
 - Posición de la muestra: los vectores unitarios tienen un error relativo de 6·10⁻⁸, unos 0,1–0,2 m en el terreno, es decir, menos de 0,005 píxeles de 40 m.
 - Elevación: la fórmula cerrada trabaja con diferencias de cota y con θ exacto; error esperado < 0,001°.
 - Diferencia admitida frente al motor de referencia: 0,002° (§3.5).
+- La aritmética se hace **relativa al sitio** (decisión D-54; llevado aquí en T-81): dirección de la muestra como `P = u0 + δ`, posición en el mapa como desplazamiento desde el sitio, cotas de los vecinos menos la del sitio, y el máximo sobre `tan(el)` con el arcotangente solo del ganador. Son las mismas muestras y la misma fórmula; la transcripción literal en `float32` da hasta 0,0039° en la prueba del §3.5 porque las primeras muestras están a 20 m, y la forma relativa, 8·10⁻⁶°.
 
 ### 3.4 Salida
 
@@ -140,7 +141,7 @@ Muestras del cubo completo: 505.344 × 720 × 3.709 = 1,35·10¹² (`full`) o 50
 | 2·10⁸ muestras/s (GPU, prudente) | 1 h 53 min | 56 min | 5 min |
 | 5·10⁷ muestras/s (CPU de muchos núcleos) | 7 h 30 min | 3 h 45 min | 21 min |
 
-Las velocidades son supuestos de diseño, no medidas. **Coste real: PENDIENTE DE VERIFICAR (I3, I1)** con la orden siguiente, en cuanto el motor pase las pruebas sintéticas (plan: «se mide con 1.000 puntos»):
+Las velocidades son supuestos de diseño, no medidas. **Coste real: medido** (D-59; `make cube-bench` extrapoló 45 min 18 s con la ley `full`; ejecución real en la RTX 4060 Laptop, registros de `out/logs/cube.log`: nivel 1 en 2 min 39 s y niveles 2–4 en 43 min 58 s, 4,8·10⁸ muestras/s; anotado en T-81). Orden de la medida, en cuanto el motor pase las pruebas sintéticas (plan: «se mide con 1.000 puntos»):
 
 ```
 make cube-bench        # = python -m pipeline.cli cube --bench
@@ -191,7 +192,7 @@ celdas sin trozo calculado → 255
 
 Cuenta de `k0`: de 2024-01-01 a 2026-01-01 hay 366 + 365 = 731 días; la muestra 1 del tramo es 2024-01-01T00:00Z.
 
-Coste: 505.344 puntos × 163.152 pasos = 8,2·10¹⁰ evaluaciones por astro. Estimación de diseño: 10–30 min en GPU y 2–4 h en CPU de muchos núcleos. Reanudable por lotes de trozos (los contadores de cada lote se guardan en `data/out/layers/partial/`). Se puede lanzar con el cubo a medias: las celdas pendientes quedan en 255 y `coverage` lo indica.
+Coste: 505.344 puntos × 163.152 pasos = 8,2·10¹⁰ evaluaciones por astro. Estimación de diseño: 10–30 min en GPU y 2–4 h en CPU de muchos núcleos. Medido (T-81, `out/logs/night-20261114T200553Z.log`): 9,2 min en la RTX 4060 Laptop para los 1.974 trozos. Reanudable por lotes de trozos (los contadores de cada lote se guardan en `data/out/layers/partial/`). Se puede lanzar con el cubo a medias: las celdas pendientes quedan en 255 y `coverage` lo indica.
 
 ### 5.3 Pruebas de las capas
 
@@ -259,7 +260,7 @@ for cada celda (i, j) calculada:
 métricas, para Sol y para Tierra, sobre el conjunto «85S» (celdas comparadas con N1/N2) y sobre el total:
     n, r de Pearson, sesgo = media(ours − nasa), mae = media(|ours − nasa|), rmse
     fracción de celdas con |ours − nasa| ≤ 10 puntos
-salida: data/out/test_results/A7B7.json, a7b7_scatter.png y a7b7_diff_map.png (formato en 09 §7.1) para la página de validación
+salida: data/out/test_results/A7.json (los 20 puntos, T-36, D-113 c) y B7.json (todas las celdas, D-106 f), a7b7_scatter.png y a7b7_diff_map.png (formato en 09 §7.1) para la página de validación
 ```
 
 ### 8.3 Umbrales

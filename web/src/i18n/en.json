@@ -95,7 +95,7 @@
   "metrics.longest_night": "Longest night",
   "metrics.help.sunlight": "Hours within the mission when the Sun's centre is above the real horizon, seen from 2 m above the ground. Source: JPL DE440 ephemeris and LOLA terrain.",
   "metrics.help.earth_link": "Hours with the Earth's centre above the real horizon: a direct line of sight for radio contact. It does not model antennas or ground stations.",
-  "metrics.help.longest_night": "Longest continuous period without the Sun during the mission.",
+  "metrics.help.longest_night": "Longest continuous period without the Sun during the mission. By default a site passes if no night lasts over 24 h: a team default, not a mission rule. Change it in Replan (0–400 h).",
   "metrics.help_button": "About {name}",
   "limits.rise_set": "Rise and set times are only as accurate as the terrain map. Where the horizon is set by low relief close to the site, a few metres of error in the map shift them by tens of minutes at mid-latitudes and by hours near the poles, where the Sun skims the horizon.",
   "metrics.now": "Now",
