@@ -11,6 +11,7 @@ import { DataState } from '../common/DataState';
 import { useScenarioModel, type ScenarioModel } from '../common/model';
 import { MetricsPanel } from '../metrics/MetricsPanel';
 import { useMission, type MissionResult } from '../metrics/useMission';
+import { Panorama } from '../panorama/Panorama';
 import { Timeline } from '../timeline/Timeline';
 import { Dialog } from '../common/Dialog';
 import { togglePlay } from '../controls/TimeControls';
@@ -148,7 +149,7 @@ function ActiveView({ tab }: { tab: Tab | 'panel' }) {
   const [model, retry] = useScenarioModel(scenario);
   const ready = model.status === 'ready' ? model.data : null;
   const mission = useMission(ready, scenario);
-  if (tab !== 'timeline' && tab !== 'panel') return <p className="data-state data-state--empty">{t('view.pending')}</p>;
+  if (tab !== 'timeline' && tab !== 'panel' && tab !== 'panorama') return <p className="data-state data-state--empty">{t('view.pending')}</p>;
   const resource =
     mission instanceof Error
       ? ({ status: 'error', error: mission } as const)
@@ -158,9 +159,20 @@ function ActiveView({ tab }: { tab: Tab | 'panel' }) {
           ? model
           : ({ status: 'loading' } as const);
   return (
-    <DataState resource={resource} loadingText={t('view.ephemeris_loading')} errorText={dataError} onRetry={retry}>
+    <DataState
+      resource={resource}
+      loadingText={tab === 'panorama' ? t('common.loading') : t('view.ephemeris_loading')}
+      errorText={(e) => (tab === 'panorama' && !(e instanceof RangeError) ? t('pano.unavailable') : dataError(e))}
+      onRetry={retry}
+    >
       {(d: { model: ScenarioModel; mission: MissionResult }) =>
-        tab === 'panel' ? <MetricsPanel model={d.model} mission={d.mission} /> : <Timeline model={d.model} mission={d.mission} scenario={scenario} />
+        tab === 'panel' ? (
+          <MetricsPanel model={d.model} mission={d.mission} />
+        ) : tab === 'panorama' ? (
+          <Panorama model={d.model} mission={d.mission} scenario={scenario} />
+        ) : (
+          <Timeline model={d.model} mission={d.mission} scenario={scenario} />
+        )
       }
     </DataState>
   );
