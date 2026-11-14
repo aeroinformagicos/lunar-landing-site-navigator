@@ -1786,3 +1786,33 @@
 .ui-v2 .v2:not(.v2--sheet) .v2-mission a {
   pointer-events: auto;
 }
+
+/* 44 × 44 px targets on touch screens and phones for the remaining text buttons (14 §6, T-63). */
+@media (pointer: coarse), (max-width: 767px) {
+  .ui-v2 .v2-detail__toggle,
+  .ui-v2 .v2-summary__more,
+  .ui-v2 .v2-link {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Text panels over the scene use the 88 % background (T-63, contrast over the 3D terrain). */
+.ui-v2 .fp,
+.ui-v2 .v2-sheet,
+.ui-v2 .story,
+.ui-v2 .v2-welcome .welcome__card,
+.ui-v2 .v2-notice {
+  background: var(--c-panel-text);
+}
+
+/* A countdown without an event (`No earthset in the next 60 days`) reads as one sentence. */
+.ui-v2 .v2-dl__row--full {
+  grid-template-columns: 1fr;
+}
+
+.ui-v2 .v2-dl__v--note {
+  text-align: left;
+  font-family: var(--font-v2-sans);
+  color: var(--c-text-2);
+}
