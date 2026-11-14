@@ -3,6 +3,7 @@
 // matrix, a click sets the landing and shows the detail, delay steps, editable requirements, next
 // valid window, ranking message, full status chip, and the Replan tab only in Plan.
 import { expect, test } from '@playwright/test';
+import { re, sitesInfo } from './data';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -11,27 +12,30 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator('[data-cell="1-30"]')).toBeVisible({ timeout: 30_000 });
 });
 
-test('matrix: one row per scenario, 31 dates, base column, next window per row', async ({ page }) => {
+test('matrix: one row per scenario, 31 dates, base column, next window per row', async ({ page, request }) => {
+  const { pair, candidates } = await sitesInfo(request);
   await expect(page.locator('.replan__matrix tbody tr')).toHaveCount(2);
   await expect(page.locator('[data-cell^="0-"]')).toHaveCount(31);
   await expect(page.locator('.replan__matrix thead th').nth(1)).toHaveText('+0');
   await expect(page.locator('.replan__matrix thead th').nth(2)).toHaveText('+1 d');
-  await expect(page.locator('[data-cell="0-0"]')).toHaveAttribute('aria-label', /^A · Demo A, landing 2027-08-01 00:00 UTC: (Still works|Works, low margin|Does not work)$/);
+  await expect(page.locator('[data-cell="0-0"]')).toHaveAttribute('aria-label', new RegExp(`^A · ${re(pair[0].short_name)}, landing 2027-08-01 00:00 UTC: (Still works|Works, low margin|Does not work)$`));
   for (const w of await page.getByTestId('next-window').allInnerTexts()) {
     expect(w).toMatch(/^(Next valid landing window: .* UTC \(.*\)|No valid landing window in the next 90 days\.)$/);
   }
-  await expect(page.getByText('No candidate regions in this build.')).toBeVisible();
+  if (candidates.length === 0) await expect(page.getByText('No candidate regions in this build.')).toBeVisible();
+  else await expect(page.getByTestId('alternative')).toHaveText(/^(Best alternative: .+ — (Still works|Works, low margin), (\d+|<1|>99) % Sun \+ Earth\.|No candidate region works for this landing\.)$/, { timeout: 30_000 });
   await expect(page.getByTestId('status-chip')).toHaveText(/^(✓ Still works|! Works, low margin|✕ Does not work)$/);
 });
 
-test('keyboard: arrows move the active cell, Enter selects it and sets the landing', async ({ page }) => {
+test('keyboard: arrows move the active cell, Enter selects it and sets the landing', async ({ page, request }) => {
+  const { pair } = await sitesInfo(request);
   await page.locator('[data-cell="0-0"]').focus();
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('ArrowDown');
   await expect(page.locator('[data-cell="1-2"]')).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(page.getByTestId('cell-detail')).toHaveText(/^B · Demo B · Landing 2027-08-03 00:00 UTC · Sun [✓✕] · Earth [✓✕] · Longest night [\d.]+ h [✓✕]$/);
+  await expect(page.getByTestId('cell-detail')).toHaveText(new RegExp(`^B · ${re(pair[1].short_name)} · Landing 2027-08-03 00:00 UTC · Sun [✓✕] · Earth [✓✕] · Longest night [\\d.]+ h [✓✕]$`));
   await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText('Landing 2027-08-03 00:00 UTC');
 });
 

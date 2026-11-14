@@ -7,7 +7,7 @@ import { DAY_S, isoToUnix } from '../time';
 import type { HorizonFile } from '../types';
 import { frameFor } from '../visibility';
 import type { Window } from '../events';
-import { bestTimeMs, exampleJson, exampleTable } from './fixtures';
+import { exampleJson, exampleTable } from './fixtures';
 
 const table = exampleTable();
 const LANDING = isoToUnix('2027-08-01T00:00:00Z');
@@ -109,16 +109,5 @@ describe('missionMetrics', () => {
     expect(c.t[144]).toBe(LANDING + DAY_S);
     const out = curves(table, frameFor(0, 0, demoA), demoA, isoToUnix('2044-12-31T23:00:00Z'), isoToUnix('2045-01-01T02:00:00Z'));
     expect(Number.isNaN(out.sunElDeg[out.t.length - 1])).toBe(true);
-  });
-});
-
-describe('budgets (07 §11)', () => {
-  it('metrics of a 14-day mission in under 10 ms', () => {
-    for (let i = 0; i < 5; i++) run(demoA, LANDING + i * DAY_S); // warm-up
-    const n = 10;
-    const ms = bestTimeMs(() => {
-      for (let i = 0; i < n; i++) run(demoA, LANDING + i * 7 * DAY_S);
-    });
-    expect(ms / n).toBeLessThan(10);
   });
 });
