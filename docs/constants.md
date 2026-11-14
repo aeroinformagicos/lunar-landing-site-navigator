@@ -341,3 +341,15 @@ Medido (`make golden`, 2026-11-14, 27 s con 26 consultas):
 | A2, puesta lisa de Blue Ghost 1 (interpolación lineal de Horizons) | 2025-03-16T20:10:39,07Z | 20:10:39 |
 | A2 con una `find_crossings` provisional (pseudocódigo de `07` §6.2, solo en la sesión, no integrada) | 0,5 s de diferencia máxima | < 5 min; < 15 s esperado |
 
+## T-53 / T-54 · Interfaz (UX de Málaga y consola)
+
+| Constante | Valor | Fuente |
+| --- | --- | --- |
+| `WELCOME_KEY` | `llsn.welcome.closed` (valor `1`) | `14` §1; D-92 |
+| Tamaño mínimo de `Button` y de los controles | 44 × 44 px, 8 px de separación | `14` §6 |
+| Cifra principal del panel / su etiqueta | 28 px / 14 px | `14` §4 |
+| `VIEW_MAX_H` del panorama | 240 px (antes 200) | T-54 (cabe en 1280 × 720) |
+| `ZOOM_W`, `SIDE_W` | 200 px (antes 236) | T-54 |
+| Zoom mínimo; margen del zoom adaptable | 4° × 2° (×10); 1,5 × (separación + diámetro del disco) | `10` §6.1; D-93 |
+| Columnas izquierda / derecha | 232 px / 320 px | T-54 |
+| `--c-accent` / `--c-on-accent` | #DCE5F0 / #0D1320 | D-93 |
