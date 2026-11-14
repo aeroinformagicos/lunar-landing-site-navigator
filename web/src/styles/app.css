@@ -1339,3 +1339,14 @@ input[aria-invalid='true'] {
   font-weight: 600;
   border-radius: var(--radius);
 }
+
+/* ---- Eclipses (F13) ---- */
+.timeline__label--eclipse {
+  fill: var(--c-eclipse);
+  font-weight: 600;
+}
+
+.eclipse-notice {
+  color: var(--c-eclipse);
+  font-weight: 600;
+}

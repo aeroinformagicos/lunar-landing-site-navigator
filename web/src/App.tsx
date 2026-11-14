@@ -2,7 +2,7 @@
 // App shell: loads config, manifest and sites (T-11), builds the initial state from
 // `sites.json.defaults` (or from a shared link, T-33) and renders the layout (T-14) or, on
 // `#/validation`, the validation page (T-23).
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { DataError, loader } from './core/loaders';
 import { t } from './i18n/t';
 import { useAppStore } from './state/store';
@@ -11,8 +11,10 @@ import { BootContext } from './ui/common/data';
 import { DataState, useResource } from './ui/common/DataState';
 import { AppLayout } from './ui/layout/AppLayout';
 import { routeOf } from './ui/validation/report';
-import { ValidationPage } from './ui/validation/ValidationPage';
-import { StoryOverlay } from './ui/story/StoryOverlay';
+
+// Loaded on demand to keep the main bundle under 350 kB (02_arquitectura.md §7).
+const ValidationPage = lazy(() => import('./ui/validation/ValidationPage').then((m) => ({ default: m.ValidationPage })));
+const StoryOverlay = lazy(() => import('./ui/story/StoryOverlay').then((m) => ({ default: m.StoryOverlay })));
 
 function bootError(error: Error): string {
   return error instanceof DataError && (error.kind === 'contract' || error.kind === 'format')
@@ -38,6 +40,7 @@ export function App() {
   const [boot, retry] = useResource('boot', () => loader.loadBoot());
   const init = useAppStore((s) => s.init);
   const initialised = useAppStore((s) => s.initialised);
+  const mode = useAppStore((s) => s.mode);
   const [linkPartial, setLinkPartial] = useState(false);
 
   // First state: the shared link in the fragment if there is one (F16), else the demo pair.
@@ -76,8 +79,18 @@ export function App() {
         {(data) =>
           initialised ? (
             <BootContext.Provider value={data}>
-              {route === 'validation' ? <ValidationPage /> : <AppLayout />}
-              <StoryOverlay />
+              {route === 'validation' ? (
+                <Suspense fallback={<p className="data-state data-state--loading">{t('validation.loading')}</p>}>
+                  <ValidationPage />
+                </Suspense>
+              ) : (
+                <AppLayout />
+              )}
+              {mode === 'learn' && (
+                <Suspense fallback={null}>
+                  <StoryOverlay />
+                </Suspense>
+              )}
             </BootContext.Provider>
           ) : null
         }

@@ -5,6 +5,7 @@ import { AZ_STEP_DEG, N_AZ } from './constants';
 import type { EphemerisTable } from './ephemeris';
 import { siteFrame, skyAt, type BodySky, type SiteFrame } from './frames';
 import { horizonAt, type Mask } from './horizon';
+import { eclipseState } from './eclipse';
 
 const DEG = Math.PI / 180;
 
@@ -71,14 +72,13 @@ export function discAny(elHor: (azDeg: number) => number, azC: number, elC: numb
   return false;
 }
 
-/** Eclipse state. Until F13 (core/eclipse.ts) is implemented, `covered = 0` (07 §4.3). */
+/** No eclipse (for callers that do not want one, e.g. comparisons against references without it). */
 export const NO_ECLIPSE: Readonly<EclipseState> = Object.freeze({ kind: 'none', covered: 0 });
 
-const noEclipse = () => NO_ECLIPSE;
 
 /**
  * Sky state at `tUnix` (07 §5). `frame = siteFrame(lat, lon, mask.siteHeightM + observer height)`.
- * `eclipseOf` lets F13 plug in the eclipse state; by default there is none.
+ * The eclipse state is that of 07 §9 (`core/eclipse.ts`); `eclipseOf` can replace it.
  * Objects are written out field by field (no spread): this runs in tight loops (07 §11: < 3 µs).
  */
 export function evaluate(
@@ -86,7 +86,7 @@ export function evaluate(
   frame: SiteFrame,
   mask: Mask,
   tUnix: number,
-  eclipseOf: (sun: BodySky, earth: BodySky) => EclipseState = noEclipse,
+  eclipseOf: (sun: BodySky, earth: BodySky) => EclipseState = eclipseState,
 ): SkyState {
   const sky = skyAt(table, frame, tUnix);
   const s = sky.sun;
