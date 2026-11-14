@@ -45,3 +45,28 @@ export function toDateTimeLocal(unix: number): string {
     `T${pad2(d.getUTCHours())}:${pad2(d.getUTCMinutes())}`
   );
 }
+
+// ---- Presentation rules (07_visibilidad.md §12.6), same in the UI and validation_report.json ----
+
+/** Elevations and margins: 2 decimals, `1.21°`. */
+export function formatDeg(deg: number): string {
+  return `${deg.toFixed(2)}°`;
+}
+
+/** Signed margin: `+0.33°` / `−0.21°`. */
+export function formatMargin(deg: number): string {
+  const r = Math.abs(deg) < 0.005 ? 0 : deg;
+  return `${r >= 0 ? '+' : '−'}${Math.abs(r).toFixed(2)}°`;
+}
+
+/** Percentages: integers; `<1 %` if 0 < v < 0.5 and `>99 %` if 99.5 ≤ v < 100. */
+export function formatPct(pct: number): string {
+  if (pct > 0 && pct < 0.5) return '<1 %';
+  if (pct >= 99.5 && pct < 100) return '>99 %';
+  return `${Math.round(pct)} %`;
+}
+
+/** Hours: 1 decimal below 100 h, integer from 100 h. */
+export function formatHours(h: number): string {
+  return h < 100 ? `${(Math.round(h * 10) / 10).toFixed(1)} h` : `${Math.round(h)} h`;
+}
