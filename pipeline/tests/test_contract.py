@@ -304,3 +304,19 @@ def test_examples_are_up_to_date(tmp_path):
     # heavy_base_url is "data" until `make deploy-heavy` (T-25) writes the URL of the heavy origin.
     assert config["data_base_url"] == "data" and set(config) == {"data_base_url", "heavy_base_url"}
     assert config["heavy_base_url"] == "data" or config["heavy_base_url"].startswith("https://")
+
+
+def test_examples_do_not_overwrite_real_data(tmp_path):
+    """D-77: with ``ephemeris.synthetic = false`` in the manifest, the copy to web/public/data is refused."""
+    spec = importlib.util.spec_from_file_location("make_examples", MAKE_EXAMPLES)
+    make_examples = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(make_examples)
+    assert not make_examples.holds_real_data(tmp_path)  # no manifest: the copy may go ahead
+    manifest = {"ephemeris": {"file": "ephemeris.bin", "bytes": 5260176, "synthetic": True}}
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    assert not make_examples.holds_real_data(tmp_path)
+    manifest["ephemeris"]["synthetic"] = False
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    assert make_examples.holds_real_data(tmp_path)
+    # The published copy in the repository holds the real table since T-06.
+    assert make_examples.holds_real_data(WEB_DATA)
