@@ -9,7 +9,9 @@ HEADER = "AI-assisted: written with Claude Code, reviewed by team Aeroinformági
 SOURCE_SUFFIXES = {".py", ".ts", ".tsx", ".mjs", ".js", ".css", ".html", ".yml", ".yaml", ".sh", ".toml"}
 SOURCE_NAMES = {"Makefile"}
 MAX_VERSIONED_BYTES = 10 * 1024 * 1024
-DESIGN_DIR = REPO_ROOT / "docs" / "design"
+# Reference material made outside this project (design-tool mockup with its vendored React runtime,
+# decision D-97 q): not our source code, so it does not carry the AI header.
+EXEMPT_DIRS = ("docs/design/",)
 
 
 def _tracked_files() -> list[Path]:
@@ -27,8 +29,7 @@ def test_source_files_start_with_ai_header():
             continue
         if path.suffix not in SOURCE_SUFFIXES and path.name not in SOURCE_NAMES:
             continue
-        # Design reference mockups are third-party exports kept verbatim (D-97).
-        if DESIGN_DIR in path.parents:
+        if path.relative_to(REPO_ROOT).as_posix().startswith(EXEMPT_DIRS):
             continue
         lines = path.read_text(encoding="utf-8").splitlines()
         # A shebang must stay on line 1; then the header goes on line 2.

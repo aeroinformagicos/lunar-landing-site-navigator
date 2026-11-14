@@ -1,7 +1,7 @@
 <!-- AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos -->
 # 15 · Interfaz v2 (2D, armazón y estilo)
 
-Rediseño completo de la presentación. **Ningún cálculo ni dato cambia: solo la presentación.** Dueño: I2 (carril 2). La vista 3D es del carril I3 (`16_vista_3d.md`); los dos carriles se encuentran en el conmutador 3D/2D del escenario central (§4). Tarea de especificación: T-60. Tarjetas: T-61, T-62 y T-63 (§12). Decisiones: D-97 a D-104.
+Rediseño completo de la presentación. **Ningún cálculo ni dato cambia: solo la presentación.** Dueño: I2 (carril 2). La vista 3D es del carril I3 (`16_vista_3d.md`); los dos carriles se encuentran en el conmutador 3D/2D del escenario central (§4). Tarea de especificación: T-60. Tarjetas: T-61, T-62 y T-63 (§12). Decisiones: D-98 a D-105.
 
 **Relación con los demás documentos.** Este documento **completa** `10_interfaz.md`: la funcionalidad, los estados, los textos exactos y la accesibilidad de `10` siguen valiendo salvo donde aquí se diga otra cosa. Para la v2, este documento manda sobre `10` en disposición, colores, tipografía y estilo. `14_ux_malaga.md` manda sobre los dos: es el criterio de la demo.
 
@@ -81,7 +81,7 @@ Zonas de la v2 (figura del §3):
 | Elemento v1 | Texto o comportamiento que se conserva | Zona v2 |
 | --- | --- | --- |
 | Título enlazado al estado inicial | `Lunar Landing Site Navigator` sigue en `app.title`, en `<title>` y como nombre accesible del enlace del emblema (§6.1); el rótulo visible es `Lunar Sightline` | H |
-| Línea de propósito (`14` §1) | `app.tagline`: la v2 enseña el lema del emblema `When will your landing site see the Sun and Earth?` (`app.motto`), y `app.tagline` va como descripción accesible del enlace (D-98) | H |
+| Línea de propósito (`14` §1) | `app.tagline`: la v2 enseña el lema del emblema `When will your landing site see the Sun and Earth?` (`app.motto`), y `app.tagline` va como descripción accesible del enlace (D-99) | H |
 | Selector de modo | `Explore`, `Plan`, `Learn`; `role="tablist"`, flechas | M |
 | Validación | `Validation` (enlace a `#/validation`) | M |
 | Compartir (Plan) | `Share`; aviso `Link copied`; si no hay portapapeles, campo con la URL | M (solo en Plan) |
@@ -109,7 +109,7 @@ Zonas de la v2 (figura del §3):
 
 | Elemento v1 | Zona v2 |
 | --- | --- |
-| Pestañas `Panorama`, `Timeline`, `Map`, `Terrain profile`, `Replan` (Plan) | B: pestañas de vista. `Panorama` pasa a llamarse **`Horizon`** (`tab.horizon`); `tab.panorama` se conserva para la v1. Orden: `Horizon`, `Map`, `Timeline`, `Terrain profile`, `Replan` (D-99) |
+| Pestañas `Panorama`, `Timeline`, `Map`, `Terrain profile`, `Replan` (Plan) | B: pestañas de vista. `Panorama` pasa a llamarse **`Horizon`** (`tab.horizon`); `tab.panorama` se conserva para la v1. Orden: `Horizon`, `Map`, `Timeline`, `Terrain profile`, `Replan` (D-100) |
 | Panorama de 40° (F3) | S: con `viewMode = '2d'`, `Stage2D` a pantalla completa (§4.2) |
 | Zoom del horizonte ×10, `Solar disc visible: 62 %`, `Margin: +0.04°` | R: sección **`Horizon detail`** (plegada por defecto en escritorio; se abre sola en la historia guiada si el paso lo pide) |
 | Tira de 360° con corchete y N, E, S, W | S: franja fina en la parte superior del escenario 2D, que sustituye a la regla de acimut de la maqueta (§4.2) |
@@ -199,7 +199,7 @@ Lienzo de referencia: 1440 × 900 (la maqueta). Pantalla única de 100vw × 100v
 
 ### 3.2 Adaptación a otras ventanas de escritorio
 
-La maqueta mide 1440 × 900; la demo se proyecta a 1280 × 720 o a 1920 × 1080. Reglas (D-100):
+La maqueta mide 1440 × 900; la demo se proyecta a 1280 × 720 o a 1920 × 1080. Reglas (D-101):
 
 - Márgenes laterales de H, B y M: `clamp(24px, 4.44vw, 64px)` (64 px a 1440).
 - Posiciones verticales: B se ancla abajo (`bottom`), no arriba. La línea de cifras queda a `bottom: 330px` en 900 px de alto. Por debajo de 800 px de alto, las cifras bajan a 44 px, el resumen muestra solo la frase 1 y K baja a 156 px.
@@ -213,7 +213,7 @@ La maqueta mide 1440 × 900; la demo se proyecta a 1280 × 720 o a 1920 × 1080.
 
 - `ui/shell/Stage.tsx` (I2) es el contenedor de `position: fixed; inset: 0`, debajo de todos los paneles (`z-index` 0).
 - Con la pestaña Horizon monta `Stage3D` o `Stage2D` según `viewMode`. Con cualquier otra pestaña, monta la hoja de esa vista (§5.3) sobre un fondo de escena atenuado.
-- `Stage3D` se carga así (D-101):
+- `Stage3D` se carga así (D-102):
 
   ```ts
   const stage3d = import.meta.glob('../stage3d/index.tsx'); // {} si el carril 3D aún no está
@@ -221,7 +221,7 @@ La maqueta mide 1440 × 900; la demo se proyecta a 1280 × 720 o a 1920 × 1080.
   const Stage3D = load ? lazy(load as () => Promise<{ default: ComponentType }>) : null;
   ```
 
-  - Sin el módulo, o si `Stage3D` lanza un error (límite de errores de React), se monta `Stage2D` con el aviso `3D view unavailable on this device. Showing the 2D view.` (D-101).
+  - Sin el módulo, o si `Stage3D` lanza un error (límite de errores de React), se monta `Stage2D` con el aviso `3D view unavailable on this device. Showing the 2D view.` (D-102).
   - Mientras carga: `Loading 3D view…` sobre el fondo, sin pantalla vacía.
 - **Conmutador T:** dos botones `3D` y `2D` en un `role="radiogroup"` con nombre accesible `View mode`.
   - Atajo `V`: alterna entre los dos, salvo dentro de un campo de texto o un diálogo, y en Learn.
@@ -236,7 +236,7 @@ La maqueta mide 1440 × 900; la demo se proyecta a 1280 × 720 o a 1920 × 1080.
 
 El panorama de 40° de `10` §6.1 a pantalla completa, con la estética de la maqueta. **La geometría no cambia:** misma proyección acimut-elevación con la misma escala en los dos ejes, centrada en el astro de enfoque, con las mismas reglas de centrado vertical y flecha `Horizon … below`.
 
-- **Escala:** 40° de acimut en todo el ancho visible del escenario; la elevación mostrada es `alto × 40 / ancho` (25° a 1440 × 900). Esto sustituye el «alto 20°» de `10` §6.1 (D-102).
+- **Escala:** 40° de acimut en todo el ancho visible del escenario; la elevación mostrada es `alto × 40 / ancho` (25° a 1440 × 900). Esto sustituye el «alto 20°» de `10` §6.1 (D-103).
 - **Horizonte a 58 % del alto.** El centro vertical deja la elevación del horizonte en el acimut del astro a `y = 0.58 × alto` para que el cielo tenga protagonismo (en la maqueta, el horizonte está entre `y = 456` y `y = 530` de 900). La regla de los 8° de `10` §6.1 se conserva: si el astro está a más de 8°, se centra en él.
 - **Capas, de abajo arriba** (valores de la maqueta):
   1. Fondo: el degradado del §3.1. Sin estrellas en 2D, para no competir con los rótulos; la 3D sí las tiene.
@@ -343,11 +343,11 @@ SVG propio que reproduce el isotipo de `ref-2-emblema.jpg`: **retícula orbital 
 - órbita: elipse `rx=19 ry=7`, girada −18°, 1,4 px `--c-earth`;
 - nodo solar: círculo `r=3` en `(30, 24)`, relleno `--c-sun`.
 
-`aria-hidden="true"`: el nombre accesible lo lleva el enlace que lo envuelve (`Lunar Landing Site Navigator — home`). Se usa a 48 px en la cabecera, a 64 px en la bienvenida y a 32 px en móvil. El mismo SVG es el `favicon.svg` (D-103).
+`aria-hidden="true"`: el nombre accesible lo lleva el enlace que lo envuelve (`Lunar Landing Site Navigator — home`). Se usa a 48 px en la cabecera, a 64 px en la bienvenida y a 32 px en móvil. El mismo SVG es el `favicon.svg` (D-104).
 
 ### 6.2 Botones
 
-El `Button` único de T-53 se conserva con nuevas variantes visuales (D-104):
+El `Button` único de T-53 se conserva con nuevas variantes visuales (D-105):
 
 | Variante | Uso | Estilo |
 | --- | --- | --- |
@@ -357,7 +357,7 @@ El `Button` único de T-53 se conserva con nuevas variantes visuales (D-104):
 | `pill` (nueva) | Píldoras de escenario, enfoque Sol/Tierra y conmutador | Radio igual a la mitad del alto, borde `--c-line`, activa con borde de color y fondo del color al 12–14 % |
 | `tab` (nueva) | Pestañas de vista y de modo | Sin fondo; activa subrayada (modo) o con borde superior (vistas) |
 
-**Objetivos táctiles:** todos los botones miden 44 × 44 px como mínimo en táctil (`pointer: coarse`) y por debajo de 768 px, y mantienen 8 px de separación (`14` §6). En escritorio con puntero fino se permiten los 32 px de la maqueta para `secondary` y `pill`, con área de clic ampliada a 44 px mediante `::before` transparente (D-104).
+**Objetivos táctiles:** todos los botones miden 44 × 44 px como mínimo en táctil (`pointer: coarse`) y por debajo de 768 px, y mantienen 8 px de separación (`14` §6). En escritorio con puntero fino se permiten los 32 px de la maqueta para `secondary` y `pill`, con área de clic ampliada a 44 px mediante `::before` transparente (D-105).
 
 ### 6.3 Iconos
 
@@ -449,7 +449,7 @@ Los tokens de la v1 (`--c-bg`, `--c-surface`, `--c-text-muted`, `--c-border`…)
 | Rótulos sobre el lienzo | Inter 600 (nombre) + JetBrains Mono 400 (datos) | 13 px + 12 px |
 
 - **Fuentes:** `@fontsource/inter` (400, 500, 600 y 700) y `@fontsource/jetbrains-mono` (300, 400 y 500), solo el subconjunto `latin`. Se importan en `main.tsx`, con licencia OFL apuntada en `SOURCES.md` y sin peticiones externas. Peso estimado: unos 200 kB de `woff2`, que no cuentan en el presupuesto de JavaScript de `02` §7.
-- **Tamaño mínimo:** 12 px, como en `10` §12. Los 10–11 px de la maqueta se suben a 12 px (D-100).
+- **Tamaño mínimo:** 12 px, como en `10` §12. Los 10–11 px de la maqueta se suben a 12 px (D-101).
 
 ### 7.4 Espaciado, radios y sombras
 
@@ -464,7 +464,7 @@ Los tokens de la v1 (`--c-bg`, `--c-surface`, `--c-text-muted`, `--c-border`…)
 
 ### 7.5 Rampas del mapa
 
-De `--c-bg-1` (`#162032`) al color del concepto (`--c-sun`, `--c-earth`, `--c-both`) en 11 pasos, interpolando en el espacio OKLab (D-102). La celda sin dato queda transparente con trama de puntos, como hoy. El plan B (NASA) usa la rampa del Sol con su banda fija.
+De `--c-bg-1` (`#162032`) al color del concepto (`--c-sun`, `--c-earth`, `--c-both`) en 11 pasos, interpolando en el espacio OKLab (D-103). La celda sin dato queda transparente con trama de puntos, como hoy. El plan B (NASA) usa la rampa del Sol con su banda fija.
 
 ## 8. UX de Málaga (`14_ux_malaga.md`) y accesibilidad (`10` §12)
 
@@ -504,7 +504,7 @@ Sigue la prueba automática de `14` §9 (`e2e/ux.spec.ts`) sobre la v2: ningún 
 
 ### 8.4 Excepciones de tamaño frente a la maqueta
 
-La maqueta usa 10–11 px en algunos rótulos (marcas `D0…D14`, ejes, `SOUTH POLE`, fecha UTC y procedencia). La v2 los sube a 12 px, que es el mínimo de `10` §12 (D-100).
+La maqueta usa 10–11 px en algunos rótulos (marcas `D0…D14`, ejes, `SOUTH POLE`, fecha UTC y procedencia). La v2 los sube a 12 px, que es el mínimo de `10` §12 (D-101).
 
 ## 9. Móvil (< 768 px)
 
