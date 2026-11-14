@@ -231,5 +231,8 @@
   "map.projection": "Polar stereographic · 500 m grid",
   "map.label": "Map of the lunar south pole. Arrow keys move, + and − zoom, Enter selects the cell under the centre cross.",
   "map.zoom_in": "Zoom in",
-  "map.zoom_out": "Zoom out"
+  "map.zoom_out": "Zoom out",
+  "timeline.eclipse": "Eclipse",
+  "metrics.eclipse": "Eclipse in progress: Earth covers {pct} of the Sun",
+  "metrics.eclipse_sun_below": "(Sun below horizon)"
 }

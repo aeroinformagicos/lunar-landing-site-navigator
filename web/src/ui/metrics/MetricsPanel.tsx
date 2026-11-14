@@ -115,6 +115,13 @@ export function MetricsPanel({ model, mission, scenario }: { model: ScenarioMode
             <p className="countdown" data-testid="earth-countdown">
               {earthCountdown}
             </p>
+            {now.sky.eclipse.kind !== 'none' && (
+              <p className="eclipse-notice" role="status" data-testid="eclipse-notice">
+                <span aria-hidden="true">◑ </span>
+                {t('metrics.eclipse', { pct: formatPct(now.sky.eclipse.covered * 100) })}
+                {!now.sky.sun.visible && ` ${t('metrics.eclipse_sun_below')}`}
+              </p>
+            )}
           </>
         ) : (
           <p>{t('metrics.outside')}</p>
