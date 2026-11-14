@@ -1,10 +1,12 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // App shell: loads config, manifest and sites (T-11), builds the initial state from
-// `sites.json.defaults` and renders the layout (T-14) or, on `#/validation`, the validation page (T-23).
+// `sites.json.defaults` (or from a shared link, T-33) and renders the layout (T-14) or, on
+// `#/validation`, the validation page (T-23).
 import { useEffect, useState } from 'react';
 import { DataError, loader } from './core/loaders';
 import { t } from './i18n/t';
 import { useAppStore } from './state/store';
+import { restoreFromHash, startUrlSync } from './state/url';
 import { BootContext } from './ui/common/data';
 import { DataState, useResource } from './ui/common/DataState';
 import { AppLayout } from './ui/layout/AppLayout';
@@ -36,10 +38,22 @@ export function App() {
   const [boot, retry] = useResource('boot', () => loader.loadBoot());
   const init = useAppStore((s) => s.init);
   const initialised = useAppStore((s) => s.initialised);
+  const [linkPartial, setLinkPartial] = useState(false);
+
+  // First state: the shared link in the fragment if there is one (F16), else the demo pair.
+  useEffect(() => {
+    if (boot.status !== 'ready' || initialised) return;
+    const restored = restoreFromHash(location.hash, boot.data.sites);
+    if (restored) {
+      useAppStore.setState({ ...restored.state, initialised: true });
+      setLinkPartial(restored.partial);
+    } else init(boot.data.sites.defaults);
+  }, [boot, initialised, init]);
 
   useEffect(() => {
-    if (boot.status === 'ready' && !initialised) init(boot.data.sites.defaults);
-  }, [boot, initialised, init]);
+    if (boot.status !== 'ready' || !initialised) return;
+    return startUrlSync(boot.data.sites, setLinkPartial);
+  }, [boot, initialised]);
 
   const synthetic = boot.status === 'ready' && boot.data.manifest.ephemeris.synthetic;
 
@@ -48,6 +62,14 @@ export function App() {
       {synthetic && (
         <div className="banner banner--example" role="note">
           {t('banner.example')}
+        </div>
+      )}
+      {linkPartial && (
+        <div className="banner banner--link" role="status">
+          <span>{t('share.partial')}</span>
+          <button type="button" onClick={() => setLinkPartial(false)}>
+            {t('share.dismiss')}
+          </button>
         </div>
       )}
       <DataState resource={boot} errorText={bootError} onRetry={retry} className="app__boot">
