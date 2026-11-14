@@ -1,7 +1,8 @@
 # AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 """Longitude wrapping and latitude/longitude <-> MOON_ME vectors.
 
-docs/spec/03_datos_y_fuentes.md §3.4 and docs/spec/00_indice.md §3.
+docs/spec/03_datos_y_fuentes.md §3.4, docs/spec/05_efemerides.md §3 (local basis) and
+docs/spec/00_indice.md §3.
 Latitude is planetocentric (north positive), longitude is east positive.
 All functions are vectorised with NumPy and work in float64.
 """
@@ -46,6 +47,22 @@ def latlon_of_unit(u):
     lat = np.degrees(np.arctan2(z, np.hypot(x, y)))
     lon = wrap180(np.degrees(np.arctan2(y, x)))
     return _scalar_or_array(lat), lon
+
+
+def enu_basis(lat_deg: float, lon_deg: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """East, north and up unit vectors of a site in MOON_ME (05_efemerides.md §3).
+
+    At the exact pole the basis is defined by the longitude given: with lat = −90°, lon = 0°,
+    N = (1, 0, 0) (towards the prime meridian) and E = (0, 1, 0).
+    """
+    lat = np.radians(float(lat_deg))
+    lon = np.radians(float(lon_deg))
+    sin_lat, cos_lat = np.sin(lat), np.cos(lat)
+    sin_lon, cos_lon = np.sin(lon), np.cos(lon)
+    east = np.array([-sin_lon, cos_lon, 0.0])
+    north = np.array([-sin_lat * cos_lon, -sin_lat * sin_lon, cos_lat])
+    up = np.array([cos_lat * cos_lon, cos_lat * sin_lon, sin_lat])
+    return east, north, up
 
 
 def site_position_km(lat_deg, lon_deg, h_m=0.0) -> np.ndarray:
