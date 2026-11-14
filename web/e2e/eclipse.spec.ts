@@ -17,10 +17,11 @@ test('Blue Ghost 1, 14 March 2025: band, events, notice and Earth in front', asy
   await expect(page.getByTestId('eclipse-band')).toHaveCount(1, { timeout: 20_000 });
   await expect(page.getByTestId('totality-band')).toHaveCount(1);
   const events = page.getByTestId('eclipse-events');
-  await expect(events).toContainText(/Eclipse starts, 2025-03-14 05:0[01] UTC/);
-  await expect(events).toContainText(/Totality starts, 2025-03-14 06:1[78] UTC/);
-  await expect(events).toContainText(/Totality ends, 2025-03-14 08:3[45] UTC/);
-  await expect(events).toContainText(/Eclipse ends, 2025-03-14 09:5[12] UTC/);
+  // Hidden data table (T-20): one row per event, name and time in separate cells.
+  await expect(events.getByRole('row', { name: /Eclipse starts 2025-03-14 05:0[01] UTC/ })).toHaveCount(1);
+  await expect(events.getByRole('row', { name: /Totality starts 2025-03-14 06:1[78] UTC/ })).toHaveCount(1);
+  await expect(events.getByRole('row', { name: /Totality ends 2025-03-14 08:3[45] UTC/ })).toHaveCount(1);
+  await expect(events.getByRole('row', { name: /Eclipse ends 2025-03-14 09:5[12] UTC/ })).toHaveCount(1);
   // Cursor to 07:30 UTC: seven hours and three steps of 10 min.
   await page.getByLabel('Time within mission').focus();
   for (let i = 0; i < 45; i++) await page.keyboard.press('ArrowRight');
