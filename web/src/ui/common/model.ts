@@ -13,6 +13,8 @@ import { t } from '../../i18n/t';
 import { parseSiteRef } from '../../state/selectors';
 import type { Scenario } from '../../state/store';
 import { frameFor } from '../../core/visibility';
+import { latLonOfCell } from '../../core/grid';
+import { loadCellMask } from '../map/mapData';
 import { useBoot } from './data';
 import { useResource } from './DataState';
 
@@ -27,6 +29,9 @@ export interface ScenarioModel {
   reliefLabel: string;
   smooth: boolean;
 }
+
+/** Every mesh point lies inside P1 (08 §1.2). */
+export const MESH_RELIEF = 'LOLA polar 40 m + 120 m';
 
 export function useEphemerisTable(): [Resource<EphemerisTable>, () => void] {
   const { config } = useBoot();
@@ -45,11 +50,26 @@ export function useScenarioModel(scenario: Scenario): [Resource<ScenarioModel>, 
   const [horizon, retryHorizon] = useResource(withMask ? `horizon:${site.id}` : null, () =>
     loader.loadHorizon(config.data_base_url, site!.id),
   );
+  // Mesh point (08 §7): mask from the horizon cube of the heavy origin.
+  const cell = ref.kind === 'grid' ? ref : null;
+  const [cellMask, retryCell] = useResource(cell ? `cell:${cell.i},${cell.j}` : null, () =>
+    loadCellMask(loader, config.heavy_base_url, null, cell!.i, cell!.j),
+  );
 
   const model = useMemo((): Resource<ScenarioModel> => {
     if (table.status === 'error') return table;
     if (withMask && horizon.status === 'error') return horizon;
+    if (cell && cellMask.status === 'error') return cellMask;
     if (table.status !== 'ready' || (withMask && horizon.status !== 'ready')) return { status: 'loading' };
+    if (cell) {
+      if (cellMask.status !== 'ready') return { status: 'loading' };
+      const { latDeg, lonDeg } = latLonOfCell(cell.i, cell.j);
+      const mask = cellMask.data;
+      return {
+        status: 'ready',
+        data: { table: table.data, mask, frame: frameFor(latDeg, lonDeg, mask), site: undefined, latDeg, lonDeg, reliefLabel: MESH_RELIEF, smooth: false },
+      };
+    }
     const latDeg = site ? site.lat_deg : ref.kind === 'custom' ? ref.latDeg : Number.NaN;
     const lonDeg = site ? site.lon_deg : ref.kind === 'custom' ? ref.lonDeg : Number.NaN;
     let mask: Mask | null = null;
@@ -70,11 +90,12 @@ export function useScenarioModel(scenario: Scenario): [Resource<ScenarioModel>, 
       },
     };
     // `ref` is derived from scenario.siteRef.
-  }, [table, horizon, withMask, site, h, scenario.siteRef]);
+  }, [table, horizon, cellMask, withMask, site, h, scenario.siteRef]);
 
   const retry = () => {
     retryTable();
     retryHorizon();
+    retryCell();
   };
   return [model, retry];
 }
