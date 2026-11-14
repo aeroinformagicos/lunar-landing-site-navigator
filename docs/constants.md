@@ -141,6 +141,40 @@ El motor de referencia cumple con margen el coste previsto. La cifra con los DEM
 en memoria) la mide T-09 con `time python -m pipeline.cli site-mask --site <id>`, que es la orden que fija
 `06_horizonte.md` §11; con la velocidad de muestreo de T-07 (6,4·10⁶ muestras/s) se esperan 0,7–0,9 s.
 
+### T-09 · Máscaras de sitio en disco (2026-11-14)
+
+Constantes nuevas (todas en `pipeline/horizon/site_mask.py` salvo indicación):
+
+| Nombre | Valor | Fuente |
+| --- | --- | --- |
+| `EL_DECIMALS`, `LATLON_DECIMALS`, `HEIGHT_DECIMALS`; `dist_m` entero | 4, 5, 1 | `06_horizonte.md` §5, `09_contrato_datos.md` §5 |
+| `USAGE_DECIMALS` (`stats.grid_usage`) | 6 | Elegido (D-81 g) |
+| `EPHEMERIS_BYTES` | 5.260.176 | `09_contrato_datos.md` §3.1 |
+| `DEFAULT_LAW` | `full` | `06_horizonte.md` §1 |
+| Orden del lote (`pipeline/common/catalog.py`) | Grupos 1–3 | `04_catalogo_sitios.md` §6 |
+| `SLDEM_LAT_MAX_DEG` (prueba) | 50,1° | `04_catalogo_sitios.md` §7 |
+| x, y de las regiones (prueba, ± 10 m) | Tabla | `04_catalogo_sitios.md` §3 |
+
+Medido con los DEM reales (`python -m pipeline.cli site-mask --site <id>`, ley `full`, 2 m y 10 m,
+P1 y P2 mapeados en memoria, primera ejecución tras abrir los ficheros):
+
+| Sitio | Relieve | Cota del sitio | Horizonte (2 m) | Tiempo | `horizon/*.json` | `profile/*.bin.gz` |
+| --- | --- | --- | --- | --- | --- | --- |
+| `shackleton-floor` | `LOLA polar 40 m + 120 m` (P1 0,9998; P2 0,0002) | −2.788,9 m | 19,7727° … 23,5789° | 2,32 s (incluye abrir P1 y P2) | 58.107 B | 597.893 B |
+| `im-2` | Ídem (P1 0,9532; P2 0,0468) | 5.321,7 m | −1,4687° … 4,0642° | 0,91 s | 55.956 B | 608.400 B |
+| `region-malapert-massif` | Ídem (P1 0,9728; P2 0,0272) | 4.769,5 m | −4,6207° … 6,9658° | 0,91 s | 55.600 B | 623.891 B |
+| `blue-ghost-1` | `SLDEM2015 59 m` (recorte) | −3.652,4 m | 0,1300° … 3,0476° | 1,88 s | 54.531 B | 409.461 B |
+
+Esperado: 1–5 s por máscara (`06` §11) y 0,7–0,9 s según T-08; `shackleton-floor` con `min_el_deg` > 10°
+(borde a unos 21°, tarjeta T-09). Ningún acimut truncado ni vacío, sin muestras sin dato. Dos ejecuciones
+dan los mismos bytes. `profile-csv` en `region-malapert-massif`, acimuts 0°, 120° y 240° (los de A5):
+5,2163° a 40 m, −0,5394° a 4.380 m y −3,3872° a 180 m, iguales a `el_deg` de la máscara.
+
+Tamaños frente a lo previsto: el JSON ocupa ~28 kB por altura (previsto ~35 kB, `09` §5); el perfil
+comprimido ocupa 0,41–0,62 MB (previsto 0,2–0,4 MB, `09` §6). Con 37 sitios con máscara el origen ligero
+pasaría de los 25 MB de `09` §1 (≈ 5,3 MB de efemérides + ≈ 24 MB de máscaras y perfiles): aviso para I3
+en el traspaso.
+
 ### T-24 · Motor del cubo (2026-11-14)
 
 Medido en el portátil de I1 (RTX 4060 Laptop de 8 GB, PyTorch 2.15.0+cu132, 10 hilos de CPU) con
