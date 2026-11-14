@@ -13,6 +13,7 @@
     "deploy": "node ops/tasks.mjs deploy",
     "info": "node ops/tasks.mjs info",
     "ephem": "node ops/tasks.mjs ephem",
+    "sites": "node ops/tasks.mjs sites",
     "cube-bench": "node ops/tasks.mjs cube-bench",
     "cube-plan": "node ops/tasks.mjs cube-plan",
     "cube": "node ops/tasks.mjs cube",
