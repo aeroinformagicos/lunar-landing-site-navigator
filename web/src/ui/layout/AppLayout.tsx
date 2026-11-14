@@ -12,6 +12,7 @@ import { useScenarioModel, type ScenarioModel } from '../common/model';
 import { MetricsPanel } from '../metrics/MetricsPanel';
 import { useMission, type MissionResult } from '../metrics/useMission';
 import { Compare } from '../compare/Compare';
+import { Replan } from '../replan/Replan';
 import { Panorama } from '../panorama/Panorama';
 import { CrossSection } from '../section/CrossSection';
 import { Timeline } from '../timeline/Timeline';
@@ -119,7 +120,13 @@ export function AppLayout() {
               ))}
             </div>
             <section id="main-view" className="view" role="tabpanel" aria-labelledby={`tab-${tab}`} tabIndex={-1}>
-              {comparing ? <Compare onClose={() => setComparing(false)} /> : <ActiveView tab={tab} />}
+              {comparing ? (
+                <Compare onClose={() => setComparing(false)} />
+              ) : tab === 'replan' ? (
+                <Replan />
+              ) : (
+                <ActiveView tab={tab} />
+              )}
             </section>
           </main>
           <aside className="app__right" aria-label={t('panel.label')}>

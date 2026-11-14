@@ -163,7 +163,13 @@ export const useAppStore = create<AppStore>()((set, get) => ({
   initialised: false,
 
   init: (defaults) => set({ ...initialState(defaults), initialised: true }),
-  setMode: (mode) => set({ mode, storyStep: mode === 'learn' ? (get().storyStep ?? 0) : null }),
+  // `Replan` exists only in Plan: leaving Plan on that tab goes back to Panorama.
+  setMode: (mode) =>
+    set((s) => ({
+      mode,
+      storyStep: mode === 'learn' ? (s.storyStep ?? 0) : null,
+      tab: mode !== 'plan' && s.tab === 'replan' ? 'panorama' : s.tab,
+    })),
   setTab: (tab) => set({ tab }),
   setActiveScenario: (id) => {
     if (!get().scenarios.some((s) => s.id === id)) return;

@@ -189,5 +189,17 @@
   "compare.verdict": "Verdict",
   "compare.best": "best",
   "compare.error": "Could not load this site's horizon.",
-  "compare.mini": "Sun, Earth and both bars of scenario {id}"
+  "compare.mini": "Sun, Earth and both bars of scenario {id}",
+  "replan.delay": "Delay step",
+  "replan.include": "Include NASA candidate regions",
+  "replan.mission": "Mission length (days)",
+  "replan.night": "Longest night allowed (h)",
+  "replan.reset": "Reset to defaults",
+  "replan.matrix": "Landing site and date matrix from {date}",
+  "replan.window": "Next valid window",
+  "replan.pick": "Choose a cell to see its detail and set that landing date.",
+  "replan.ranking": "Ranking for landing {date}",
+  "replan.no_candidates": "No candidate regions in this build.",
+  "replan.both_pct": "Sun + Earth %",
+  "replan.add": "Add as scenario"
 }

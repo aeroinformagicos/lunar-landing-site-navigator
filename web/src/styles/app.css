@@ -1063,3 +1063,117 @@ input[aria-invalid='true'] {
   width: 100%;
   height: 36px;
 }
+
+/* ---- Replanning (10 §6.5, F10) ---- */
+.replan__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-bottom: 8px;
+}
+
+.replan__controls .field input {
+  width: 5em;
+}
+
+.replan__label {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  align-self: center;
+}
+
+.replan__matrix {
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.replan__matrix th,
+.replan__matrix td {
+  padding: 1px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.replan__matrix thead th {
+  font-weight: 400;
+  color: var(--c-text-muted);
+  padding: 2px 3px;
+}
+
+.replan__site {
+  text-align: left !important;
+  padding-right: 8px !important;
+  font-weight: 600;
+}
+
+.replan__base {
+  outline: 2px solid var(--c-text);
+  outline-offset: -1px;
+}
+
+.replan__cell {
+  min-width: 22px;
+  min-height: 22px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 3px;
+  font-size: 12px;
+  border: none;
+  color: var(--c-bg);
+}
+
+.replan__cell--go {
+  background: var(--c-go);
+}
+
+.replan__cell--marginal {
+  background: var(--c-marginal);
+}
+
+.replan__cell--no_go {
+  background: var(--c-nogo);
+}
+
+.replan__cell--none {
+  background: var(--c-border);
+  color: var(--c-text-muted);
+}
+
+.replan__window {
+  text-align: left !important;
+  padding-left: 8px !important;
+  font-size: 12px;
+  white-space: normal !important;
+  min-width: 220px;
+}
+
+.replan__detail {
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.replan__ranking h3 {
+  font-size: 15px;
+  margin: 8px 0;
+}
+
+.status-chip--go {
+  color: var(--c-go);
+}
+
+.status-chip--marginal {
+  color: var(--c-marginal);
+}
+
+.status-chip--no_go {
+  color: var(--c-warn-text);
+}
+
+@media (pointer: coarse) {
+  .replan__cell {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
