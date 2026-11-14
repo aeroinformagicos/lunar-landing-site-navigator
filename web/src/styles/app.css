@@ -1,0 +1,207 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* Skeleton layout (10_interfaz.md §3). T-14 refines it with ui/layout. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: var(--c-text);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+button[aria-selected='true'],
+button[aria-pressed='true'] {
+  border-color: var(--c-text);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--c-earth);
+  outline-offset: 2px;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.banner--example {
+  background: var(--c-marginal);
+  color: var(--c-bg);
+  text-align: center;
+  font-weight: 600;
+  padding: 4px 16px;
+}
+
+.app__header {
+  min-height: var(--header-h);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.app__title {
+  font-size: 18px;
+  margin: 0;
+}
+
+.app__title a {
+  text-decoration: none;
+}
+
+.segmented,
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.app__boot {
+  flex: 1;
+}
+
+.app__body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: var(--col-left) minmax(0, 1fr) var(--col-right);
+  gap: var(--gap);
+  padding: var(--gap) 16px;
+}
+
+.app__left h2 {
+  font-size: 14px;
+  margin: 0 0 8px;
+  color: var(--c-text-muted);
+}
+
+.scenario-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.scenario-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 8px;
+}
+
+.scenario-card--active {
+  border-color: var(--c-text);
+}
+
+.scenario-card p {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+
+.scenario-card__select {
+  width: 100%;
+  text-align: left;
+  border: none;
+  padding: 0;
+  background: none;
+}
+
+.scenario-card__letter {
+  font-weight: 700;
+}
+
+.view {
+  margin-top: var(--gap);
+  min-height: 360px;
+  background: var(--c-surface);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.muted {
+  color: var(--c-text-muted);
+}
+
+.warn {
+  color: var(--c-warn);
+}
+
+.data-state {
+  padding: 16px;
+  color: var(--c-text-muted);
+}
+
+.data-state--error {
+  color: var(--c-text);
+}
+
+.skeleton {
+  height: 12px;
+  width: 60%;
+  border-radius: var(--radius);
+  background: var(--c-border);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+.app__footer {
+  border-top: 1px solid var(--c-border);
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--c-text-muted);
+}
+
+.app__footer p {
+  margin: 2px 0;
+}
+
+/* 768–1023 px: right column below the main view; < 768 px: single column (10 §3.2). */
+@media (max-width: 1023px) {
+  .app__body {
+    grid-template-columns: var(--col-left) minmax(0, 1fr);
+  }
+  .app__right {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .app__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

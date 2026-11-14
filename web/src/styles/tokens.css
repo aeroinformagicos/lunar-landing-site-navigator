@@ -1,0 +1,35 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* Colour tokens (10_interfaz.md §2): Okabe–Ito palette, single dark theme. */
+:root {
+  --c-sun: #e69f00;
+  --c-earth: #56b4e9;
+  --c-both: #009e73;
+  --c-none: #8a8f98;
+  --c-go: #009e73;
+  --c-marginal: #f0e442;
+  --c-nogo: #d55e00;
+  --c-eclipse: #cc79a7;
+  --c-warn: #d55e00;
+  --c-bg: #0b0e14;
+  --c-surface: #161b22;
+  --c-text: #e8eaed;
+  --c-terrain: #5c6370;
+  --c-terrain-line: #c9ced6;
+  --c-smooth: #c9ced6;
+
+  /* Derived, not in the colour table: muted text and borders on the dark surface. */
+  --c-text-muted: #a9b0bb;
+  --c-border: #2d333b;
+
+  /* Layout of 10 §3.1. */
+  --header-h: 56px;
+  --col-left: 240px;
+  --col-right: 300px;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --radius: 6px;
+  --gap: 12px;
+
+  color-scheme: dark;
+}
