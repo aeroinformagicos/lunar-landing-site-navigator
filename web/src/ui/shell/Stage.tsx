@@ -9,11 +9,11 @@ import { useAppStore, type Tab } from '../../state/store';
 import { can3d, STAGE3D_MODULES } from '../../state/viewMode';
 import { DataState } from '../common/DataState';
 import { Compare } from '../compare/Compare';
-import { Panorama } from '../panorama/Panorama';
 import { Replan } from '../replan/Replan';
 import { CrossSection } from '../section/CrossSection';
 import { replanViewForStep } from '../story/storySteps';
 import { Timeline } from '../timeline/Timeline';
+import { Stage2D } from './Stage2D';
 import { useActive, type ActiveReady } from './useActive';
 
 const load3d = Object.values(STAGE3D_MODULES)[0] as (() => Promise<{ default: ComponentType }>) | undefined;
@@ -47,16 +47,6 @@ function WithData({ children, loading }: { children: (d: ActiveReady) => ReactNo
     <DataState resource={resource} loadingText={loading ?? t('view.ephemeris_loading')} errorText={dataError} onRetry={retry} className="v2-state">
       {children}
     </DataState>
-  );
-}
-
-/** Provisional 2D view (T-61): the current panorama, centred on the stage, until T-62 draws it full-width. */
-function Stage2D() {
-  const { scenario } = useActive();
-  return (
-    <div className="v2-stage2d" data-view="2d">
-      <WithData loading={t('common.loading')}>{(d) => <Panorama model={d.model} mission={d.mission} scenario={scenario} />}</WithData>
-    </div>
   );
 }
 

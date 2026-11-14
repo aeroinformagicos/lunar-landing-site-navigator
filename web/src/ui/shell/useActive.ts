@@ -48,6 +48,9 @@ export function useActiveData(): ActiveData {
 
 export const ActiveContext = createContext<ActiveData | null>(null);
 
+/** Measured height of the bottom strip (px), so the 2D horizon stays clear of it. */
+export const BottomStripContext = createContext(0);
+
 export function useActive(): ActiveData {
   const a = useContext(ActiveContext);
   if (!a) throw new Error('useActive outside the v2 shell');
