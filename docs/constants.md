@@ -87,6 +87,8 @@ fuente (CLAUDE.md §2).
 | Rangos de fecha de aterrizaje admitidos | 1969-01-01 – 1973-01-01 y 2024-01-01 – 2045-01-01 (UTC) | — | Validez de los tramos de `ephemeris.meta.json` (`09` §3.2, `05` §4.5) | `web/src/state/selectors.ts` (`SUPPORTED_RANGES`) |
 | Duración de la misión | 0,5 – 60, paso 0,5 | días | `10_interfaz.md` §4, `01_alcance.md` F2 | `web/src/state/selectors.ts` |
 | Paso del deslizador del cursor | 600 (flechas); 86.400 (PageUp/PageDown); 3.600 (botones y `[` `]`) | s | `10_interfaz.md` §4, §12 | `web/src/state/selectors.ts`, `ui/controls/TimeControls.tsx` |
+| Panorama: vista, umbral de recentrado, zoom y rejillas | 40° × 20°; 8°; 4° × 2°; 5° y 0,5° | ° | `10_interfaz.md` §6.1 | `web/src/ui/panorama/geometry.ts` |
+| Tira de 360°: rango de elevación | −15 a +15 | ° | D-74 | `web/src/ui/panorama/geometry.ts` (`STRIP_MIN_EL`, `STRIP_MAX_EL`) |
 
 ## Valores medidos
 
