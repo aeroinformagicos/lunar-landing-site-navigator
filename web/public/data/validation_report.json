@@ -1,13 +1,13 @@
 {
   "contract_version": "1.1.0",
-  "generated_utc": "2026-11-14T22:12:15Z",
-  "git_commit": "71b2db8",
+  "generated_utc": "2026-11-14T23:04:25Z",
+  "git_commit": "f27ad3b",
   "summary": {
     "total": 21,
-    "passed": 9,
+    "passed": 11,
     "failed": 0,
     "manual": 1,
-    "skipped": 11,
+    "skipped": 9,
     "horizons_comparisons": 256,
     "horizons_max_abs_err_deg": 2.5398885904692747e-05
   },
@@ -2320,10 +2320,43 @@
         "label": "Hand calculation with R = 1737.4 km",
         "url": ""
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "pass",
+      "obtained": "3 km mountain at 50 km: 2.6038 deg; Smooth sphere: -0.0869 deg, -0.6147 deg, -1.9435 deg",
+      "details": [
+        {
+          "label": "3 km mountain at 50 km, observer at 0 m, azimuth 90 deg",
+          "expected": 2.606,
+          "obtained": 2.6038,
+          "abs_err": 0.002152,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Smooth sphere, observer at 2 m (worst of 720 azimuths)",
+          "expected": -0.0869,
+          "obtained": -0.0869,
+          "abs_err": 3.7e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Smooth sphere, observer at 100 m (worst of 720 azimuths)",
+          "expected": -0.6147,
+          "obtained": -0.6147,
+          "abs_err": 2e-05,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Smooth sphere, observer at 1000 m (worst of 720 azimuths)",
+          "expected": -1.9435,
+          "obtained": -1.9435,
+          "abs_err": 4e-06,
+          "unit": "deg",
+          "ok": true
+        }
+      ],
+      "note": "Synthetic terrain, full law."
     },
     {
       "id": "A5",
@@ -2478,10 +2511,51 @@
         "label": "Logical properties",
         "url": ""
       },
-      "status": "skipped",
-      "obtained": "",
-      "details": [],
-      "note": "Not run in this build."
+      "status": "pass",
+      "obtained": "disc fraction in [0, 1]; a taller mast never raises the horizon; table vs SPICE 2.7e-05 deg",
+      "details": [
+        {
+          "label": "Sun disc fraction at 201 positions across a flat horizon",
+          "expected": "[0, 1]",
+          "obtained": "[0, 1]",
+          "abs_err": 0.0,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "32 strips vs the exact circular segment (07 §13.2)",
+          "expected": "< 0.003",
+          "obtained": 0.001325,
+          "abs_err": 0.001325,
+          "unit": "",
+          "ok": true
+        },
+        {
+          "label": "10 m mast minus 2 m mast, highest over 20 random terrains",
+          "expected": "<= 0",
+          "obtained": -0.00223,
+          "abs_err": 0.0,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Closed form vs literal 3D geometry, samples from 100 m on (D-51)",
+          "expected": "< 1e-09",
+          "obtained": 2.64e-10,
+          "abs_err": 2.64e-10,
+          "unit": "deg",
+          "ok": true
+        },
+        {
+          "label": "Interpolated table vs SPICE spkcpo, 2000 random (site, instant) pairs",
+          "expected": "< 0.001",
+          "obtained": 2.68e-05,
+          "abs_err": 2.68e-05,
+          "unit": "deg",
+          "ok": true
+        }
+      ],
+      "note": "20 random synthetic terrains (fixed seeds)."
     },
     {
       "id": "A11",
