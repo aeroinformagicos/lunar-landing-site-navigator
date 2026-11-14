@@ -4,6 +4,7 @@
 import { useMemo } from 'react';
 import { findSegment } from '../../core/ephemeris';
 import { curves, missionMetrics, type Curves, type Metrics } from '../../core/metrics';
+import { eclipseTimeline, type EclipseTimeline } from '../../core/events';
 import { evaluate, type SkyState } from '../../core/visibility';
 import type { Scenario } from '../../state/store';
 import type { ScenarioModel } from '../common/model';
@@ -14,6 +15,8 @@ export interface MissionResult {
   landing: SkyState | null;
   curves: Curves;
   range: { t0: number; t1: number };
+  /** Eclipses over the displayed interval (07 §9). */
+  eclipse: EclipseTimeline;
 }
 
 export function computeMission(model: ScenarioModel, scenario: Scenario): MissionResult {
@@ -26,6 +29,7 @@ export function computeMission(model: ScenarioModel, scenario: Scenario): Missio
     landing: findSegment(table, scenario.landingUnix) ? evaluate(table, frame, mask, scenario.landingUnix) : null,
     curves: curves(table, frame, mask, range.t0, range.t1),
     range,
+    eclipse: eclipseTimeline(table, frame, range.t0, range.t1),
   };
 }
 

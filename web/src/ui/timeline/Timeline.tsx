@@ -49,7 +49,7 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
   const [hoverT, setHoverT] = useState<number | null>(null);
   const dragging = useRef(false);
 
-  const { curves: c, metrics, range } = mission;
+  const { curves: c, metrics, range, eclipse } = mission;
   const end = missionEnd(scenario);
   const x = useMemo(() => timeScale(range.t0, range.t1, PAD_L, width - PAD_R), [range, width]);
   const dom = useMemo(() => elevationDomain(c), [c]);
@@ -173,7 +173,22 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
               <rect width="6" height="6" fill="var(--c-both)" />
               <path d="M0 0H6M0 0V6" stroke="var(--c-surface)" strokeWidth="1.5" />
             </pattern>
+            <pattern id="pat-eclipse" width="6" height="6" patternUnits="userSpaceOnUse">
+              <rect width="2" height="6" fill="var(--c-eclipse)" />
+            </pattern>
           </defs>
+          {/* Eclipse band (07 §9, F13): partial phases striped, totality denser */}
+          {eclipse.windows.map((ew) => (
+            <g key={`e${ew.startUnix}`} data-testid="eclipse-band">
+              <rect x={x.x(ew.startUnix)} y={PLOT_TOP} width={Math.max(2, x.x(ew.endUnix) - x.x(ew.startUnix))} height={PLOT_H} fill="url(#pat-eclipse)" opacity={0.55} />
+              <text x={x.x(ew.startUnix) + 3} y={PLOT_TOP + 12} className="timeline__label timeline__label--eclipse">
+                {t('timeline.eclipse')}
+              </text>
+            </g>
+          ))}
+          {eclipse.totality.map((tw) => (
+            <rect key={`t${tw.startUnix}`} x={x.x(tw.startUnix)} y={PLOT_TOP} width={Math.max(2, x.x(tw.endUnix) - x.x(tw.startUnix))} height={PLOT_H} fill="var(--c-eclipse)" opacity={0.35} data-testid="totality-band" />
+          ))}
           {/* Mission zone */}
           <rect x={x.x(scenario.landingUnix)} y={PLOT_TOP} width={x.x(end) - x.x(scenario.landingUnix)} height={PLOT_H} className="timeline__mission" />
           {/* 0° line and elevation labels */}
@@ -222,7 +237,7 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
           <line x1={cx} x2={cx} y1={PLOT_TOP} y2={H - 4} className="timeline__cursor" />
         </svg>
         {/* Event markers: buttons over the bars (accessible, keyboard focusable) */}
-        {metrics.events.map((e) => {
+        {metrics.events.filter((e) => e.kind.endsWith('rise') || e.kind.endsWith('set')).map((e) => {
           const row = e.kind.startsWith('sun') ? 0 : 1;
           return (
             <button
@@ -251,7 +266,7 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
 
 /** Visually hidden data table of events and windows for screen readers (10 §12). */
 function EventTable({ mission }: { mission: MissionResult }) {
-  const { metrics } = mission;
+  const { metrics, eclipse } = mission;
   const rows: [string, typeof metrics.windows.sun][] = [
     [t('timeline.sun'), metrics.windows.sun],
     [t('timeline.earth'), metrics.windows.earth],
@@ -260,6 +275,13 @@ function EventTable({ mission }: { mission: MissionResult }) {
   return (
     <div id="timeline-data" className="visually-hidden">
       <h3>{t('timeline.events')}</h3>
+      {eclipse.events.length > 0 && (
+        <ul data-testid="eclipse-events">
+          {eclipse.events.map((e) => (
+            <li key={`${e.kind}-${e.tUnix}`}>{eventLabel(e)}</li>
+          ))}
+        </ul>
+      )}
       {metrics.events.length === 0 ? (
         <p>{t('timeline.no_events')}</p>
       ) : (

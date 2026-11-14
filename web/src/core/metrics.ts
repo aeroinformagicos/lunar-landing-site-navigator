@@ -5,6 +5,7 @@ import { findSegment, type EphemerisTable } from './ephemeris';
 import {
   complementWindows,
   earthMarginFn,
+  eclipseTimeline,
   findCrossings,
   intersectWindows,
   longestHours,
@@ -125,6 +126,7 @@ export function missionMetrics(
   const events: SkyEvent[] = [
     ...sunC.crossings.map((c): SkyEvent => ({ tUnix: c.t, kind: c.rising ? 'sunrise' : 'sunset' })),
     ...earthC.crossings.map((c): SkyEvent => ({ tUnix: c.t, kind: c.rising ? 'earthrise' : 'earthset' })),
+    ...eclipseTimeline(table, frame, tA, tB).events,
   ].sort((x, y) => x.tUnix - y.tUnix);
 
   return {
