@@ -1,5 +1,7 @@
 /* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
-/* Colour tokens (10_interfaz.md §2): Okabe–Ito palette, single dark theme. */
+/* Colour tokens (10_interfaz.md §2): Okabe–Ito palette for the data, single dark theme.
+   Console surfaces of T-54: night-blue graphite in three steps (page, panel, raised), 1 px borders,
+   and one light "moonlight" accent for the single primary action, so no data colour is reused. */
 :root {
   --c-sun: #e69f00;
   --c-earth: #56b4e9;
@@ -10,29 +12,49 @@
   --c-nogo: #d55e00;
   --c-eclipse: #cc79a7;
   --c-warn: #d55e00;
-  --c-bg: #0b0e14;
-  --c-surface: #161b22;
-  --c-text: #e8eaed;
-  --c-terrain: #5c6370;
-  --c-terrain-line: #c9ced6;
+  --c-bg: #0d1320;
+  --c-surface: #141c2a;
+  --c-surface-2: #1a2435;
+  --c-text: #e6ebf2;
+  --c-terrain: #4f5866;
+  --c-terrain-line: #d4d9e1;
   --c-smooth: #c9ced6;
 
-  /* Derived, not in the colour table: muted text and borders on the dark surface. */
-  --c-text-muted: #a9b0bb;
-  --c-border: #2d333b;
+  /* Derived, not in the colour table: muted text (≥ 6.9:1 on --c-surface-2) and borders. */
+  --c-text-muted: #a3afc0;
+  --c-border: #273246;
+  --c-border-strong: #3b4a61;
+  /* Primary action (14_ux_malaga.md §3): filled moonlight, dark text (≥ 13:1). */
+  --c-accent: #dce5f0;
+  --c-accent-hover: #f2f6fb;
+  --c-on-accent: #0d1320;
+  /* Panorama sky and ground (T-54). */
+  --c-sky-top: #04060b;
+  --c-sky-low: #121b2c;
+  --c-ground-top: #5d6676;
+  --c-ground-low: #2a303a;
   /* Focus outline (10_interfaz.md §12): 2 px #F0E442. */
   --c-focus: #f0e442;
   /* Small warning text: --c-warn (#D55E00) gives 4.4:1 on --c-surface, below 4.5:1 (D-71). */
   --c-warn-text: #ee7a3b;
 
-  /* Layout of 10 §3.1. */
+  /* Layout of 10 §3.1, compacted for one 1280 × 720 screen (T-54). */
   --header-h: 56px;
-  --col-left: 240px;
-  --col-right: 300px;
+  --col-left: 232px;
+  --col-right: 320px;
 
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  /* System faces (no web-font download): one sans for everything, one mono for coordinates and
+     times (14 §4); figures use tabular numerals so they do not jump while playing. */
+  --font-sans: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Roboto, sans-serif;
+  --font-mono: 'Cascadia Mono', 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
   --radius: 6px;
+  --radius-lg: 10px;
+  /* 4 / 8 px spacing scale. */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s6: 24px;
   --gap: 12px;
 
   color-scheme: dark;

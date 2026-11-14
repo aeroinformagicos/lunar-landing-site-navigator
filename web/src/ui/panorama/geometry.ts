@@ -205,3 +205,22 @@ export function stripBracket(w: number, centreAz: number, widthDeg = VIEW_WIDTH_
 export function stripAzAt(w: number, x: number): number {
   return wrap360((Math.min(Math.max(x, 0), w) / w) * 360);
 }
+
+/**
+ * Horizon zoom that always shows the terrain and the disc (T-54): centred halfway between the body and
+ * the horizon below it, at least 4° × 2° (×10) and widened when they are further apart, keeping the
+ * 2:1 aspect so both axes share one scale. Returns the view, its zoom factor and a grid step.
+ */
+export function zoomView(
+  body: { azDeg: number; elDeg: number; radiusDeg: number },
+  horizonElDeg: number,
+  w: number,
+): { view: View; factor: number; gridDeg: number } {
+  const sep = Math.abs(body.elDeg - horizonElDeg);
+  // Disc, horizon and a 25 % margin above and below.
+  const heightDeg = Math.max(ZOOM_HEIGHT_DEG, (sep + 2 * body.radiusDeg) * 1.5);
+  const widthDeg = 2 * heightDeg;
+  const view: View = { az: body.azDeg, el: (body.elDeg + horizonElDeg) / 2, widthDeg, heightDeg, w, h: w / 2 };
+  const gridDeg = heightDeg <= 3 ? 0.5 : heightDeg <= 8 ? 1 : 5;
+  return { view, factor: VIEW_WIDTH_DEG / widthDeg, gridDeg };
+}

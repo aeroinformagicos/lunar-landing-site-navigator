@@ -31,20 +31,19 @@ import {
   VIEW_HEIGHT_DEG,
   VIEW_WIDTH_DEG,
   viewCentre,
-  ZOOM_HEIGHT_DEG,
-  ZOOM_WIDTH_DEG,
+  zoomView,
   type View,
 } from './geometry';
 import { bodyTrace, pointerReadout, ridgeLabel, terrainEffectLines } from './texts';
 
 const BODIES: FocusBody[] = ['sun', 'earth'];
 const COLOR = { sun: 'var(--c-sun)', earth: 'var(--c-earth)' } as const;
-const ZOOM_W = 236;
+const ZOOM_W = 200;
 const STRIP_H = 56;
 /** The 40° view keeps the same scale on both axes; its height is capped so the page fits 1280 × 720. */
-const VIEW_MAX_H = 200;
+const VIEW_MAX_H = 240;
 /** Zoom, readouts and `Terrain effect` sit beside the 40° view when there is room. */
-const SIDE_W = 236;
+const SIDE_W = 200;
 
 function useWidth(): [React.RefObject<HTMLDivElement | null>, number] {
   const ref = useRef<HTMLDivElement>(null);
@@ -60,8 +59,11 @@ function useWidth(): [React.RefObject<HTMLDivElement | null>, number] {
   return [ref, w];
 }
 
-/** Sky, terrain, optional smooth line and the two discs (visible part filled, outline always). */
-function Scene({ v, model, sky, showSmooth, idp }: { v: View; model: ScenarioModel; sky: SkyState; showSmooth: boolean; idp: string }) {
+/**
+ * Sky (subtle gradient toward the horizon), filled terrain with a marked crest, optional smooth line and
+ * the two discs: a soft halo behind, visible part filled, outline always and, in the large view, a label.
+ */
+function Scene({ v, model, sky, showSmooth, idp, labels = false }: { v: View; model: ScenarioModel; sky: SkyState; showSmooth: boolean; idp: string; labels?: boolean }) {
   const line = horizonLine(v, model.mask.elDeg);
   const smoothY = smoothHorizon(model.mask.observerHeightM).elDeg;
   return (
@@ -70,23 +72,48 @@ function Scene({ v, model, sky, showSmooth, idp }: { v: View; model: ScenarioMod
         <clipPath id={`${idp}-sky`}>
           <path d={skyPath(line)} />
         </clipPath>
+        <linearGradient id={`${idp}-skyfill`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" className="pano__sky-top" />
+          <stop offset="1" className="pano__sky-low" />
+        </linearGradient>
+        <linearGradient id={`${idp}-ground`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" className="pano__ground-top" />
+          <stop offset="1" className="pano__ground-low" />
+        </linearGradient>
+        {BODIES.map((b) => (
+          <radialGradient key={b} id={`${idp}-halo-${b}`}>
+            <stop offset="0.35" stopColor={COLOR[b]} stopOpacity={0.55} />
+            <stop offset="1" stopColor={COLOR[b]} stopOpacity={0} />
+          </radialGradient>
+        ))}
       </defs>
-      <rect width={v.w} height={v.h} className="pano__sky" />
+      <rect width={v.w} height={v.h} className="pano__sky" style={{ fill: `url(#${idp}-skyfill)` }} />
       {BODIES.map((b) => {
         const d = discOf(v, sky[b]);
+        const glow = Math.max(d.r * 3, 7);
         return (
           <g key={b} data-body={b}>
+            <circle cx={d.cx} cy={d.cy} r={glow} fill={`url(#${idp}-halo-${b})`} clipPath={`url(#${idp}-sky)`} className="pano__halo" aria-hidden="true" />
             {/* During an eclipse the Earth is in front of the Sun and shows its night side (F13). */}
             <circle cx={d.cx} cy={d.cy} r={d.r} fill={b === 'earth' && sky.eclipse.kind !== 'none' ? 'var(--c-bg)' : COLOR[b]} clipPath={`url(#${idp}-sky)`} data-testid={`disc-${b}`} />
           </g>
         );
       })}
-      <path d={terrainPath(v, line)} className="pano__terrain" />
+      <path d={terrainPath(v, line)} className="pano__terrain" style={{ fill: `url(#${idp}-ground)` }} />
       <path d={pathOf(line)} className="pano__horizon" />
       {showSmooth && <path d={pathOf(flatLine(v, smoothY))} className="pano__smooth" data-testid="smooth-line" />}
       {BODIES.map((b) => {
         const d = discOf(v, sky[b]);
-        return <circle key={b} cx={d.cx} cy={d.cy} r={d.r} fill="none" stroke={COLOR[b]} strokeWidth={1} />;
+        return (
+          <g key={b}>
+            <circle cx={d.cx} cy={d.cy} r={d.r} fill="none" stroke={COLOR[b]} strokeWidth={1} />
+            {labels && d.cx > -20 && d.cx < v.w + 20 && d.cy > 0 && d.cy < v.h && (
+              <text x={d.cx + Math.max(d.r, 4) + 6} y={d.cy + 4} className={`pano__body-label pano__body-label--${b}`}>
+                {b === 'sun' ? t('timeline.sun') : t('timeline.earth')}
+              </text>
+            )}
+          </g>
+        );
       })}
     </>
   );
@@ -132,8 +159,12 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
   const ridge = model.smooth ? null : ridgeLabel(blocker.distM);
   const ridgeAt = project(v, blocker.azDeg, blocker.elDeg);
   const k = pxPerDeg(v);
-  const zv: View = { az: body.azDeg, el: body.elDeg, widthDeg: ZOOM_WIDTH_DEG, heightDeg: ZOOM_HEIGHT_DEG, w: ZOOM_W, h: ZOOM_W / 2 };
-  const zgrid = gridLines(zv, 0.5);
+  // The zoom always frames the disc and the horizon below it (T-54).
+  const zoom = zoomView(body, horizonAt(model.mask.elDeg, body.azDeg), ZOOM_W);
+  const zv = zoom.view;
+  const zgrid = gridLines(zv, zoom.gridDeg);
+  const zoomCaption =
+    zoom.factor === 10 ? t('pano.zoom_caption') : t('pano.zoom_caption_scaled', { x: zoom.factor >= 2 ? Math.round(zoom.factor) : zoom.factor.toFixed(1), g: zoom.gridDeg });
   const sw = width;
   const bodyName = focus === 'sun' ? 'Sun' : 'Earth';
 
@@ -196,7 +227,7 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
         onPointerLeave={() => setHover(null)}
         onKeyDown={onKeyDown}
       >
-        <Scene v={v} model={model} sky={sky} showSmooth={showSmooth} idp={`${idp}-v`} />
+        <Scene v={v} model={model} sky={sky} showSmooth={showSmooth} idp={`${idp}-v`} labels />
         {grid.az.map((g) => (
           <g key={`a${g.label}`}>
             <line x1={g.x} x2={g.x} y1={0} y2={v.h} className="pano__grid" />
@@ -256,7 +287,7 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
               <line key={`ze${g.label}`} x1={0} x2={zv.w} y1={g.y} y2={g.y} className="pano__grid" />
             ))}
           </svg>
-          <figcaption className="pano__label-text">{t('pano.zoom_caption')}</figcaption>
+          <figcaption className="pano__label-text">{zoomCaption}</figcaption>
         </figure>
         <div className="pano__zoom-readout">
           {focus === 'sun' && <p data-testid="disc-visible">{t('pano.disc_visible', { pct: formatPct(sky.sun.discFraction * 100) })}</p>}
@@ -289,7 +320,7 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
         onPointerMove={onStrip}
         onKeyDown={onKeyDown}
       >
-        <rect width={sw} height={STRIP_H} className="pano__sky" />
+        <rect width={sw} height={STRIP_H} className="pano__sky pano__sky--strip" />
         <path d={`${pathOf(stripHorizon(sw, STRIP_H, model.mask.elDeg))}L${sw} ${STRIP_H}L0 ${STRIP_H}Z`} className="pano__terrain" />
         {stripBracket(sw, centre.az).map((b, i) => (
           <rect key={i} x={b.x} y={1} width={b.w} height={STRIP_H - 2} className="pano__bracket" />
