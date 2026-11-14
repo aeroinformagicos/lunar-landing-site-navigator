@@ -1,0 +1,121 @@
+// AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
+// Right panel (10_interfaz.md §6.6, F6, F7): three big figures with icon, unit and help, the basic
+// requirement chip, the `Now` block with the two countdowns and the provenance line.
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { t, type TextKey } from '../../i18n/t';
+import { useAppStore } from '../../state/store';
+import { formatDeg, formatHours, formatMargin, formatPct } from '../common/format';
+import type { ScenarioModel } from '../common/model';
+import { countdownText, cursorState, requirementChecks } from './derive';
+import type { MissionResult } from './useMission';
+
+/** Live text for screen readers: at most every 10 s and never during playback (10 §12). */
+function useThrottledLive(text: string, paused: boolean): string {
+  const [live, setLive] = useState(text);
+  const last = useRef(0);
+  useEffect(() => {
+    if (paused) return;
+    const now = Date.now();
+    const wait = Math.max(0, 10_000 - (now - last.current));
+    const id = setTimeout(() => {
+      last.current = Date.now();
+      setLive(text);
+    }, wait);
+    return () => clearTimeout(id);
+  }, [text, paused]);
+  return live;
+}
+
+function Figure({ id, icon, value }: { id: 'sunlight' | 'earth_link' | 'longest_night'; icon: string; value: string }) {
+  const [help, setHelp] = useState(false);
+  const name = t(`metrics.${id}` as TextKey);
+  return (
+    <div className={`figure figure--${id}`}>
+      <div className="figure__head">
+        <span className="figure__icon" aria-hidden="true">
+          {icon}
+        </span>
+        <span className="figure__name">{name}</span>
+        <button
+          type="button"
+          className="figure__help"
+          aria-expanded={help}
+          aria-controls={`help-${id}`}
+          aria-label={t('metrics.help_button', { name })}
+          onClick={() => setHelp(!help)}
+        >
+          ⓘ
+        </button>
+      </div>
+      <p className="figure__value">{value}</p>
+      {help && (
+        <p id={`help-${id}`} className="figure__helptext">
+          {t(`metrics.help.${id}` as TextKey)}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export function MetricsPanel({ model, mission }: { model: ScenarioModel; mission: MissionResult }) {
+  const cursor = useAppStore((s) => s.cursorUnix);
+  const playing = useAppStore((s) => s.playing);
+  const requirements = useAppStore((s) => s.requirements);
+  const { metrics, landing } = mission;
+  const now = useMemo(() => cursorState(model.table, model.frame, model.mask, cursor), [model, cursor]);
+  const checks = requirementChecks(landing, metrics, requirements);
+
+  const sunCountdown = now?.nextSun ? countdownText(now.nextSun, cursor) : '';
+  const earthCountdown = now?.nextEarth ? countdownText(now.nextEarth, cursor) : '';
+  const live = useThrottledLive(`${sunCountdown}. ${earthCountdown}.`, playing);
+  const checkLabel = (key: string) =>
+    key === 'sun' ? t('req.sun') : key === 'earth' ? t('req.earth_short') : t('req.night', { h: requirements.maxNightHours });
+
+  return (
+    <>
+      <div className="figures">
+        <Figure id="sunlight" icon="☀" value={`${formatHours(metrics.sunHours)} · ${formatPct(metrics.sunPct)}`} />
+        <Figure id="earth_link" icon="◐" value={`${formatHours(metrics.earthHours)} · ${formatPct(metrics.earthPct)}`} />
+        <Figure id="longest_night" icon="☾" value={formatHours(metrics.longestNightH)} />
+      </div>
+      {metrics.truncated && <p className="field__warn">{t('warn.truncated')}</p>}
+
+      <ul className="checks" aria-label={t('metrics.status')}>
+        {checks.map((c) => (
+          <li key={c.key} className={c.ok ? 'check check--ok' : 'check check--fail'}>
+            {checkLabel(c.key)} <span aria-label={c.ok ? 'met' : 'not met'}>{c.ok ? '✓' : '✕'}</span>
+          </li>
+        ))}
+      </ul>
+
+      <section className="now" aria-labelledby="now-title">
+        <h3 id="now-title">{t('metrics.now')}</h3>
+        {now ? (
+          <>
+            <p>{t('metrics.sun_elevation', { el: formatDeg(now.sky.sun.elDeg) })}</p>
+            <p>{t('metrics.disc_visible', { pct: formatPct(now.sky.sun.discFraction * 100) })}</p>
+            <p>
+              {t('metrics.earth_elevation', {
+                el: formatDeg(now.sky.earth.elDeg),
+                margin: formatMargin(now.sky.earth.marginDeg),
+              })}
+            </p>
+            <p className="countdown" data-testid="sun-countdown">
+              {sunCountdown}
+            </p>
+            <p className="countdown" data-testid="earth-countdown">
+              {earthCountdown}
+            </p>
+          </>
+        ) : (
+          <p>{t('metrics.outside')}</p>
+        )}
+        <p className="visually-hidden" aria-live="polite">
+          {live}
+        </p>
+      </section>
+
+      <p className="provenance">{t('metrics.provenance', { terrain: model.reliefLabel })}</p>
+    </>
+  );
+}

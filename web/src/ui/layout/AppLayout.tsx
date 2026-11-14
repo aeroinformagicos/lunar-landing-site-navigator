@@ -3,9 +3,15 @@
 // Keyboard shortcuts of §12 and the mobile rule for Plan (§3.2).
 import { useEffect, useState } from 'react';
 import { t, type TextKey } from '../../i18n/t';
-import { shortcutFor } from '../../state/selectors';
+import { activeScenario, shortcutFor } from '../../state/selectors';
 import { useAppStore, type Tab } from '../../state/store';
+import { DataError } from '../../core/loaders';
 import { useBoot } from '../common/data';
+import { DataState } from '../common/DataState';
+import { useScenarioModel, type ScenarioModel } from '../common/model';
+import { MetricsPanel } from '../metrics/MetricsPanel';
+import { useMission, type MissionResult } from '../metrics/useMission';
+import { Timeline } from '../timeline/Timeline';
 import { Dialog } from '../common/Dialog';
 import { togglePlay } from '../controls/TimeControls';
 import { ScenarioColumn } from '../scenario/ScenarioColumn';
@@ -107,11 +113,13 @@ export function AppLayout() {
                 </button>
               ))}
             </div>
-            <section id="main-view" className="view" role="tabpanel" aria-labelledby={`tab-${tab}`} tabIndex={0}>
-              <p className="data-state data-state--empty">{t('view.pending')}</p>
+            <section id="main-view" className="view" role="tabpanel" aria-labelledby={`tab-${tab}`} tabIndex={-1}>
+              <ActiveView tab={tab} />
             </section>
           </main>
-          <aside className="app__right" aria-label={t('panel.label')} />
+          <aside className="app__right" aria-label={t('panel.label')}>
+            <ActiveView tab="panel" />
+          </aside>
         </div>
       )}
       {help && (
@@ -125,5 +133,35 @@ export function AppLayout() {
         </Dialog>
       )}
     </>
+  );
+}
+
+function dataError(e: Error): string {
+  if (e instanceof RangeError) return t('error.range');
+  if (e instanceof DataError && (e.kind === 'contract' || e.kind === 'format')) return t('error.contract');
+  return t('error.ephemeris');
+}
+
+/** Views of the active scenario: one model and one memoised mission per render of the layout. */
+function ActiveView({ tab }: { tab: Tab | 'panel' }) {
+  const scenario = useAppStore(activeScenario);
+  const [model, retry] = useScenarioModel(scenario);
+  const ready = model.status === 'ready' ? model.data : null;
+  const mission = useMission(ready, scenario);
+  if (tab !== 'timeline' && tab !== 'panel') return <p className="data-state data-state--empty">{t('view.pending')}</p>;
+  const resource =
+    mission instanceof Error
+      ? ({ status: 'error', error: mission } as const)
+      : model.status === 'ready' && mission
+        ? ({ status: 'ready', data: { model: model.data, mission } } as const)
+        : model.status === 'error'
+          ? model
+          : ({ status: 'loading' } as const);
+  return (
+    <DataState resource={resource} loadingText={t('view.ephemeris_loading')} errorText={dataError} onRetry={retry}>
+      {(d: { model: ScenarioModel; mission: MissionResult }) =>
+        tab === 'panel' ? <MetricsPanel model={d.model} mission={d.mission} /> : <Timeline model={d.model} mission={d.mission} scenario={scenario} />
+      }
+    </DataState>
   );
 }
