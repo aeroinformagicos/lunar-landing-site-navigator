@@ -7,6 +7,7 @@ import { inGrid } from '../core/grid';
 import type { ObserverHeight, SitesFile } from '../core/types';
 import { routeOf } from '../ui/validation/report';
 import { normaliseMissionDays, SUPPORTED_RANGES } from './selectors';
+import { can3d, VIEW_MODES, type ViewMode } from './viewMode';
 import {
   initialState,
   missionEnd,
@@ -53,6 +54,8 @@ export interface LinkState {
   rq: { n: number; su: 0 | 1; ea: 0 | 1 };
   ml: MapLayer;
   mp: string;
+  /** 3D or 2D stage (15_interfaz_v2.md §4.1); absent in links made before the v2. */
+  vm?: ViewMode;
 }
 
 // ---- Encoding ------------------------------------------------------------------------------
@@ -92,6 +95,7 @@ export function toLinkState(s: AppState): LinkState {
     rq: { n: s.requirements.maxNightHours, su: s.requirements.needSunAtLanding ? 1 : 0, ea: s.requirements.needEarthAtLanding ? 1 : 0 },
     ml: s.mapLayer,
     mp: s.mapPeriod,
+    vm: s.viewMode,
   };
 }
 
@@ -270,6 +274,12 @@ export function restoreFromHash(hash: string, sitesFile: SitesFile): Restored | 
   }
   if (has('mp')) {
     if (typeof raw.mp === 'string' && /^(mean186|\d{4}-(0[1-9]|1[0-2]))$/.test(raw.mp)) state.mapPeriod = raw.mp;
+    else bad();
+  }
+
+  // View mode: a link asking for 3D on a device that cannot show it opens in 2D without a notice.
+  if (has('vm')) {
+    if (oneOf(VIEW_MODES, raw.vm)) state.viewMode = raw.vm === '3d' && !can3d() ? '2d' : raw.vm;
     else bad();
   }
 

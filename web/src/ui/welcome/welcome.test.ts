@@ -1,7 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // T-53: when the welcome card shows (14_ux_malaga.md §1, §9).
 import { describe, expect, it } from 'vitest';
-import { rememberWelcomeClosed, shouldWelcome, urlHasState, WELCOME_KEY, type KeyStore } from './welcome';
+import { rememberWelcomeClosed, shouldWelcome, urlHasState, welcomePending, WELCOME_KEY, type KeyStore } from './welcome';
 
 function memory(): KeyStore & { data: Map<string, string> } {
   const data = new Map<string, string>();
@@ -35,6 +35,7 @@ describe('welcome card', () => {
     rememberWelcomeClosed(m);
     expect(m.data.get(WELCOME_KEY)).toBe('1');
     expect(shouldWelcome('', '', m)).toBe(false);
+    expect(welcomePending()).toBe(false); // nor when the layout mounts again in this page load
   });
 
   it('storage that throws or is missing: the card shows and closing does not crash', () => {

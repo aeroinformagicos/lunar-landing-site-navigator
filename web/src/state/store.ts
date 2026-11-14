@@ -11,6 +11,9 @@ import {
 import type { Requirements } from '../core/requirements';
 import { DAY_S, isoToUnix } from '../core/time';
 import type { ObserverHeight, SiteDefaults } from '../core/types';
+import { can3d, defaultViewMode, type ViewMode } from './viewMode';
+
+export type { ViewMode };
 
 export type Mode = 'explore' | 'plan' | 'learn';
 export type Tab = 'panorama' | 'timeline' | 'map' | 'section' | 'replan';
@@ -60,6 +63,10 @@ export interface AppState {
   linkDates: boolean;
   /** The comparison table (F8) replaces the main view until `Close comparison`. */
   comparing: boolean;
+  /** 3D or 2D central stage of the v2 interface (15_interfaz_v2.md §4.1); shared as `vm` (F16). */
+  viewMode: ViewMode;
+  /** Set when the 3D view failed after mounting and the stage fell back to 2D (16 §10.3). */
+  viewNotice: 'webgl_failed' | null;
 }
 
 export interface AppActions {
@@ -91,6 +98,11 @@ export interface AppActions {
   setLanding(unix: number): void;
   /** Mission length (days) of the active scenario, or of all with `linkDates`. */
   setMissionDays(days: number): void;
+  /** 3D only if this device and build can show it (15 §4.1). */
+  setViewMode(mode: ViewMode): void;
+  /** Called by the 3D view when WebGL fails after mounting: 2D with a plain notice (16 §10.3). */
+  fallbackTo2d(reason: string): void;
+  dismissViewNotice(): void;
 }
 
 export type AppStore = AppState & AppActions & { initialised: boolean };
@@ -130,6 +142,8 @@ export function initialState(defaults: SiteDefaults): AppState {
     storyStep: null,
     linkDates: true,
     comparing: false,
+    viewMode: defaultViewMode(),
+    viewNotice: null,
   };
 }
 
@@ -223,6 +237,12 @@ export const useAppStore = create<AppStore>()((set, get) => ({
       const next = { ...s, scenarios };
       return { scenarios, cursorUnix: clampCursor(next, s.cursorUnix) };
     }),
+  setViewMode: (viewMode) => {
+    if (viewMode === '3d' && !can3d()) return;
+    set({ viewMode });
+  },
+  fallbackTo2d: () => set({ viewMode: '2d', viewNotice: 'webgl_failed' }),
+  dismissViewNotice: () => set({ viewNotice: null }),
   removeScenario: (id) =>
     set((s) => {
       if (s.scenarios.length <= 1) return {};

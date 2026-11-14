@@ -13,7 +13,7 @@
    instead of 12; ``marginal`` counts as valid; A and B up to 2000 m apart.
 
 Output: ``<out>/demo_candidates.json`` (not part of the contract: A1 reads it and picks one pair,
-A2 copies it into the catalog as ``demo-a`` and ``demo-b``). Decision D-107 fixes what 04 §5.1
+A2 copies it into the catalog as ``demo-a`` and ``demo-b``). Decision D-108 fixes what 04 §5.1
 leaves open.
 """
 
@@ -60,7 +60,7 @@ RELAXATIONS = (
     "delay 10-16 d; marginal counts as valid",
     "delay 10-16 d; marginal counts as valid; A-B up to 2000 m",
 )
-# Precision written to the file (D-107): coordinates like horizon/<site>.json (06 §5).
+# Precision written to the file (D-108): coordinates like horizon/<site>.json (06 §5).
 LATLON_DECIMALS = 5
 
 FORMAT = "llsn-demo-candidates-1"

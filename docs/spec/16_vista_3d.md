@@ -152,7 +152,7 @@ Un segundo `Scene` de cielo, dibujado antes del terreno con una cámara que solo
 
 ### 6.1 Luz del Sol
 
-Luz direccional con la dirección `d_scene` del Sol (§5.1), intensidad 3,0 (visual) multiplicada por la fracción no eclipsada. Dentro de la escena polar, el ángulo del Sol en cada punto cambia con la vertical local (hasta 9° de diferencia entre el centro y la esquina de la malla): no hace falta hacer nada, sale de usar la dirección global y las normales reales.
+Luz direccional con la dirección `d_scene` del Sol (§5.1), intensidad 8,0 (visual; D-107 c) multiplicada por la fracción no eclipsada. Dentro de la escena polar, el ángulo del Sol en cada punto cambia con la vertical local (hasta 9° de diferencia entre el centro y la esquina de la malla): no hace falta hacer nada, sale de usar la dirección global y las normales reales.
 
 ### 6.2 Material de regolito (D-97 h)
 
@@ -325,7 +325,7 @@ Lee, con los selectores existentes y `useScenarioModel`: escenarios, escenario a
 
 ### 10.3 Paso a 2D por fallo (D-97 n, propuesta a I2)
 
-El armazón decide `viewMode` al arrancar (anexo A: `'2d'` sin WebGL o con ventana < 768 px). **Requisito concreto: WebGL 2** (three.js ya no admite WebGL 1); I2 debe comprobar `canvas.getContext('webgl2')`. Si la 3D falla después de montarse (contexto perdido y no recuperado en 3 s, error de compilación de sombreadores, fallo del trabajador o de three.js), Stage3D llama a una acción del almacén `fallbackTo2d(reason)` que pone `viewMode = '2d'` y guarda `viewNotice = 'webgl_failed'`; el armazón muestra el aviso `The 3D view is not available on this device. Showing the 2D view.` con `Dismiss`. La acción y el campo los crea I2 en T-61; si T-71 llega antes, T-71 los añade con el cambio mínimo en `state/store.ts` y lo explica en la petición. Un error de **datos** no pasa a 2D: baja de escena (§2.1).
+El armazón decide `viewMode` al arrancar (anexo A: `'2d'` sin WebGL o con ventana < 768 px). **Requisito concreto: WebGL 2** (three.js ya no admite WebGL 1); I2 debe comprobar `canvas.getContext('webgl2')`. Si la 3D falla después de montarse (contexto perdido y no recuperado en 3 s, error de compilación de sombreadores, fallo del trabajador o de three.js), Stage3D **lanza el error durante el render**; el límite de errores del armazón (`Fallback3d` en `ui/shell/Stage.tsx`, D-102) llama a `fallbackTo2d` del almacén, que pone `viewMode = '2d'` y `viewNotice = 'webgl_failed'`, y el armazón muestra `The 3D view is not available on this device. Showing the 2D view.` con `Dismiss` (D-106, D-107 a). Un error de **datos** no pasa a 2D: baja de escena (§2.1).
 
 ### 10.4 Textos
 
@@ -362,7 +362,7 @@ Todos en `web/src/i18n/en.json`, en un bloque contiguo de claves `stage3d.*` col
 
 ### 10.5 Antes de que exista el armazón v2
 
-Si T-71 empieza antes de que T-61 esté en `main`: Stage3D se ve con `?ui=v2&vm=3d` en la interfaz actual, sustituyendo al panorama dentro del recuadro de la vista principal (cambio mínimo en `ui/layout/AppLayout.tsx`, explicado en la petición), sin tocar nada más. Sin esos parámetros, la interfaz actual no cambia (prueba E5).
+Ya no aplica: T-61 está en `main` y la 3D se abre con `?ui=v2` (y `vm=3d` o `vm=2d` para forzar el modo). Mientras T-61 no estaba, T-71 la montaba en la v1 con `?ui=v2&vm=3d` (D-107 a).
 
 ## 11. Ficheros del carril
 
@@ -445,7 +445,7 @@ Calidad adaptativa: mientras se pinta de forma continua (cámara moviéndose o r
 | Id | Prueba | Esperado |
 | --- | --- | --- |
 | U1 | Marco polar: `mapToScene(0, 0, 0)`; `mapToScene(+x)`; `mapToScene(+y)`; ida y vuelta `sceneToMap(mapToScene(x, y, h))` en 1.000 puntos al azar de la malla | Origen; +X; −Z; error < 1 mm en x, y y h |
-| U2 | Malla de un relieve sintético: DEM de cota 0 | Todos los vértices a distancia R del centro de la Luna (± 1 mm); 752 × 672 vértices y 2·751·671 triángulos en `alto`; 376 × 336 en 1 km |
+| U2 | Malla de un relieve sintético: DEM de cota 0 | Todos los vértices a distancia R del centro de la Luna (± 5 mm: posiciones `float32` relativas a la tesela, D-107 e); 752 × 672 vértices y 2·751·671 triángulos en `alto`; 376 × 336 en 1 km |
 | U3 | Relieve sintético en rampa (`h = 0,01·x`) y un hueco de 3 × 3 celdas | Cota de cada vértice = la del DEM; normales inclinadas `atan(0,01)` respecto a la vertical local (± 0,01°); hueco rellenado con valores entre sus vecinos y marcado |
 | U4 | Dirección del Sol y de la Tierra en la escena: para 200 pares (az, el) al azar y para el escenario A de ejemplo en 3 instantes (con `skyAt` de la tabla de ejemplo), `dirToScene` y vuelta al marco local del sitio | Mismos acimut y elevación que `skyAt` a 10⁻⁹° (la 3D y la 2D dan los mismos números) |
 | U5 | Cámara nunca bajo el terreno: montaña gaussiana sintética de 3 km; 1.000 posiciones y pasos de vuelo al azar (incluidos pasos de 50 km hacia la montaña) y órbitas con el segmento cortando la montaña | Tras `clampCamera`, altura ≥ `groundAt` + margen del modo en todos los casos |

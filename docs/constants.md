@@ -96,6 +96,11 @@ fuente (CLAUDE.md §2).
 | B1: tolerancia del % de disco en pantalla (más el medio paso del redondeo entero) | 10⁻⁴ (10⁻⁶ en fracción) | % | `07_visibilidad.md` §12.4 (fracciones 10⁻⁶); B1 solo da `B1_deg` y `B1_min` | `web/e2e/b1.spec.ts` |
 | B1: tolerancia de un % de tiempo en pantalla (más el medio paso del redondeo entero) | `B1_min` / (D·24 h) × 100 | % | `tests/golden/tolerances.json` (`B1_min`) llevado al porcentaje de la misión (`07` §7: horas ÷ duración × 100) | `web/e2e/b1.spec.ts` |
 
+| Vista 3D: función de fase lunar-Lambert de McEwen `L(α) = 1 + A1·α + A2·α² + A3·α³` (α en grados), recortada a [0, 1] | A1 = −0,019; A2 = 0,000242; A3 = −0,00000146 | 1/°, 1/°², 1/°³ | USGS ISIS, modelo fotométrico `LunarLambertMcEwen` (`LunarLambertMcEwen.cpp`, ISIS 8.1/9.0), a partir de McEwen (1991), *Icarus* 92, 298–311 (`16_vista_3d.md` §6.2) | `web/src/ui/stage3d/scene/shaders.ts` (`TERRAIN_FRAG`) |
+| Vista 3D: muestras de la sombra proyectada (primera distancia, razón, alcance, altura del ojo) | 250; 1,04; 300.000; 2 | m; —; m; m | `16_vista_3d.md` §6.3 (medio píxel de 500 m; la razón del código de distancia del cubo, `09` §10.2; el alcance del perfil, `06` §8; observador de CLAUDE.md §2) | `web/src/ui/stage3d/shadow.ts` |
+| Vista 3D: órbita (distancia mínima y máxima, inclinación, holgura, encuadre inicial) | 300 m – 800 km; 3°–89°; 50 m; 18 km a 14° | m; °; m | `16_vista_3d.md` §7.1, §7.6 | `web/src/ui/stage3d/camera.ts` (`ORBIT`) |
+| Vista 3D: niveles de calidad (malla, sombra, frecuencia, píxeles) y umbral adaptativo | `16` §12.2; 45 fps durante 2 s, una bajada cada 10 s | — | `16_vista_3d.md` §12.2 | `web/src/ui/stage3d/quality.ts` |
+| Vista 3D: parámetros visuales (intensidades, albedo, colores del Sol y la Tierra, estrellas) | `LOOK` | — | Solo visuales, sin significado físico ni efecto en ninguna cifra (D-97 h) | `web/src/ui/stage3d/look.ts` |
 ## Valores medidos
 
 Medidos al ejecutar cada tarjeta en el portátil de I1 (Windows 11, SSD) con los ficheros de `$LLSN_DATA_DIR`.
@@ -450,10 +455,10 @@ Constantes nuevas (`pipeline/vis/demo.py` y `pipeline/tests/test_pick_demo.py`):
 | `MIN_BOTH_A_PCT`, `MAX_BOTH_B_PCT` | 60 %; 10 % | `04` §5.1, paso 2 |
 | `MAX_PAIR_DIST_M`, `RELAXED_PAIR_DIST_M` | 1.000 m (2 celdas); 2.000 m | `04` §5.1, paso 2 y relajaciones |
 | `N_PAIRS` | 5 | `04` §5.1, paso 3 |
-| `SEARCH_STEP_S`, `DELAY_DAYS`, `RELAXED_DELAY_DAYS` | 6 h; 12 d; 10–16 d (cada 6 h, la más cercana a 12 d primero) | `04` §5.1, paso 4 y relajaciones; D-107 |
+| `SEARCH_STEP_S`, `DELAY_DAYS`, `RELAXED_DELAY_DAYS` | 6 h; 12 d; 10–16 d (cada 6 h, la más cercana a 12 d primero) | `04` §5.1, paso 4 y relajaciones; D-108 |
 | `MISSION_DAYS`, `OBSERVER_HEIGHTS_M`, `LAW` | 14 d; 2 y 10 m; `full` | `04` §5.1, pasos 3 y 4 |
 | `PAIR_RELIEF` | `lola_polar` | El relieve de las regiones candidatas del catálogo (`04` §3) |
-| `LATLON_DECIMALS` (coordenadas de A y B) | 5 | Como `horizon/<site>.json` (`06` §5); D-107 |
+| `LATLON_DECIMALS` (coordenadas de A y B) | 5 | Como `horizon/<site>.json` (`06` §5); D-108 |
 
 Cifras medidas con los datos reales (cubo completo, capas `computed`, 2026-11-14):
 

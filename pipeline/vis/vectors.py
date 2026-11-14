@@ -365,7 +365,7 @@ def block_assess(ctx: Context, rng: random.Random) -> list[dict]:
 
     # `night_near_limit` (a night between 75 % and 100 % of the limit) is also rare at random; one case
     # searched with the default requirements, after a cheap check that Sun and Earth are up at landing
-    # (decision D-107 j, T-31).
+    # (decision D-108 j, T-31).
     def draw_near_limit(r: random.Random) -> dict | None:
         site_id = r.choice(polar)
         m, f = ctx.site_mask_frame(site_id, 2)
