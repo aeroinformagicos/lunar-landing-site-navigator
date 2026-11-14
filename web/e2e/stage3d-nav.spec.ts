@@ -72,7 +72,7 @@ test('E7 · a click on a computed cell chooses that mesh point; elsewhere it say
   await stage(page).focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button', { name: /^Scenario A: Nearest mesh point: [\d.]+° S, [\d.]+° [EW] \(500 m grid\)$/ })).toBeVisible({ timeout: 20_000 });
-  // The pole is not computed in the served cube.
+  // The pole is not computed in the example cube.
   await hook(page, 'focusMap', 0, 0);
   await page.waitForTimeout(500);
   await stage(page).focus();

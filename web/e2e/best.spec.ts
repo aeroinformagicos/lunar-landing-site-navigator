@@ -2,7 +2,7 @@
 // T-35 end to end (F32, 10_interfaz.md §6.4): «Most Sun + Earth in a period» lists 10 points and can
 // add one as a scenario; «Longest continuous Sun + Earth from a date» runs in the worker, can be
 // cancelled, and the interface keeps responding meanwhile.
-import { expect, test, type Page } from './example';
+import { expect, v1Test as test, type Page } from './example';
 
 async function openBest(page: Page) {
   await page.goto('/');
@@ -16,7 +16,7 @@ test('period mode: 10 points, a row centres the map, Add as scenario', async ({ 
   await page.getByRole('button', { name: 'Find', exact: true }).click();
   const rows = page.getByTestId('period-hits').locator('li');
   await expect(rows).toHaveCount(10);
-  await expect(rows.first()).toContainText(/^1 · \d+\.\d\d° S, \d+\.\d\d° E · Both \d+ % · Sun \d+ % · Earth \d+ %/);
+  await expect(rows.first()).toContainText(/^1 · \d+\.\d\d° S, \d+\.\d\d° [EW] · Both \d+ % · Sun \d+ % · Earth \d+ %/);
   await expect(page.locator('.map__canvas')).toHaveAttribute('data-zoom', '4');
   await rows.first().getByRole('button', { name: 'Add as scenario' }).click();
   await expect(page.getByRole('article', { name: 'Scenario C' })).toContainText('Mesh point');

@@ -2,7 +2,7 @@
 // T-14 end to end (F1, F2, 10_interfaz.md §4, §5, §12) on the example data: start with the demo pair,
 // keyboard navigation through header and cards, site picker, 4-scenario limit, date validation,
 // custom coordinates in Plan, playback.
-import { expect, test } from '@playwright/test';
+import { expect, test } from './v1';
 import { DAY, HOUR, sitesInfo, utc } from './data';
 
 test.beforeEach(async ({ page }) => {

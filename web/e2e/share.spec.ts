@@ -4,7 +4,8 @@
 // the app (what is not valid is ignored and a message says so); a plain URL stays clean.
 // Site names and defaults come from the published `sites.json`, so the test runs on the example data
 // and on the real batch alike.
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Page } from './v1';
+import { withV1 } from './v1';
 
 const PARTIAL = 'Some settings in this link could not be restored.';
 const DAY = 86_400;
@@ -43,8 +44,8 @@ async function ready(page: Page) {
 test('Share copies a link that a new context opens in the same state', async ({ browser, request }) => {
   const demo = await demoOf(request);
   const ctx = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
-  const page = await ctx.newPage();
-  await page.goto('/');
+  const page = await ctx.newPage(); // its own context: not wrapped by the v1 `test`, so the URL says it
+  await page.goto(withV1('/'));
   await ready(page);
   expect(new URL(page.url()).hash).toBe(''); // the initial state keeps a clean URL
 

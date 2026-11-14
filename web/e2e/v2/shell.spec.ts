@@ -88,13 +88,13 @@ test('the view mode travels in the shared link (vm)', async ({ page }) => {
   expect(['3d', '2d']).toContain(json.vm);
 });
 
-test('?ui=v1 is still the current interface, and it is the default until T-63', async ({ page }) => {
+test('the v2 is the default since T-63; ?ui=v1 keeps the previous interface', async ({ page }) => {
   await page.goto('/?ui=v1');
   await expect(page.getByRole('link', { name: 'Lunar Landing Site Navigator' })).toBeVisible();
   await expect(page.locator('.v2')).toHaveCount(0);
   await expect(page.getByRole('tab', { name: 'Panorama' })).toBeVisible();
   await page.goto('/');
-  await expect(page.locator('.v2')).toHaveCount(0);
+  await expect(page.locator('.v2')).toBeVisible({ timeout: 20_000 });
 });
 
 for (const [w, h] of [

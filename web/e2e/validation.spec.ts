@@ -3,7 +3,7 @@
 // cards (JPL Horizons, the Blue Ghost 1 eclipse and the NASA maps; decision D-95) with prediction,
 // fact, tolerance, linked source and state; the retired A3 stays in the full table; the full table
 // unfolds and each row expands; a mismatch is shown; without a report, the message.
-import { exampleReport, expect, test, type Page } from './example';
+import { exampleReport, expect, v1Test as test, type Page } from './example';
 
 async function openValidation(page: Page) {
   await page.goto('/');
