@@ -29,6 +29,7 @@ in which it is first used. Content owner: A2.
 | Park, R. S., Folkner, W. M., Williams, J. G., Boggs, D. H. (2021), "The JPL Planetary and Lunar Ephemerides DE440 and DE441", *The Astronomical Journal* 161:105, doi:10.3847/1538-3881/abd414 | Ephemerides and lunar orientation behind `de440.bsp` and `moon_pa_de440_200625.bpc`; reference [1] of `moon_de440_250416.tf`, whose own check value is the first SPICE test | https://doi.org/10.3847/1538-3881/abd414 | Cited, not redistributed |
 | Josefsson, S. (2006), RFC 4648 "The Base16, Base32, and Base64 Data Encodings", §5 "Base 64 Encoding with URL and Filename Safe Alphabet" | Encoding of the shareable link `#s=<base64url(JSON)>` (F16) in `web/src/state/url.ts` | https://www.rfc-editor.org/rfc/rfc4648#section-5 | IETF standard (reference only, nothing copied) |
 | Cloudflare Pages documentation: "Limits" (files per site, size per file) and "Headers" (`_headers` file format) | `make deploy-heavy`: limits checked before publishing and the CORS `_headers` file of the heavy origin | https://developers.cloudflare.com/pages/platform/limits/ and https://developers.cloudflare.com/pages/configuration/headers/ | Cloudflare documentation (reference only, nothing copied) |
+| McEwen, A. S. (1991), "Photometric functions for photoclinometry and other applications", *Icarus* 92, 298-311; phase-function coefficients as implemented in the USGS ISIS photometric model `LunarLambertMcEwen` | Lunar-Lambert reflectance of the regolith in the 3D view (illustrative shading only; no figure depends on it) | https://isis.astrogeology.usgs.gov/9.0.0/Object/Programmer/_lunar_lambert_mc_ewen_8cpp_source.html | Cited; ISIS is public domain (USGS) |
 
 ## Software libraries
 
@@ -48,5 +49,6 @@ in which it is first used. Content owner: A2.
 | Playwright | 1.65.0 | End-to-end tests | Apache-2.0 |
 | Zustand | 5.1.0 | Web state | MIT |
 | d3-array, d3-scale, d3-shape, d3-selection, d3-zoom | 3.2.5, 4.0.3, 3.2.1, 3.0.1, 3.0.1 | Charts and map zoom | ISC |
+| three.js (`three`, `@types/three`), https://threejs.org | 0.187.0 | 3D view: WebGL 2 renderer, shader materials, geometry (loaded on demand) | MIT |
 | Wrangler | 4.160.0 | Cloudflare Pages deployment | MIT OR Apache-2.0 |
 | @fontsource/inter, @fontsource/jetbrains-mono | 5.3.0, 5.3.0 | Fonts of the v2 interface (Inter, JetBrains Mono), bundled, latin subset only | OFL-1.1 (fonts); MIT (package) |

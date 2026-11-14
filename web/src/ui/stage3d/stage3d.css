@@ -1,0 +1,177 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* 3D view (16_vista_3d.md §10.1, §13). Tokens of the common contract by name, with the contract
+   values as fallbacks until the v2 tokens exist (they are created by I2 in T-61). */
+.stage3d {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+  color: var(--c-text, #f8fafc);
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+.stage3d:focus-visible {
+  outline: 2px solid var(--c-focus, #f0e442);
+  outline-offset: -2px;
+}
+.stage3d__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.stage3d__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  background: var(--c-bg-0, #0a0e17);
+  color: var(--c-muted, #94a3b8);
+  font-size: 14px;
+}
+
+/* Scenario pins (§8.1): anchored at the top of the mast, centred above it. */
+.stage3d__labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.stage3d__pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -22px 0 0 -22px;
+  white-space: nowrap;
+  will-change: transform;
+}
+.stage3d__pin[hidden] {
+  display: none;
+}
+.stage3d__pin-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1.5px solid var(--c-text, #f8fafc);
+  border-radius: 22px;
+  background: var(--c-panel, rgba(17, 24, 39, 0.72));
+  backdrop-filter: blur(12px);
+  color: var(--c-text, #f8fafc);
+  font: 600 14px var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  cursor: pointer;
+}
+.stage3d__pin--active {
+  margin: -28px 0 0 -28px;
+}
+.stage3d__pin--active .stage3d__pin-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  box-shadow: 0 0 0 3px var(--c-accent, #dce5f0);
+}
+.stage3d__pin-btn:focus-visible {
+  outline: 2px solid var(--c-focus, #f0e442);
+  outline-offset: 3px;
+}
+.stage3d__pin-name {
+  font-size: 13px;
+  font-weight: 500;
+  text-shadow: 0 1px 3px #000, 0 0 8px #000;
+}
+.stage3d__pin-status {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px;
+  border: 1px solid var(--c-line, #334155);
+  border-radius: 8px;
+  background: var(--c-panel, rgba(17, 24, 39, 0.72));
+  font: 400 12px var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+}
+
+/* Camera controls (§10.1): bottom right, above the time bar; the shell sets the insets. */
+.stage3d__controls {
+  position: absolute;
+  right: var(--stage3d-inset-right, 24px);
+  bottom: var(--stage3d-inset-bottom, 120px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: min(360px, calc(100% - 48px));
+  padding: 10px 12px;
+  border: 1px solid var(--c-line, #334155);
+  border-radius: 16px;
+  background: var(--c-panel, rgba(17, 24, 39, 0.72));
+  backdrop-filter: blur(12px);
+}
+.stage3d__controls--closed {
+  padding: 4px;
+}
+.stage3d__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.stage3d__relief,
+.stage3d__note,
+.stage3d__status {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--c-muted, #94a3b8);
+}
+.stage3d__relief {
+  color: var(--c-text, #f8fafc);
+}
+.stage3d__relief--warn,
+.stage3d__status--error {
+  color: var(--c-warn-text, #fb923c);
+}
+.stage3d__help {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  width: min(340px, 80vw);
+  padding: 12px 14px;
+  border: 1px solid var(--c-line, #334155);
+  border-radius: 12px;
+  background: var(--c-bg-1, #162032);
+  font-size: 13px;
+}
+.stage3d__help-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stage3d__help h2 {
+  margin: 0;
+  font-size: 14px;
+}
+.stage3d__help dl {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+.stage3d__help dl div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.stage3d__help dt {
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  color: var(--c-muted, #94a3b8);
+}
+.stage3d__help dd {
+  margin: 0;
+}

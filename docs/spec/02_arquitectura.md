@@ -100,8 +100,9 @@ Las versiones son las publicadas en los registros (`referencias/versiones/`). La
 | `vitest` | 5.1.0 | Pruebas unitarias y de rendimiento del núcleo | Misma configuración que Vite | — |
 | `@playwright/test` | 1.65.0 | Pruebas de extremo a extremo (B1, B2, B9) | Navegador real, también móvil emulado | — |
 | `wrangler` | 4.160.0 | Subida directa a Cloudflare Pages | §6.2 | GitHub Pages |
+| `three` (y `@types/three`) | 0.187.0 | Vista 3D (`ui/stage3d/`, T-71), cargada con `import()` dinámico | WebGL 2 maduro, MIT, sin dependencias (`16_vista_3d.md` §12.1) | Vista 2D sola (plan B del rediseño) |
 
-Sin biblioteca de componentes, de traducción, de fechas ni de mapas. CSS propio con variables (`styles/tokens.css`). `package.json` fija versiones exactas (sin `^`) y se versiona `package-lock.json`.
+Sin biblioteca de componentes, de traducción, de fechas ni de mapas (three.js es solo para la vista 3D). CSS propio con variables (`styles/tokens.css`). `package.json` fija versiones exactas (sin `^`) y se versiona `package-lock.json`.
 
 ## 4. Órdenes
 
