@@ -315,6 +315,53 @@ Medido con la tabla publicada (`web/public/data/ephemeris.bin`) y los cuatro nú
 | Coste en Python: `sky_at` / `evaluate` | 31 µs / 39 µs | — | — |
 | Las 86 pruebas nuevas, ejecutadas solas | 1,5 s | — | — |
 
+### T-22 · Pruebas con datos reales e informe de validación (2026-11-14)
+
+Constantes nuevas (`pipeline/tests/test_a3_blueghost_sunset.py`, `test_a8_sanity.py`, `test_a10_im2.py`,
+`pipeline/cli/report.py`):
+
+| Nombre | Valor | Fuente |
+| --- | --- | --- |
+| A3: sitio, máscara y observador | `blue-ghost-1`, 18,562° N, 61,810° E; SLDEM2015; 2 m | `11_validacion.md` §4 (A3) |
+| A3: ventana de la puesta (`WINDOW_START`; fin = `sunset_latest`) | 2025-03-16, 18:00–18:15 UTC | `11` §4 (A3); `tests/golden/events_published.csv` |
+| A3: tolerancia | `A3_min` = 30 min de `tolerances.json` (pasa entre 17:30 y 18:45 UTC) | `11` §1 y §4 |
+| A3: horizonte que implica la ventana y acimut del Sol poniente (`EXPECTED_HORIZON_DEG`, `SUNSET_AZ_DEG`) | ~0,9°; 269,7° (se informan, no son criterio) | `11` §4 (A3) |
+| A3: elevación del Sol a las 18:15 UTC (Horizons, 0 m) | 0,924849952° (se informa) | `05_efemerides.md` §8.3 |
+| A3: puesta lisa a 0 m | 2025-03-16T20:10:39Z | `05` §8.3; `11` §4 |
+| A8: Chang'e 4 | −45,4561°, 177,5885° | `contract/sites.catalog.json` |
+| A8: puntos (0°, 0°) y (−90°, 0°); límites | Tierra > 75°; \|Sol\| < 1,6°; \|Tierra\| < 7,5° | `11` §4 (A8) |
+| A8: rejilla | Cada hora de 2024-01-01T00:00Z a 2045-01-01T00:00Z (tramo `main`) | `11` §4 (A8); `05` §4.4 |
+| A8 y A10: tabla frente a SPICE en los instantes comprobados (`TABLE_VS_SPICE_DEG`) | 0,001° | `05` §8.4 |
+| A10: sitio | `im-2-planned`, 84,78° S, 29,13° E | `11` §4 (A10) |
+| A10: salida lisa a 0 m y su tolerancia (`SUNRISE`, `SUNRISE_TOL_S`) | 2025-03-04T09:14Z; ± 2 min | `11` §4 (A10); tarjeta T-22 |
+| A10: elevación del Sol a las 17:30 UTC del 06/03 y su tolerancia | 2,46°; ± 0,01° | `11` §4 (A10), Horizons `05` §8.3 (2,464349919°); tarjeta T-22 |
+| A10 con relieve: observador | 2 m (máscara LOLA polar) | `07_visibilidad.md` §1 (alturas de las máscaras) |
+| Informe: titulares y su orden; figuras de `A7B7` | B3, A3, A7B7; `validation/a7b7_scatter.png`, `validation/a7b7_diff_map.png` | `09_contrato_datos.md` §7 y §7.1 |
+| Informe: casos manuales | A5, A11, B8, B9, B10, B11 | `11` §7.1 |
+| Informe: hora de los titulares | Redondeada al minuto (medio minuto hacia arriba) | Elegido (D-90 d) |
+
+Medido (tabla publicada, máscaras publicadas de T-21, cuatro núcleos):
+
+| Qué | Valor medido | Esperado | Fuente del esperado |
+| --- | --- | --- | --- |
+| **A3: puesta del centro del Sol, SLDEM2015, 2 m** | **2025-03-16T18:53:55Z (38,9 min después de las 18:15)** | **17:30–18:45 UTC** | `11` §4 (A3) |
+| A3: mitad del disco puesta (fracción 0,5) | 18:53:55 UTC | — | — |
+| A3: disco puesto del todo (fracción 0) | 19:28:03 UTC | — | — |
+| A3: horizonte en el acimut 269,7° | 0,618° | ~0,9° | `11` §4 (A3) |
+| A3: elevación del Sol a las 18:15 UTC (observador a 2 m sobre el relieve) | 0,9248° | 0,9248° (Horizons, 0 m) | `05` §8.3 |
+| A3: puesta lisa a 0 m | 20:10:39 UTC (0 s) | 20:10:39 | `05` §8.3 |
+| A8: elevación máxima de la Tierra en Chang'e 4 | −37,12° (2024-09-25T03Z; SPICE −37,12°) | < 0° | `11` §4 |
+| A8: elevación mínima de la Tierra en (0°, 0°) | 79,49° (2033-10-14T15Z) | > 75° | `11` §4 |
+| A8: \|elevación del Sol\| máxima en el polo sur | 1,590° (2044-06-10T09Z) | < 1,6° | `11` §4 |
+| A8: \|elevación de la Tierra\| máxima en el polo sur | 7,109° (2038-01-13T05Z) | < 7,5° | `11` §4 |
+| A8: instantes comprobados | 184.105 (0,3 s) | — | — |
+| A10 liso: salida | 2025-03-04T09:14:10Z (10 s) | 09:14 ± 2 min | `11` §4; tarjeta |
+| A10 liso: elevación del Sol el 06/03 a las 17:30 UTC | 2,464350° (SPICE 2,464350°) | 2,46 ± 0,01° | `11` §4; tarjeta |
+| A10 con relieve (LOLA 40 m + 120 m, 2 m): salida | 2025-03-06T00:11:07Z (+38,9 h) | Más tarde | `11` §4 |
+| A10 con relieve: margen del Sol a las 17:30 UTC | 1,684° (horizonte 0,780°) | Más bajo que 2,464° | `11` §4 |
+| A1 (tabla): valores comparados y error máximo | 256; 2,5·10⁻⁵° | < 0,02° | `11` §4 |
+| `make report` | 21 casos publicados: 4 pass, 1 fail (A3), 16 skipped | — | — |
+
 ## T-05 · Valores de referencia de Horizons (A1, A2)
 
 | Constante | Valor | Fuente |
