@@ -1338,3 +1338,49 @@ input[aria-invalid='true'] {
   color: var(--c-eclipse);
   font-weight: 600;
 }
+
+/* ---- Best site (10 §6.4, F32) ---- */
+.best {
+  margin-top: 8px;
+}
+
+.best__body {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+}
+
+.best h3 {
+  font-size: 14px;
+  margin: 10px 0 4px;
+}
+
+.best__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.best__list {
+  margin: 6px 0;
+  padding-left: 20px;
+  font-size: 13px;
+}
+
+.best__list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0;
+}
+
+.best__row {
+  min-height: 28px;
+  padding: 2px 6px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 13px;
+}

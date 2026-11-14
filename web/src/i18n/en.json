@@ -234,5 +234,17 @@
   "map.zoom_out": "Zoom out",
   "timeline.eclipse": "Eclipse",
   "metrics.eclipse": "Eclipse in progress: Earth covers {pct} of the Sun",
-  "metrics.eclipse_sun_below": "(Sun below horizon)"
+  "metrics.eclipse_sun_below": "(Sun below horizon)",
+  "best.title": "Best site",
+  "best.find_best": "Find the best site",
+  "best.region": "Region",
+  "best.all": "All candidate regions",
+  "best.period_title": "Most Sun + Earth in a period",
+  "best.find": "Find",
+  "best.add": "Add as scenario",
+  "best.date_title": "Longest continuous Sun + Earth from a date",
+  "best.search": "Search",
+  "best.progress": "Checking {done} of {total} points…",
+  "best.best": "Best: {coords} — {dur} of continuous sunlight and Earth link",
+  "best.none": "No point in the selected area has both sunlight and Earth link at that time."
 }
