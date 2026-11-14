@@ -1816,3 +1816,8 @@
   font-family: var(--font-v2-sans);
   color: var(--c-text-2);
 }
+
+/* The `main` landmark only wraps the stage's tab panel; it adds no box of its own. */
+.ui-v2 .v2-main {
+  display: contents;
+}

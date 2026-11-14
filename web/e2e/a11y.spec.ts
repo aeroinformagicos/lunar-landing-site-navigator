@@ -8,7 +8,7 @@ const VIEW_TABS = ['Panorama', 'Timeline', 'Map', 'Terrain profile'];
 
 async function open(page: Page) {
   await page.goto('/');
-  await expect(page.getByRole('article', { name: 'Scenario A' })).toBeVisible();
+  await expect(page.getByRole('article', { name: 'Scenario A' })).toBeVisible({ timeout: 30_000 }); // real heavy origin under load
   await expect(page.getByTestId('status-chip')).toBeVisible({ timeout: 20_000 });
 }
 

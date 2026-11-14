@@ -72,8 +72,10 @@ export function Stage() {
   const setComparing = useAppStore((s) => s.setComparing);
   const show3d = tab === 'panorama' && !comparing && viewMode === '3d' && Stage3D !== null && can3d();
 
+  // A `main` landmark around the tab panel: `role="tabpanel"` is not allowed on `main` itself (B9).
   return (
-    <main
+    <main className="v2-main">
+    <section
       id="main-view"
       className={`v2-stage v2-stage--${tab}${comparing ? ' v2-stage--sheet' : tab === 'panorama' ? '' : ' v2-stage--sheet'}`}
       role="tabpanel"
@@ -94,6 +96,7 @@ export function Stage() {
       ) : (
         <div className="v2-sheet">{comparing ? <Compare onClose={() => setComparing(false)} /> : <SheetView tab={tab} />}</div>
       )}
+    </section>
     </main>
   );
 }

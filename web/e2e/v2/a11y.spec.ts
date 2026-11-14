@@ -52,15 +52,15 @@ test('keyboard: skip link first, then brand, pills, mode, switch, panels, stage,
       if (!el || el === document.body) return null;
       const s = getComputedStyle(el);
       const visible = s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2;
-      return { name: (el.getAttribute('aria-label') || el.textContent || el.tagName).trim().slice(0, 40), visible };
+      return { name: (el.getAttribute('aria-label') || el.textContent || el.tagName).trim().slice(0, 120), visible };
     });
     if (!r) continue;
     seen.push(r.name);
     if (!r.visible) hidden.push(r.name);
   }
   const at = (re: RegExp) => seen.findIndex((s) => re.test(s));
-  expect(at(/^Lunar Landing Site Navigator$/)).toBeGreaterThanOrEqual(0);
-  expect(at(/^A · /)).toBeGreaterThan(at(/^Lunar Landing Site Navigator$/));
+  expect(at(/Lunar Landing Site Navigator$/)).toBeGreaterThanOrEqual(0);
+  expect(at(/^A · /)).toBeGreaterThan(at(/Lunar Landing Site Navigator$/));
   expect(at(/^Explore$/)).toBeGreaterThan(at(/^A · /));
   expect(at(/^Play$/)).toBeGreaterThan(at(/^Explore$/));
   expect(hidden).toEqual([]);

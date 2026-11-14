@@ -164,7 +164,8 @@ test.describe('B1: panel figures equal the Python reference', () => {
         const link = linkOf(site, landing, days, cursor);
         if (ui === 'v1') {
           await page.goto(link.replace('/#', '/?ui=v1#'));
-          await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText(info.short_name);
+          // The first read waits as long as the others: the real heavy origin can be slow under load.
+          await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText(info.short_name, { timeout: 30_000 });
           const now = page.getByRole('region', { name: 'Now' });
           expectDeg(await text(page, now.getByText(/^Sun elevation /)), /^Sun elevation ([−-]?\d+\.\d\d)°$/, ref!.sun_el_deg, `${where} Sun elevation`);
           expectPct(match(await text(page, now.getByText(/^Solar disc visible /)), /^Solar disc visible (.+)$/)[1], ref!.sun_disc_pct, TOL_DISC_PCT, `${where} disc`);
@@ -176,7 +177,7 @@ test.describe('B1: panel figures equal the Python reference', () => {
         } else {
           // v2 (15_interfaz_v2.md): the 2D stage, the pills and the Now at site panel.
           await page.goto(link.replace('/#', '/?ui=v2&vm=2d#'));
-          await expect(page.getByRole('group', { name: 'Scenarios' })).toContainText(`A · ${info.short_name}`);
+          await expect(page.getByRole('group', { name: 'Scenarios' })).toContainText(`A · ${info.short_name}`, { timeout: 30_000 });
           const row = (label: string) => page.locator('.v2-dl__row', { has: page.locator('dt', { hasText: new RegExp(`^${label}$`) }) }).locator('dd');
           expectDeg(await text(page, row('Sun elevation')), /^([−-]?\d+\.\d\d)°$/, ref!.sun_el_deg, `${where} Sun elevation`);
           expectPct(await text(page, row('Solar disc visible')), ref!.sun_disc_pct, TOL_DISC_PCT, `${where} disc`);
