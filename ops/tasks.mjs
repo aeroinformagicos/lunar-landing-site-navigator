@@ -143,6 +143,11 @@ const tasks = {
   info() {
     cli('info');
   },
+  // Hourly ephemeris table into web/public/data (05_efemerides.md §4.4, T-06); < 1 min.
+  // SAMPLE=1 also rewrites tests/golden/ephem_sample.json.
+  ephem() {
+    cli('ephem', ...(envVar('SAMPLE') === '1' ? ['--write-sample'] : []));
+  },
   // Cost of the horizon cube with 4 chunks (08_mapa_polar.md §4). Optional: LAW=full|fast,
   // RING=<samples per block>, PTS_BATCH=<points per batch>; the device comes from LLSN_DEVICE.
   'cube-bench'() {

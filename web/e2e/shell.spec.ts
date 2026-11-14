@@ -9,8 +9,9 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole('article', { name: 'Scenario A' })).toBeVisible();
 });
 
-test('opens with the demo pair and the example banner', async ({ page }) => {
-  await expect(page.getByText('Example data — not for use')).toBeVisible();
+test('opens with the demo pair; the example banner follows the manifest', async ({ page, request }) => {
+  const manifest = await (await request.get('/data/manifest.json')).json();
+  await expect(page.getByText('Example data — not for use')).toHaveCount(manifest.ephemeris.synthetic ? 1 : 0);
   await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText('Demo A');
   await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText('Demo B');
   await expect(page.getByLabel('Landing (UTC)')).toHaveValue('2027-08-01T00:00');

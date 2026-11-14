@@ -16,6 +16,11 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+# Where `make ephem` publishes the table (02_arquitectura.md §4.1): the light data of the web.
+WEB_DATA_DIR = REPO_ROOT / "web" / "public" / "data"
+EPHEM_SAMPLE = REPO_ROOT / "tests" / "golden" / "ephem_sample.json"
+
 
 def default_data_dir() -> Path:
     env = os.environ.get("LLSN_DATA_DIR")
@@ -30,6 +35,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--out-dir", type=Path, default=None)
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("info", help="print the data directory and what it contains")
+    ephem = sub.add_parser(
+        "ephem", help="hourly ephemeris table ephemeris.bin + meta (default --out-dir web/public/data)"
+    )
+    ephem.add_argument(
+        "--write-sample",
+        action="store_true",
+        help="also write tests/golden/ephem_sample.json (50 samples with their spkpos values)",
+    )
     bench = sub.add_parser("bench-sampler", help="measure the speed of bilinear DEM sampling")
     bench.add_argument("--samples", type=int, default=2_000_000, help="samples per measurement")
     bench.add_argument(
@@ -79,6 +92,38 @@ def cmd_info(args: argparse.Namespace) -> int:
         path = root / name
         count = sum(1 for p in path.iterdir() if p.is_file()) if path.is_dir() else 0
         print(f"  {name:<16} {'present' if path.is_dir() else 'missing'} ({count} files)")
+    return 0
+
+
+def cmd_ephem(args: argparse.Namespace) -> int:
+    """ephemeris.bin and ephemeris.meta.json (05_efemerides.md §4.4); SPICE errors get a prefix (§6)."""
+    import numpy as np
+    from spiceypy.utils.exceptions import SpiceyError
+
+    from pipeline.ephem import table
+    from pipeline.ephem.kernels import KernelMissing
+
+    target = args.out_dir if args.out_dir is not None else WEB_DATA_DIR
+    kdir = args.data_dir / "kernels"
+    t0 = time.perf_counter()
+    try:
+        records = table.build_table(kdir, progress=print)
+        path = table.write_table(target, records)
+        if args.write_sample:
+            sample = table.write_sample(EPHEM_SAMPLE, kdir)
+            print(f"{table.SAMPLE_COUNT} samples written to {sample}")
+    except KernelMissing as exc:
+        print(exc)
+        return 1
+    except SpiceyError as exc:
+        print(f"SPICE error: {exc}")
+        return 1
+    sun = np.linalg.norm(records[:, :3], axis=1)
+    earth = np.linalg.norm(records[:, 3:], axis=1)
+    print(
+        f"{len(records)} records, {path.stat().st_size} B -> {path} in {time.perf_counter() - t0:.1f} s; "
+        f"|sun| {sun.min():.4e}-{sun.max():.4e} km, |earth| {earth.min():.1f}-{earth.max():.1f} km"
+    )
     return 0
 
 
@@ -291,6 +336,7 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     handlers = {
         "info": cmd_info,
+        "ephem": cmd_ephem,
         "bench-sampler": cmd_bench_sampler,
         "cube-plan": cmd_cube_plan,
         "cube": cmd_cube,

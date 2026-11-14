@@ -508,6 +508,18 @@ def make_all(out: Path) -> None:
     make_compact(out)
 
 
+def holds_real_data(data_dir: Path) -> bool:
+    """True if ``data_dir/manifest.json`` says the ephemeris is real (``synthetic: false``, 09 §3.1)."""
+    manifest = data_dir / "manifest.json"
+    if not manifest.is_file():
+        return False
+    try:
+        doc = json.loads(manifest.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    return isinstance(doc, dict) and doc.get("ephemeris", {}).get("synthetic") is False
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--out", type=Path, default=None, help="write only here (default: both copies)")
@@ -519,6 +531,13 @@ def main(argv: list[str] | None = None) -> int:
     examples = REPO_ROOT / "contract" / "examples" / "data"
     web_public = REPO_ROOT / "web" / "public"
     make_all(examples)
+    if holds_real_data(web_public / "data"):
+        print(
+            f"example data written to {examples}; {web_public / 'data'} NOT overwritten: its manifest.json "
+            "has ephemeris.synthetic = false (real data, decision D-77). Move it away first if you "
+            "really want the example copy there."
+        )
+        return 1
     shutil.rmtree(web_public / "data", ignore_errors=True)
     shutil.copytree(examples, web_public / "data")
     write_json(web_public / "config.json", {"data_base_url": "data", "heavy_base_url": "data"})
