@@ -346,7 +346,7 @@ enviar result
 Después, en el hilo principal, para los 3 primeros: descargar su trozo del cubo, construir la máscara completa y calcular la ventana exacta de «ambos» que empieza en `t0` (`07` §6, rejilla de 10 min y bisección); se reordenan por la duración exacta y se muestran como `12 d 7 h`. El primero se marca en el mapa y puede añadirse como escenario.
 
 - La máscara compacta es conservadora (máximo en ±1°): la duración del trabajador nunca supera la real en más que el efecto del paso de 1 h; por eso se recalcula.
-- Si `hours` es 0 en todos los puntos: `No point in the selected area has both sunlight and Earth link at that time.`
+- Si `hours` es 0 en todos los puntos: `No point in the selected area has both sunlight and Earth contact at that time.`
 - Si `capped`: se muestra `≥ {K/24} d` (`≥ 90 d` salvo que el final de la tabla recorte K).
 - Coste máximo: 10.252 puntos × 2.161 pasos × 2 astros = 4,4·10⁷ evaluaciones; presupuesto < 10 s en un portátil y, en el caso típico, < 2 s, porque la mayoría de los puntos se descarta en el primer paso. Se puede cancelar terminando el trabajador.
 - `source = 'overview'` (todo el mapa, un punto de cada 4) solo se ofrece si el fichero existe.

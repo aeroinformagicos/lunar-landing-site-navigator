@@ -15,6 +15,7 @@ import { ScenarioMarker } from './ScenarioMarker';
 import { meshPointLabel } from '../map/mapData';
 import { MESH_RELIEF } from '../common/model';
 import { SitePicker } from './SitePicker';
+import { Button } from '../common/Button';
 
 /** What the picker is choosing for: a new scenario or the site of an existing one. */
 type PickerTarget = { kind: 'add' } | { kind: 'change'; id: ScenarioId };
@@ -52,18 +53,18 @@ export function ScenarioColumn() {
         ))}
       </ul>
       <div className="scenario-actions">
-        <button type="button" onClick={() => setPicker({ kind: 'add' })} disabled={full} aria-describedby={full ? 'max-scenarios' : undefined}>
-          {t('scenario.add')}
-        </button>
+        <Button variant="secondary" onClick={() => setPicker({ kind: 'add' })} disabled={full} aria-describedby={full ? 'max-scenarios' : undefined}>
+          <span aria-hidden="true">＋</span> {t('scenario.add')}
+        </Button>
         {full && (
           <p id="max-scenarios" className="muted">
             {t('scenario.max')}
           </p>
         )}
         {scenarios.length >= 2 && (
-          <button type="button" aria-pressed={comparing} onClick={() => setComparing(!comparing)}>
+          <Button variant="secondary" aria-pressed={comparing} onClick={() => setComparing(!comparing)}>
             {t('scenario.compare')}
-          </button>
+          </Button>
         )}
       </div>
       {picker && (
@@ -132,15 +133,15 @@ export function ScenarioCard({ scenario, sites, onChangeSite }: CardProps) {
         </DataState>
       )}
       <div className="scenario-card__actions">
-        <button type="button" onClick={onChangeSite}>
+        <Button variant="ghost" onClick={onChangeSite}>
           {t('scenario.change')}
-        </button>
-        <button type="button" onClick={() => duplicate(scenario.id)} disabled={count >= MAX_SCENARIOS}>
+        </Button>
+        <Button variant="ghost" onClick={() => duplicate(scenario.id)} disabled={count >= MAX_SCENARIOS}>
           {t('scenario.duplicate')}
-        </button>
-        <button type="button" onClick={() => remove(scenario.id)} disabled={count <= 1}>
+        </Button>
+        <Button variant="ghost" onClick={() => remove(scenario.id)} disabled={count <= 1}>
           {t('scenario.remove')}
-        </button>
+        </Button>
       </div>
     </article>
   );

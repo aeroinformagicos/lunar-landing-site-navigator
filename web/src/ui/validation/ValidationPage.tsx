@@ -8,6 +8,7 @@ import { loader } from '../../core/loaders';
 import { t, type TextKey } from '../../i18n/t';
 import { useBoot } from '../common/data';
 import { DataState, useResource } from '../common/DataState';
+import { buttonClass } from '../common/Button';
 import {
   checkCount,
   detailValue,
@@ -211,8 +212,8 @@ export function ValidationPage() {
   return (
     <main className="validation" aria-labelledby="validation-title">
       <p>
-        <a href="#" className="button-link">
-          ← {t('validation.back')}
+        <a href="#" className={buttonClass('secondary', 'button-link')}>
+          <span aria-hidden="true">←</span> {t('validation.back')}
         </a>
       </p>
       <h1 id="validation-title">{t('validation.title')}</h1>
