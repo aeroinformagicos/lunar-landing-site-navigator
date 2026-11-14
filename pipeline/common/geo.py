@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from pipeline.common.constants import R_MOON_KM
+from pipeline.common.constants import R_MOON_KM, ZENITH_REL
 
 
 def _scalar_or_array(x):
@@ -63,6 +63,27 @@ def enu_basis(lat_deg: float, lon_deg: float) -> tuple[np.ndarray, np.ndarray, n
     north = np.array([-sin_lat * cos_lon, -sin_lat * sin_lon, cos_lat])
     up = np.array([cos_lat * cos_lon, cos_lat * sin_lon, sin_lat])
     return east, north, up
+
+
+def azel_from_vector(v, east, north, up):
+    """Azimuth (deg, [0, 360)), elevation (deg, [-90, 90]) and length of site -> body vector(s).
+
+    ``v`` has shape [..., 3] (km) and ``east, north, up`` come from :func:`enu_basis`
+    (05_efemerides.md §3). Azimuth is measured from north towards east. At the zenith or nadir the
+    azimuth is 0° by convention; rounding residues of cos(±90°) ≈ 6e-17 count as zero, otherwise
+    atan2(0, -1e-13) would give 180° at the exact pole (decision D-62). The operations and their
+    order are those of ``azelFromVector`` in web/src/core/frames.ts.
+    """
+    v = np.asarray(v, dtype=np.float64)
+    vx, vy, vz = v[..., 0], v[..., 1], v[..., 2]
+    e = vx * east[0] + vy * east[1] + vz * east[2]
+    n = vx * north[0] + vy * north[1] + vz * north[2]
+    u = vx * up[0] + vy * up[1] + vz * up[2]
+    rng = np.sqrt(vx * vx + vy * vy + vz * vz)
+    horiz = np.sqrt(e * e + n * n)
+    az = np.where(horiz <= ZENITH_REL * rng, 0.0, wrap360(np.degrees(np.arctan2(e, n))))
+    el = np.degrees(np.arctan2(u, horiz))
+    return _scalar_or_array(az), _scalar_or_array(el), _scalar_or_array(rng)
 
 
 def site_position_km(lat_deg, lon_deg, h_m=0.0) -> np.ndarray:
