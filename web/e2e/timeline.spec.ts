@@ -49,7 +49,7 @@ test('panel: three figures with unit, help and source (F7)', async ({ page }) =>
   await expect(panel.getByText(/^Solar disc visible/)).toBeVisible();
   await expect(panel.getByText(/^Earth elevation .* \(margin [+−]\d+\.\d\d°\)$/)).toBeVisible();
   await expect(panel.getByText('Terrain: LOLA polar 40 m + 120 m · Ephemeris: JPL DE440 · Frame: MOON_ME')).toBeVisible();
-  await expect(panel.getByText('Sun at landing')).toBeVisible();
+  await expect(panel.locator('.check').first()).toContainText('Sun at landing');
 });
 
 test('pointer readout shows time, elevations and margins (F5)', async ({ page }) => {

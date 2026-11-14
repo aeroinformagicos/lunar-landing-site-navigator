@@ -12,6 +12,7 @@ import { useScenarioModel, type ScenarioModel } from '../common/model';
 import { MetricsPanel } from '../metrics/MetricsPanel';
 import { useMission, type MissionResult } from '../metrics/useMission';
 import { Panorama } from '../panorama/Panorama';
+import { CrossSection } from '../section/CrossSection';
 import { Timeline } from '../timeline/Timeline';
 import { Dialog } from '../common/Dialog';
 import { togglePlay } from '../controls/TimeControls';
@@ -149,7 +150,7 @@ function ActiveView({ tab }: { tab: Tab | 'panel' }) {
   const [model, retry] = useScenarioModel(scenario);
   const ready = model.status === 'ready' ? model.data : null;
   const mission = useMission(ready, scenario);
-  if (tab !== 'timeline' && tab !== 'panel' && tab !== 'panorama') return <p className="data-state data-state--empty">{t('view.pending')}</p>;
+  if (tab !== 'timeline' && tab !== 'panel' && tab !== 'panorama' && tab !== 'section') return <p className="data-state data-state--empty">{t('view.pending')}</p>;
   const resource =
     mission instanceof Error
       ? ({ status: 'error', error: mission } as const)
@@ -167,9 +168,11 @@ function ActiveView({ tab }: { tab: Tab | 'panel' }) {
     >
       {(d: { model: ScenarioModel; mission: MissionResult }) =>
         tab === 'panel' ? (
-          <MetricsPanel model={d.model} mission={d.mission} />
+          <MetricsPanel model={d.model} mission={d.mission} scenario={scenario} />
         ) : tab === 'panorama' ? (
           <Panorama model={d.model} mission={d.mission} scenario={scenario} />
+        ) : tab === 'section' ? (
+          <CrossSection model={d.model} scenario={scenario} />
         ) : (
           <Timeline model={d.model} mission={d.mission} scenario={scenario} />
         )

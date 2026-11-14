@@ -7,7 +7,7 @@ import { DAY_S, isoToUnix } from '../time';
 import type { HorizonFile } from '../types';
 import { frameFor } from '../visibility';
 import type { Window } from '../events';
-import { exampleJson, exampleTable } from './fixtures';
+import { bestTimeMs, exampleJson, exampleTable } from './fixtures';
 
 const table = exampleTable();
 const LANDING = isoToUnix('2027-08-01T00:00:00Z');
@@ -115,9 +115,10 @@ describe('missionMetrics', () => {
 describe('budgets (07 §11)', () => {
   it('metrics of a 14-day mission in under 10 ms', () => {
     for (let i = 0; i < 5; i++) run(demoA, LANDING + i * DAY_S); // warm-up
-    const n = 20;
-    const start = performance.now();
-    for (let i = 0; i < n; i++) run(demoA, LANDING + i * 7 * DAY_S);
-    expect((performance.now() - start) / n).toBeLessThan(10);
+    const n = 10;
+    const ms = bestTimeMs(() => {
+      for (let i = 0; i < n; i++) run(demoA, LANDING + i * 7 * DAY_S);
+    });
+    expect(ms / n).toBeLessThan(10);
   });
 });

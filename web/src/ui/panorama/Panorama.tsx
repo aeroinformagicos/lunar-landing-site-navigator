@@ -38,10 +38,12 @@ import { bodyTrace, pointerReadout, ridgeLabel, terrainEffectLines } from './tex
 
 const BODIES: FocusBody[] = ['sun', 'earth'];
 const COLOR = { sun: 'var(--c-sun)', earth: 'var(--c-earth)' } as const;
-const ZOOM_W = 200;
+const ZOOM_W = 236;
 const STRIP_H = 56;
 /** The 40° view keeps the same scale on both axes; its height is capped so the page fits 1280 × 720. */
-const VIEW_MAX_H = 230;
+const VIEW_MAX_H = 200;
+/** Zoom, readouts and `Terrain effect` sit beside the 40° view when there is room. */
+const SIDE_W = 236;
 
 function useWidth(): [React.RefObject<HTMLDivElement | null>, number] {
   const ref = useRef<HTMLDivElement>(null);
@@ -119,8 +121,10 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
   if (!sky) return <p className="data-state data-state--empty">{t('error.range')}</p>;
 
   const body = sky[focus];
+  const side = width >= 2 * VIEW_MAX_H + SIDE_W + 12;
+  const viewW = Math.min(side ? width - SIDE_W - 12 : width, 2 * VIEW_MAX_H);
   const centre = viewCentre(model.mask.elDeg, body, panAz);
-  const v: View = { az: centre.az, el: centre.el, widthDeg: VIEW_WIDTH_DEG, heightDeg: VIEW_HEIGHT_DEG, w: Math.min(width, 2 * VIEW_MAX_H), h: Math.min(width, 2 * VIEW_MAX_H) / 2 };
+  const v: View = { az: centre.az, el: centre.el, widthDeg: VIEW_WIDTH_DEG, heightDeg: VIEW_HEIGHT_DEG, w: viewW, h: viewW / 2 };
   const grid = gridLines(v, 5);
   const blocker = blockerAt(model.mask, body.azDeg);
   const ridge = model.smooth ? null : ridgeLabel(blocker.distM);
@@ -173,6 +177,8 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
         </label>
       </div>
 
+      <div className="pano__main">
+      <div className="pano__left">
       {/* 1. 40° view */}
       <svg
         className="pano__view"
@@ -234,8 +240,9 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
         {hover ?? ' '}
       </p>
       {!body.visible && <p className="pano__note">{t('pano.below', { body: bodyName })}</p>}
+      </div>
 
-      <div className="pano__row">
+      <div className="pano__side">
         {/* 2. Horizon zoom */}
         <figure className="pano__zoom">
           <svg width={zv.w} height={zv.h} role="img" aria-label={t('pano.zoom_label')}>
@@ -261,6 +268,7 @@ export function Panorama({ model, mission, scenario }: { model: ScenarioModel; m
           <p>{lines.earthLink}</p>
           <p data-testid="first-event-shift">{lines.firstEvent}</p>
         </section>
+      </div>
       </div>
 
       {/* 3. 360° strip */}
