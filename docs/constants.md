@@ -364,6 +364,38 @@ Medido (tabla publicada, máscaras publicadas de T-21, cuatro núcleos):
 | A1 (tabla): valores comparados y error máximo | 256; 2,5·10⁻⁵° | < 0,02° | `11` §4 |
 | `make report` | 21 casos publicados: 4 pass, 1 fail (A3), 16 skipped | — | — |
 
+### T-26 · Referencia de visibilidad, parte II (2026-11-14)
+
+Constantes nuevas (`pipeline/vis/metrics.py`, `requirements.py`, `ranking.py`, `vectors.py` y sus pruebas):
+
+| Nombre | Valor | Fuente |
+| --- | --- | --- |
+| `NEXT_EVENT_HORIZON_S` (búsqueda de la cuenta atrás) | 60 d | `07_visibilidad.md` §7 (igual que `web/src/core/metrics.ts`) |
+| `TRUNCATED_WARNING` | `Mission extends beyond available ephemeris; results truncated.` | `07` §7 |
+| `Requirements` por defecto: Sol y Tierra al aterrizar, noche máxima, margen de la Tierra, fracción del Sol | sí; sí; 24 h; 1,0°; 1,0 | `07` §8.1 |
+| `NIGHT_NEAR_LIMIT`; `SUN_FRACTION_EPS` | 0,75; 10⁻⁹ | `07` §8.2 |
+| `GRID_S`, `MATRIX_COLUMNS`, pasos Δ | 600 s; 31; 6 h, 12 h, 1 d, 2 d | `07` §8.3 |
+| `NEXT_WINDOW_DAYS`, paso de aterrizaje | 90 d; 1 h | `07` §8.4 |
+| `STATUS_ORDER`; redondeo del ranking | go 0, marginal 1, no_go 2; 0,1 (mitad hacia arriba) | `07` §8.5 y §12.7 |
+| `COUNTS` (casos por bloque de los vectores) | 200, 50, 100, 100, 20, 20, 30, 6, 4, 30 | `07` §12.3 |
+| `FORMULA_MASKS` | `flat:0`, `flat:0.5`, `tilt:0.3`, `sine:1,3` | `07` §12.3 |
+| `SEED`; `EDGE_DEG`; `EDGE_H` (generador de vectores) | 26; 10⁻⁶°; 0,01 h | Elección del generador (D-96 c): la semilla es arbitraria; los umbrales son la tolerancia de ángulos de `07` §12.4 y 10 veces la de horas |
+| Escenarios de B1 | Los cinco de `11_validacion.md` (B1) | `11` §4; D-90 a |
+| B2: aterrizaje base, duración, retrasos y estados esperados | 2025-03-02T08:34:00Z; 14 d; 0, 14 y 29,5 d → `go`, `no_go` (`night_too_long`), `go` | `07` §13.7 |
+| B2: puesta del +14 d | Entre 18:00 y 20:30 UTC del 16/03/2025 | `07` §13.7 («hacia las 18:00–20:20 UTC») |
+| Fechas de los eclipses del bloque `eclipse` | 2025-03-14, 2025-09-07, 2026-03-03, 2026-08-28, 2028-12-31, 2029-06-26 | `tests/golden/eclipses_nasa.csv` (Espenak, caso B4) |
+| (−90°, 0°): extremos de la elevación del Sol | \|el\| < 1,6° | `07` §13.6 |
+
+Valores medidos:
+
+| Magnitud | Medido | Esperado | Fuente |
+| --- | --- | --- | --- |
+| B2, Luna lisa (2 m): +0 / +14 / +29,5 d | `go` / `no_go` (`night_too_long`, noche 324,21 h) / `go` | `go` / `no_go` / `go` | `07` §13.7 |
+| B2, SLDEM2015 (2 m): +0 / +14 / +29,5 d | `go` / `no_go` (`night_too_long`, noche 325,67 h) / `go` | Ídem | `07` §13.7 |
+| `core_vectors.json` | 560 casos, 0,18 MB; unos 2 min de generación (el 80 % en `assess` y `rank`) | — | — |
+| `vectors.test.ts` con el fichero | 10 bloques, todos en verde (0,7 s) | Tolerancias de `07` §12.4 | `07` §12.4 |
+| Dos generaciones seguidas | Ficheros idénticos byte a byte | — | D-96 c |
+
 ## T-05 · Valores de referencia de Horizons (A1, A2)
 
 | Constante | Valor | Fuente |
