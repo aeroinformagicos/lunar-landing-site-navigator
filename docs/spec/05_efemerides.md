@@ -90,7 +90,13 @@ sun,   _ = spiceypy.spkpos('SUN',   et, 'MOON_ME', 'LT+S', 'MOON')
 earth, _ = spiceypy.spkpos('EARTH', et, 'MOON_ME', 'LT+S', 'MOON')
 ```
 
-La web obtiene el vector sitio → astro restando la posición del sitio: `v = V − p`. Diferencia con `spkcpo`: el tiempo de luz y la aberración se calculan para el centro de la Luna y no para el sitio. El sitio está a 1.737 km del centro (0,006 s de luz) y se mueve respecto a él a menos de 4,7 m/s: el efecto es menor de 0,000002° (cota: 4,7 m/s ÷ 299.792.458 m/s = 1,6·10⁻⁸ rad = 0,0000009° de aberración, más 0,006 s × 1 km/s ÷ 384.000 km = 1,6·10⁻⁸ rad de posición de la Tierra).
+La web obtiene el vector sitio → astro restando la posición del sitio: `v = V − p`. Diferencia con `spkcpo`: el tiempo de luz y la aberración se calculan para el centro de la Luna y no para el sitio. El sitio está a 1.737 km del centro (0,006 s de luz) y se mueve respecto a él a menos de 4,7 m/s. Hay tres términos (D-69):
+
+- **Aberración trasladada al sitio (dominante).** `LT+S` desplaza el vector del centro `V` en |V|·β perpendicular a la línea de mira, con β = v/c ≈ 1,0·10⁻⁴ (velocidad de la Luna respecto al baricentro, ~30 km/s). Al restar `p` ese desplazamiento no se recalcula para la línea de mira del sitio, y queda un error de posición de hasta |p|·β ≈ 1.739 km × 1,0·10⁻⁴ ≈ 0,175 km. Para la Tierra (≥ 356.000 km) son hasta 4,9·10⁻⁷ rad ≈ **0,000028°**; para el Sol (≥ 1,47·10⁸ km), 7·10⁻¹⁰ rad, despreciable. Medido (T-06): 0,175 km y 0,000026°; con `LT` en lugar de `LT+S` el error cae a 10⁻⁸°.
+- Aberración por la velocidad del sitio respecto al centro: 4,7 m/s ÷ 299.792.458 m/s = 1,6·10⁻⁸ rad = 0,0000009°.
+- Tiempo de luz: 0,006 s × 1 km/s ÷ 384.000 km = 1,6·10⁻⁸ rad de posición de la Tierra.
+
+Total: < 0,00003° para la Tierra y < 0,000002° para el Sol. En tiempo, la Tierra se mueve en el cielo lunar a 0,062°/h (mediana de 2024–2044) y como mucho 0,113°/h, de modo que 0,000028° mueven una salida o puesta de la Tierra del orden de 1–2 s (más cerca de los extremos de la libración, cuando la Tierra apenas se mueve). Para el Sol (0,51°/h) el efecto es menor de 0,01 s.
 
 ### 4.2 Tramos
 
@@ -301,7 +307,7 @@ Estas 15 filas van a `tests/golden/horizons_smoke.csv` (formato en `11_validacio
 
 ### 8.4 La tabla frente a SPICE (invariante de A9)
 
-Para 2.000 pares (sitio, instante) al azar con semilla fija (latitud uniforme en el seno, longitud uniforme, instantes uniformes en `main` y `apollo`): |az_tabla − az_spkcpo|·cos(el) < 0,001° y |el_tabla − el_spkcpo| < 0,001° para Sol y Tierra. Valor esperado real: del orden de 0,00001°. Además, 200 instantes que caen justo en una hora de la rejilla dan diferencia menor de 0,00002°.
+Para 2.000 pares (sitio, instante) al azar con semilla fija (latitud uniforme en el seno, longitud uniforme, instantes uniformes en `main` y `apollo`): |az_tabla − az_spkcpo|·cos(el) < 0,001° y |el_tabla − el_spkcpo| < 0,001° para Sol y Tierra. Valor esperado real: del orden de 0,00001°. Además, 200 instantes que caen justo en una hora de la rejilla dan diferencia menor de 0,00003° (D-69; antes 0,00002°, por debajo del término de aberración del §4.1).
 
 ### 8.5 `MOON_ME` frente a `MOON_PA` (prueba que justifica la prohibición)
 
