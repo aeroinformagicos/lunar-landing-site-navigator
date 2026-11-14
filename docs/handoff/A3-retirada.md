@@ -1,7 +1,7 @@
 <!-- AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos -->
 # A3 retirado · Traspaso
 
-Rama `t-22-a3-retirada`, salida de `t-22-a3-investigacion` (PR #36, **aún sin integrar**) con `main`
+Rama `t-22-a3-retirada`, salida de `t-22-a3-investigacion` (PR #36, ya integrada) con `main`
 fusionado. Decisión **D-95, pendiente de la firma de A1: no se integra sin ella.**
 
 ## Qué se hizo
@@ -47,7 +47,7 @@ Horizons: 256 valores, diferencia máxima 2,5·10⁻⁵°. Tarjetas: A1 `Match`,
 ## Qué queda / para quién
 - **A1:** firmar D-95 (o rechazarla) en `docs/decisions.md`: cambiar «PENDIENTE DE FIRMA DE A1» por la
   firma con fecha y hora. Hasta entonces, no integrar.
-- **I3:** integrar antes la PR #36 (esta rama sale de ella); revisar el contrato 1.1.0.
+- **I3:** revisar el contrato 1.1.0 (la PR #36, de la que sale esta rama, ya está integrada).
 - **A2:** si se quiere, marcar en `tests/golden/events_published.csv` que las filas A3 ya no se usan
   (cambio de `tests/golden/`, que necesita la aprobación de A1).
 - **A3 (persona):** revisar el texto `limits.rise_set` y el README.
