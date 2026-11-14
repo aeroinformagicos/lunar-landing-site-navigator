@@ -54,8 +54,12 @@ export interface DescribeInput {
   lonDeg: number;
   sky: SkyState | null;
   mask: Mask | null;
+  /** Camera mode; `distM` is the distance to the site (orbit) or the height above the terrain (fly). */
+  mode?: 'orbit' | 'fly' | 'ground';
   distM: number;
   headingDeg: number;
+  /** Observer height in Ground (m). */
+  eyeM?: number;
 }
 
 /** Text description of the view for screen readers (§13). Never prints NaN or identifiers. */
@@ -76,8 +80,11 @@ export function describeView(d: DescribeInput): string {
     const e = d.sky.earth;
     parts.push(e.visible ? t('stage3d.desc.earth_up', { el: formatDeg(e.elDeg) }) : t('stage3d.desc.earth_hidden'));
   }
-  if (Number.isFinite(d.distM)) {
-    parts.push(t('stage3d.desc.camera', { dist: distanceWords(d.distM), dir: compassWord(d.headingDeg) }));
+  const dir = compassWord(((d.headingDeg % 360) + 360) % 360);
+  if (d.mode === 'ground') parts.push(t('stage3d.desc.camera_ground', { h: d.eyeM ?? 2, dir }));
+  else if (Number.isFinite(d.distM)) {
+    const dist = distanceWords(Math.max(0, d.distM));
+    parts.push(t(d.mode === 'fly' ? 'stage3d.desc.camera_fly' : 'stage3d.desc.camera', { dist, dir }));
   }
   return parts.join(' ');
 }

@@ -218,7 +218,7 @@ Tres modos con un selector de texto (`Orbit`, `Fly`, `Ground`) en el grupo de co
 
 - Centro: el sitio activo, en la superficie del DEM. Arrastre con el botón principal, gira; rueda o pellizco, acerca y aleja (exponencial); arrastre con el secundario o con dos dedos, desplaza el centro sobre el terreno.
 - Distancia de 300 m a 800 km; ángulo sobre el horizonte local del centro de 3° a 89°; la cámara nunca queda a menos de 50 m sobre el terreno (§7.6). Amortiguación suave (sin ella con movimiento reducido).
-- **Encuadre inicial** (y de `Recenter`): distancia 18 km, 14° sobre el horizonte, rumbo de la cámara = acimut del astro de enfoque (`focusBody`) + 180°, de modo que la cámara mira hacia ese astro y su luz rasante cruza el terreno hacia el espectador. Si el escenario B está a menos de 25 km de A, la distancia se ajusta para que entren los dos.
+- **Encuadre inicial** (y de `Recenter`): distancia 45 km, 22° sobre el horizonte (D-110 a; antes 18 km y 14°), rumbo de la cámara = acimut del astro de enfoque (`focusBody`) + 180°, de modo que la cámara mira hacia ese astro y su luz rasante cruza el terreno hacia el espectador. Si el escenario B está a menos de 25 km de A, la distancia se ajusta para que entren los dos.
 - Teclado: flechas giran 5°; `+` / `−` (o `PageUp` / `PageDown`) acercan y alejan ×1,25; `Enter` equivale a un clic en el centro (§10.2); `Home` = `Recenter`.
 - Al cambiar `focusBody` (botones `Centre on Sun` / `Centre on Earth` del armazón), la cámara gira (vuelo suave de 1 s) al rumbo del nuevo astro.
 
@@ -293,7 +293,7 @@ Cada sitio de `sites.json` que cae en la escena y no es escenario: punto de 6 px
 
 En el grupo de controles (§10.1):
 - **Rosa de rumbos**: círculo de 44 px con `N` que gira con la cámara (norte local del sitio activo; en la escena polar, además, una marca `0° E` hacia el lado de la Tierra). Es un botón: clic = norte arriba (vuelo de 0,5 s).
-- **Barra de escala**: longitud redonda (1–2–5 × 10ⁿ m) que mide entre 60 y 120 px a la distancia del centro de la pantalla; texto `2 km` (`units.km`) o `500 m`.
+- **Barra de escala**: longitud redonda (1–2–5 × 10ⁿ m) que mide entre 60 y 150 px (D-110 e) a la distancia del centro de la pantalla; texto `2 km` (`units.km`) o `500 m`.
 - **Lectura** bajo el puntero, o bajo la cruz central si no hay puntero (teclado y táctil, `14` §6): `87.21° S, 125.48° E · +1,204 m` con `formatLatLon` (3 decimales) y `formatInt`; fuera del terreno, `—` no: se oculta la línea.
 
 ## 9. Capas del mapa proyectadas
@@ -325,7 +325,7 @@ Lee, con los selectores existentes y `useScenarioModel`: escenarios, escenario a
 
 ### 10.3 Paso a 2D por fallo (D-97 n, propuesta a I2)
 
-El armazón decide `viewMode` al arrancar (anexo A: `'2d'` sin WebGL o con ventana < 768 px). **Requisito concreto: WebGL 2** (three.js ya no admite WebGL 1); I2 debe comprobar `canvas.getContext('webgl2')`. Si la 3D falla después de montarse (contexto perdido y no recuperado en 3 s, error de compilación de sombreadores, fallo del trabajador o de three.js), Stage3D **lanza el error durante el render**; el límite de errores del armazón (`Fallback3d` en `ui/shell/Stage.tsx`, D-102) llama a `fallbackTo2d` del almacén, que pone `viewMode = '2d'` y `viewNotice = 'webgl_failed'`, y el armazón muestra `The 3D view is not available on this device. Showing the 2D view.` con `Dismiss` (D-110, D-107 a). Un error de **datos** no pasa a 2D: baja de escena (§2.1).
+El armazón decide `viewMode` al arrancar (anexo A: `'2d'` sin WebGL o con ventana < 768 px). **Requisito concreto: WebGL 2** (three.js ya no admite WebGL 1); I2 debe comprobar `canvas.getContext('webgl2')`. Si la 3D falla después de montarse (contexto perdido y no recuperado en 3 s, error de compilación de sombreadores, fallo del trabajador o de three.js), Stage3D **lanza el error durante el render**; el límite de errores del armazón (`Fallback3d` en `ui/shell/Stage.tsx`, D-102) llama a `fallbackTo2d` del almacén, que pone `viewMode = '2d'` y `viewNotice = 'webgl_failed'`, y el armazón muestra `The 3D view is not available on this device. Showing the 2D view.` con `Dismiss` (D-111, D-107 a). Un error de **datos** no pasa a 2D: baja de escena (§2.1).
 
 ### 10.4 Textos
 

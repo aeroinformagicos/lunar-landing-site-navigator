@@ -9,7 +9,7 @@ import { pxPerDeg, viewCentre, VIEW_WIDTH_DEG, type View } from '../panorama/geo
 
 /**
  * Horizon line at this share of the stage height. The mockup has it at 51–59 %; our bottom strip is
- * taller (summary, tabs, two credit lines), so it sits at 50 % to stay clear of the verdict (D-111).
+ * taller (summary, tabs, two credit lines), so it sits at 50 % to stay clear of the verdict (D-112).
  */
 export const HORIZON_AT = 0.5;
 

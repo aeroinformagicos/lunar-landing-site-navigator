@@ -19,9 +19,9 @@ export const ORBIT = Object.freeze({
   minPitchDeg: 3,
   maxPitchDeg: 89,
   clearanceM: 50,
-  /** Initial framing (§7.1). */
-  startDistM: 18_000,
-  startPitchDeg: 14,
+  /** Initial framing (§7.1; D-110 a: 45 km at 22° with the real DEM, 18 km at 14° showed mostly shadow). */
+  startDistM: 45_000,
+  startPitchDeg: 22,
   /** Scenario B also framed if it is closer than this to A. */
   pairM: 25_000,
 });

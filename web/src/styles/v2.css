@@ -1108,7 +1108,7 @@
   font-family: var(--font-v2-sans);
 }
 
-/* Data views open: a compact strip (figures at 28 px, no summary) so the sheet has room (D-110). */
+/* Data views open: a compact strip (figures at 28 px, no summary) so the sheet has room (D-111). */
 .ui-v2 .v2--sheet .v2-mission {
   flex-direction: row;
   align-items: center;
@@ -1569,7 +1569,7 @@
   bottom: calc(var(--bottom-h, 200px) + 8px);
 }
 
-/* ---- Phones (< 768 px): one column, 2D, panels inline (15 §9, simplified, D-111) ---- */
+/* ---- Phones (< 768 px): one column, 2D, panels inline (15 §9, simplified, D-112) ---- */
 @media (max-width: 767px) {
   .ui-v2 {
     height: auto;
@@ -1774,4 +1774,15 @@
   .ui-v2 .v2 {
     overflow-x: clip;
   }
+}
+
+/* The figures and the summary float over the scene: the pointer goes through them to the scene
+   (drag, readout), except on their own buttons (help, More). */
+.ui-v2 .v2:not(.v2--sheet) .v2-mission {
+  pointer-events: none;
+}
+
+.ui-v2 .v2:not(.v2--sheet) .v2-mission button,
+.ui-v2 .v2:not(.v2--sheet) .v2-mission a {
+  pointer-events: auto;
 }
