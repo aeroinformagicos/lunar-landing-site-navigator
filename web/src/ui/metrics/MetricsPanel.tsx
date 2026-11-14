@@ -33,6 +33,10 @@ function useThrottledLive(text: string, paused: boolean): string {
 function Figure({ id, icon, value }: { id: 'sunlight' | 'earth_link' | 'longest_night'; icon: string; value: string }) {
   const [help, setHelp] = useState(false);
   const name = t(`metrics.${id}` as TextKey);
+  // `259 h · 77 %`: hours large (≥ 28 px, 14 §4), the share smaller; the text stays the same.
+  const cut = value.indexOf(' · ');
+  const main = cut < 0 ? value : value.slice(0, cut);
+  const rest = cut < 0 ? '' : value.slice(cut);
   return (
     <div className={`figure figure--${id}`}>
       <div className="figure__head">
@@ -51,7 +55,10 @@ function Figure({ id, icon, value }: { id: 'sunlight' | 'earth_link' | 'longest_
           ⓘ
         </button>
       </div>
-      <p className="figure__value">{value}</p>
+      <p className="figure__value">
+        {main}
+        {rest && <span className="figure__sub">{rest}</span>}
+      </p>
       {help && (
         <p id={`help-${id}`} className="figure__helptext">
           {t(`metrics.help.${id}` as TextKey)}
@@ -85,18 +92,27 @@ export function MetricsPanel({ model, mission, scenario }: { model: ScenarioMode
       </div>
       {metrics.truncated && <p className="field__warn">{t('warn.truncated')}</p>}
 
-      {assessment && (
-        <p className={`status-chip status-chip--${assessment.status}`} data-testid="status-chip">
-          <span aria-hidden="true">{STATUS_ICON[assessment.status]}</span> {STATUS_TEXT[assessment.status]}
-        </p>
-      )}
-      <ul className="checks" aria-label={t('metrics.status')}>
-        {checks.map((c) => (
-          <li key={c.key} className={c.ok ? 'check check--ok' : 'check check--fail'}>
-            {checkLabel(c.key)} <span aria-label={c.ok ? 'met' : 'not met'}>{c.ok ? '✓' : '✕'}</span>
-          </li>
-        ))}
-      </ul>
+      {/* Verdict card (T-54): the state with icon and word, then the requirement checks. */}
+      <section className={`verdict${assessment ? ` verdict--${assessment.status}` : ''}`} aria-labelledby="verdict-title">
+        <h3 id="verdict-title" className="visually-hidden">
+          {t('panel.verdict')}
+        </h3>
+        {assessment && (
+          <p className={`status-chip status-chip--${assessment.status}`} data-testid="status-chip">
+            <span aria-hidden="true">{STATUS_ICON[assessment.status]}</span> {STATUS_TEXT[assessment.status]}
+          </p>
+        )}
+        <ul className="checks" aria-label={t('metrics.status')}>
+          {checks.map((c) => (
+            <li key={c.key} className={c.ok ? 'check check--ok' : 'check check--fail'}>
+              <span className="check__mark" aria-label={c.ok ? 'met' : 'not met'}>
+                {c.ok ? '✓' : '✕'}
+              </span>{' '}
+              {checkLabel(c.key)}
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="now" aria-labelledby="now-title">
         <h3 id="now-title">{t('metrics.now')}</h3>

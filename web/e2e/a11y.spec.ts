@@ -4,7 +4,7 @@
 // regions, chart descriptions, hidden data tables, text sizes and 200 % zoom.
 import { expect, test, type Page } from '@playwright/test';
 
-const VIEW_TABS = ['Panorama', 'Timeline', 'Map', 'Cross-section'];
+const VIEW_TABS = ['Panorama', 'Timeline', 'Map', 'Terrain profile'];
 
 async function open(page: Page) {
   await page.goto('/');

@@ -15,7 +15,8 @@ test.beforeEach(async ({ page }) => {
 test('40° view with degree axes, zoom and strip (F3)', async ({ page }) => {
   await expect(page.getByRole('img', { name: '40° view of the horizon centred on the Sun' })).toBeVisible();
   await expect(page.locator('.pano__view text').filter({ hasText: /°/ }).first()).toBeVisible();
-  await expect(page.getByText('Horizon zoom ×10 · grid 0.5°')).toBeVisible();
+  // ×10 near the horizon; wider when the body is far from it, so terrain and disc stay in view (T-54).
+  await expect(page.getByText(/^Horizon zoom ×[\d.]+ · grid [\d.]+°$/)).toBeVisible();
   await expect(page.getByTestId('disc-visible')).toHaveText(/^Solar disc visible: (\d+|<1|>99) %$/);
   await expect(page.getByTestId('margin')).toHaveText(/^Margin: [+−]\d+\.\d\d°$/);
   await expect(page.locator('.pano__bracket')).toHaveCount(1);
@@ -56,7 +57,7 @@ test('smooth-Moon line and Terrain effect box (F4)', async ({ page }) => {
   await expect(page.getByTestId('smooth-line').first()).toHaveAttribute('d', /^M0\.00 [\d.]+L\d+\.00 [\d.]+$/);
   const fx = page.getByRole('region', { name: 'Terrain effect' });
   await expect(fx).toContainText(/Sunlight: ([+−]\d+\.\d|0) h/);
-  await expect(fx).toContainText(/Earth link: ([+−]\d+\.\d|0) h/);
+  await expect(fx).toContainText(/Earth contact: ([+−]\d+\.\d|0) h/);
   await expect(page.getByTestId('first-event-shift')).toHaveText(/^(Sunset|Sunrise): /);
 });
 

@@ -7,7 +7,7 @@ describe('t', () => {
   it('has the general texts of 10_interfaz.md §7', () => {
     expect(t('app.title')).toBe('Lunar Landing Site Navigator');
     expect(t('banner.example')).toBe('Example data — not for use');
-    expect(t('status.marginal')).toBe('Works, low margin');
+    expect(t('status.marginal')).toBe('Tight');
     expect(t('error.contract')).toBe('Data format not supported by this version of the app. Reload the page.');
   });
 

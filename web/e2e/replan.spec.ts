@@ -18,13 +18,13 @@ test('matrix: one row per scenario, 31 dates, base column, next window per row',
   await expect(page.locator('[data-cell^="0-"]')).toHaveCount(31);
   await expect(page.locator('.replan__matrix thead th').nth(1)).toHaveText('+0');
   await expect(page.locator('.replan__matrix thead th').nth(2)).toHaveText('+1 d');
-  await expect(page.locator('[data-cell="0-0"]')).toHaveAttribute('aria-label', new RegExp(`^A · ${re(pair[0].short_name)}, landing 2027-08-01 00:00 UTC: (Still works|Works, low margin|Does not work)$`));
+  await expect(page.locator('[data-cell="0-0"]')).toHaveAttribute('aria-label', new RegExp(`^A · ${re(pair[0].short_name)}, landing 2027-08-01 00:00 UTC: (Works|Tight|Doesn't work)$`));
   for (const w of await page.getByTestId('next-window').allInnerTexts()) {
     expect(w).toMatch(/^(Next valid landing window: .* UTC \(.*\)|No valid landing window in the next 90 days\.)$/);
   }
   if (candidates.length === 0) await expect(page.getByText('No candidate regions in this build.')).toBeVisible();
-  else await expect(page.getByTestId('alternative')).toHaveText(/^(Best alternative: .+ — (Still works|Works, low margin), (\d+|<1|>99) % Sun \+ Earth\.|No candidate region works for this landing\.)$/, { timeout: 30_000 });
-  await expect(page.getByTestId('status-chip')).toHaveText(/^(✓ Still works|! Works, low margin|✕ Does not work)$/);
+  else await expect(page.getByTestId('alternative')).toHaveText(/^(Best alternative: .+ — (Works|Tight), (\d+|<1|>99) % Sun \+ Earth\.|No candidate region works for this landing\.)$/, { timeout: 30_000 });
+  await expect(page.getByTestId('status-chip')).toHaveText(/^(✓ Works|! Tight|✕ Doesn't work)$/);
 });
 
 test('keyboard: arrows move the active cell, Enter selects it and sets the landing', async ({ page, request }) => {
@@ -45,7 +45,7 @@ test('delay steps and editable requirements', async ({ page }) => {
   await expect(page.locator('.replan__matrix thead th').nth(5)).toHaveText('+1 d');
   // With the requirements switched off, every cell inside the table works.
   await page.getByLabel('Sun at landing').uncheck();
-  await page.getByLabel('Earth link at landing').uncheck();
+  await page.getByLabel('Earth contact at landing').uncheck();
   await page.getByLabel('Longest night allowed (h)').fill('400');
   await expect(page.locator('.replan__cell--no_go')).toHaveCount(0);
   await page.getByRole('button', { name: 'Reset to defaults' }).click();
