@@ -94,7 +94,7 @@ def test_table_steps_are_the_hourly_nodes_from_2026(example_table):
 
 
 def test_units_round_half_up_in_integers():
-    # v = round(pct / 0.4), pct = 100·count/n (09 §9.2); a value exactly halfway rounds up (D-98).
+    # v = round(pct / 0.4), pct = 100·count/n (09 §9.2); a value exactly halfway rounds up (D-106).
     n = 744
     assert lay.units_of_counts([0, n, n // 2], n).tolist() == [0, 250, 125]
     assert lay.units_of_counts([1], 500).tolist() == [1]  # 0.2 % = 0.5 units -> 1

@@ -405,12 +405,12 @@ Constantes nuevas (`pipeline/layers/layers.py`, `hillshade.py`, `compare_nasa.py
 | `MEAN_START_UTC`, `MEAN_STEPS` (periodo `mean186`) | 2026-01-01T00:00:00Z; 163.152 pasos de 1 h (fin 2044-08-12T00:00:00Z) | `08_mapa_polar.md` §5.1; D-22 |
 | `FIRST_STEP_INDEX` (2026-01-01T00Z en el tramo `main`) | 17.545 = 1 + 731·24 | `08` §5.2 (se comprueba contra `t0_unix` de la tabla) |
 | `MONTHS`, `MONTH_STEPS_TOTAL`; febrero de 2028 | 2026-01 … 2030-12; 43.824 pasos; 696 | `08` §5.1 y §5.3 |
-| `ANY_EVERY` (pasos del criterio «cualquier fracción») | 1 de cada 3 (54.384) | `08` §5.2; D-98 d |
+| `ANY_EVERY` (pasos del criterio «cualquier fracción») | 1 de cada 3 (54.384) | `08` §5.2; D-106 d |
 | `ANY_COLUMNS`, `MIN_COS_EL` | −0,8, −0,4, 0, 0,4, 0,8; 0,05 | `07_visibilidad.md` §4.2 (ya en `pipeline/vis/discs.py`) |
 | `PCT_PER_UNIT`, `UNITS_FULL`, `NODATA` | 0,4 %; 250; 255 | `09_contrato_datos.md` §9 |
-| Redondeo de `v` | `(500·cuenta + n) // (2n)`, mitad hacia arriba | `09` §9.2; D-98 a |
+| Redondeo de `v` | `(500·cuenta + n) // (2n)`, mitad hacia arriba | `09` §9.2; D-106 a |
 | `DEFAULT_BATCH_CHUNKS`, `DEFAULT_BLOCK_STEPS` | 64 trozos (16.384 puntos); 512 pasos | `08` §5.2 (valores de ejemplo) |
-| `NASA_OBSERVER_HEIGHT_M` (plan B-4) | 0 m | `03_datos_y_fuentes.md` §6 («se toma como superficie»); D-98 e |
+| `NASA_OBSERVER_HEIGHT_M` (plan B-4) | 0 m | `03_datos_y_fuentes.md` §6 («se toma como superficie»); D-106 e |
 | `HILL_STEP_M`, `HILL_W`, `HILL_H` | 250 m; 1.504 × 1.344 px | `09` §8.3 |
 | `Z_FACTOR`, luz (`LIGHT_AZ_DEG`, `LIGHT_ALT_DEG`), `AMBIENT`, `DIFFUSE` | 2; L = (−cos 30°·sin 45°, cos 30°·cos 45°, sin 30°); 0,35; 0,65 | `08` §6 |
 | `DEM_NODATA` de `dem_500m` | −32.768 | `09` §8.3 |
@@ -420,7 +420,7 @@ Constantes nuevas (`pipeline/layers/layers.py`, `hillshade.py`, `compare_nasa.py
 | `WITHIN_PTS` | 10 puntos | `08` §8.2 |
 | Umbral de B7 | r > 0,9 (se lee de `tests/golden/tolerances.json`, `B7_r_min`) | `08` §8.3; `11` §5 |
 | Figuras: `SCATTER_PX`, `DIFF_PX`, `FIGURE_MAX_BYTES`, `DIFF_RANGE_PTS` | 1.200 × 600 RGB; 752 × 672 RGBA; 300 kB; ±30 puntos | `09` §7.1 |
-| `DIFF_CLASS_PTS` (clases del mapa de diferencias) | 5 puntos | Elección de presentación (D-98 g) |
+| `DIFF_CLASS_PTS` (clases del mapa de diferencias) | 5 puntos | Elección de presentación (D-106 g) |
 | Colores de las figuras | `--c-surface` #141C2A, `--c-text` #E6EBF2, `--c-text-muted` #A3AFC0, `--c-border` #273246, `--c-sun` #E69F00, `--c-earth` #56B4E9, `--c-nogo` #D55E00 | `web/src/styles/tokens.css` (paleta de Okabe e Ito, `10_interfaz.md` §2) |
 
 Valores medidos (portátil de I1, RTX 4060 Laptop, PyTorch 2.15.0+cu132; tabla real de `web/public/data`):
@@ -431,7 +431,7 @@ Valores medidos (portátil de I1, RTX 4060 Laptop, PyTorch 2.15.0+cu132; tabla r
 | Luna lisa (−0,0869°) en las 4 celdas junto al polo, `mean186` | Sol 51,2 %; Tierra 48,8–49,2 %; ambos 25,2 % | Sol 45–60 %; Tierra 40–60 %; ambos ≤ mín. | `08` §5.3 |
 | Ídem, criterio «cualquier fracción» | Sol 56,4–56,8 %; Tierra 53,6 % | — | — |
 | Capa frente a la referencia de `07` (3 celdas con máscaras de fórmula, enero a marzo de 2026, 2.160 pasos) | Cuentas idénticas en las tres bandas, por mes y en `_any` | Diferencia ≤ 0,4 puntos | `08` §5.3 (B6 sintético) |
-| PyTorch `float32` (CPU) frente a NumPy `float64`, 64 puntos × 2.000 pasos | Diferencia de cuentas ≤ 2 pasos en < 1 % de las celdas | — | D-98 c |
+| PyTorch `float32` (CPU) frente a NumPy `float64`, 64 puntos × 2.000 pasos | Diferencia de cuentas ≤ 2 pasos en < 1 % de las celdas | — | D-106 c |
 | Velocidad en la GPU: 16.384 puntos × 4.096 pasos | 0,45 s → **recorrido completo (505.344 puntos × 163.152 pasos) unos 9 min** | 10–30 min (diseño) | `08` §5.2 |
 | Velocidad de PyTorch en CPU (10 hilos): 2.048 puntos × 4.096 pasos | 0,92 s → recorrido completo unas 2,5 h | 2–4 h (diseño) | `08` §5.2 |
 | N1, N2, N4: tamaño, DN mínimo y máximo | Iguales a la etiqueta | Iguales | `03` §6 |
