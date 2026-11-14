@@ -931,6 +931,16 @@ input[aria-invalid='true'] {
     overflow-y: auto;
     padding-right: 4px;
   }
+  /* Same rule for the scenario column (up to 4 cards) and the main view (comparison table). */
+  .app__left {
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .view {
+    max-height: calc(100vh - 258px);
+    overflow-y: auto;
+  }
 }
 
 /* ---- Cross-section (10 §6.3) ---- */
@@ -981,4 +991,248 @@ input[aria-invalid='true'] {
 .section__text {
   margin: 6px 0 0;
   font-size: 14px;
+}
+
+/* ---- Comparison (10 §5, F8) ---- */
+.compare__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.compare__head h2 {
+  font-size: 17px;
+  margin: 0;
+}
+
+.compare__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.compare__table th,
+.compare__table td {
+  text-align: left;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--c-border);
+  vertical-align: top;
+}
+
+.compare__table thead th {
+  white-space: nowrap;
+}
+
+.compare__best strong {
+  font-weight: 700;
+}
+
+.compare__status--go {
+  color: var(--c-go);
+}
+
+.compare__status--marginal {
+  color: var(--c-marginal);
+}
+
+.compare__status--no_go {
+  color: var(--c-warn-text);
+}
+
+.compare__verdict {
+  font-size: 13px;
+  min-width: 160px;
+}
+
+.compare__minis {
+  margin-top: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.compare__mini-row {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.compare__mini {
+  width: 100%;
+  height: 36px;
+}
+
+/* ---- Replanning (10 §6.5, F10) ---- */
+.replan__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-bottom: 8px;
+}
+
+.replan__controls .field input {
+  width: 5em;
+}
+
+.replan__label {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  align-self: center;
+}
+
+.replan__matrix {
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.replan__matrix th,
+.replan__matrix td {
+  padding: 1px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.replan__matrix thead th {
+  font-weight: 400;
+  color: var(--c-text-muted);
+  padding: 2px 3px;
+}
+
+.replan__site {
+  text-align: left !important;
+  padding-right: 8px !important;
+  font-weight: 600;
+}
+
+.replan__base {
+  outline: 2px solid var(--c-text);
+  outline-offset: -1px;
+}
+
+.replan__cell {
+  min-width: 22px;
+  min-height: 22px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 3px;
+  font-size: 12px;
+  border: none;
+  color: var(--c-bg);
+}
+
+.replan__cell--go {
+  background: var(--c-go);
+}
+
+.replan__cell--marginal {
+  background: var(--c-marginal);
+}
+
+.replan__cell--no_go {
+  background: var(--c-nogo);
+}
+
+.replan__cell--none {
+  background: var(--c-border);
+  color: var(--c-text-muted);
+}
+
+.replan__window {
+  text-align: left !important;
+  padding-left: 8px !important;
+  font-size: 12px;
+  white-space: normal !important;
+  min-width: 220px;
+}
+
+.replan__detail {
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.replan__ranking h3 {
+  font-size: 15px;
+  margin: 8px 0;
+}
+
+.status-chip--go {
+  color: var(--c-go);
+}
+
+.status-chip--marginal {
+  color: var(--c-marginal);
+}
+
+.status-chip--no_go {
+  color: var(--c-warn-text);
+}
+
+@media (pointer: coarse) {
+  .replan__cell {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ---- Guided story (10 §11, F15) ---- */
+.story {
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  width: min(900px, calc(100% - 24px));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-text-muted);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 50%);
+}
+
+.story__text {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+}
+
+.story__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.story__count {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--c-text-muted);
+}
+
+.story__next {
+  border-color: var(--c-text);
+  font-weight: 600;
+}
+
+.replan__active {
+  outline: 3px solid var(--c-marginal);
+  outline-offset: -2px;
+}
+
+.replan__highlight {
+  outline: 2px solid var(--c-marginal);
+}
+
+@media (max-width: 767px) {
+  .story {
+    flex-direction: column;
+    align-items: stretch;
+    bottom: 120px;
+  }
 }

@@ -10,6 +10,7 @@ import { DataState, useResource } from './ui/common/DataState';
 import { AppLayout } from './ui/layout/AppLayout';
 import { routeOf } from './ui/validation/report';
 import { ValidationPage } from './ui/validation/ValidationPage';
+import { StoryOverlay } from './ui/story/StoryOverlay';
 
 function bootError(error: Error): string {
   return error instanceof DataError && (error.kind === 'contract' || error.kind === 'format')
@@ -54,6 +55,7 @@ export function App() {
           initialised ? (
             <BootContext.Provider value={data}>
               {route === 'validation' ? <ValidationPage /> : <AppLayout />}
+              <StoryOverlay />
             </BootContext.Provider>
           ) : null
         }

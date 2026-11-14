@@ -11,7 +11,12 @@
 //     "events":        [{ site_id, observer_height_m, t_a, t_b, events: [{ t_unix, kind }] }],
 //     "metrics":       [{ site_id, observer_height_m, landing_unix, mission_days, cursor_unix,
 //                         sun_hours, earth_hours, both_hours, longest_night_h, longest_link_gap_h,
-//                         sun_el_max_deg, sun_el_min_deg }] }
+//                         sun_el_max_deg, sun_el_min_deg }],
+//     "assess":        [{ site_id, observer_height_m, landing_unix, mission_days, requirements?: {need_sun_at_landing,
+//                         need_earth_at_landing, max_night_hours, marginal_earth_margin_deg, marginal_sun_fraction},
+//                         status, reasons }],
+//     "replan_row":    [{ site_id, observer_height_m, t0, delta_s, mission_days, statuses: [31 × status | null] }],
+//     "rank":          [{ landing_unix, mission_days, site_ids: [ordered, replan_candidate sites] }] }
 //
 // `mask` is a formula id (`flat:0`, `tilt:0.3`, `sine:1,3`…) or a published site id.
 import { describe, expect, it } from 'vitest';
@@ -19,6 +24,8 @@ import { findEvents } from '../events';
 import { siteFrame, skyAt } from '../frames';
 import { formulaMask, horizonAt, maskFromFile, smoothMask, type Mask } from '../horizon';
 import { missionMetrics } from '../metrics';
+import { rankCandidates } from '../ranking';
+import { assess, replanRow, type Requirements } from '../requirements';
 import type { HorizonFile, SitesFile } from '../types';
 import { discFraction, evaluate, frameFor } from '../visibility';
 import { realTable, repoFile } from './fixtures';
@@ -28,6 +35,20 @@ const TOL_FRAC = 1e-6;
 const TOL_KM = 1e-3;
 const TOL_S = 1;
 const TOL_H = 0.001;
+
+const DEFAULT_REQ: Requirements = { needSunAtLanding: true, needEarthAtLanding: true, maxNightHours: 24, marginalEarthMarginDeg: 1, marginalSunFraction: 1 };
+
+function reqOf(r: unknown): Requirements {
+  const x = r as Record<string, number | boolean> | undefined;
+  if (!x) return DEFAULT_REQ;
+  return {
+    needSunAtLanding: x.need_sun_at_landing as boolean,
+    needEarthAtLanding: x.need_earth_at_landing as boolean,
+    maxNightHours: x.max_night_hours as number,
+    marginalEarthMarginDeg: x.marginal_earth_margin_deg as number,
+    marginalSunFraction: x.marginal_sun_fraction as number,
+  };
+}
 
 type Case = Record<string, unknown>;
 
@@ -126,5 +147,37 @@ describe('core_vectors.json (07 §12)', () => {
     close(m.longestLinkGapH, c.longest_link_gap_h as number, TOL_H, `#${i} longest_link_gap_h`);
     close(m.sunElMaxDeg, c.sun_el_max_deg as number, TOL_DEG, `#${i} sun_el_max_deg`);
     close(m.sunElMinDeg, c.sun_el_min_deg as number, TOL_DEG, `#${i} sun_el_min_deg`);
+  });
+
+  /** Assessment of a site for a landing (07 §8.2): status and reasons identical. */
+  function assessOf(siteId: string, h: number, landing: number, days: number, req: Requirements) {
+    const site = siteOf(siteId);
+    const mask = maskOf(site.id, h);
+    const frame = frameFor(site.lat_deg, site.lon_deg, mask);
+    const m = missionMetrics(table!, frame, mask, { landingUnix: landing, missionDays: days }, landing);
+    return { a: assess(evaluate(table!, frame, mask, landing), m, req), m };
+  }
+
+  block('assess', true, (c, i) => {
+    const { a } = assessOf(c.site_id as string, c.observer_height_m as number, c.landing_unix as number, c.mission_days as number, reqOf(c.requirements));
+    expect(a.status, `#${i}`).toBe(c.status);
+    expect(a.reasons, `#${i}`).toEqual(c.reasons);
+  });
+
+  block('replan_row', true, (c, i) => {
+    const site = siteOf(c.site_id as string);
+    const mask = maskOf(site.id, c.observer_height_m as number);
+    const row = replanRow(table!, frameFor(site.lat_deg, site.lon_deg, mask), mask, c.t0 as number, c.delta_s as number, c.mission_days as number, DEFAULT_REQ);
+    expect(row.map((x) => x.status), `#${i}`).toEqual(c.statuses);
+  });
+
+  block('rank', true, (c, i) => {
+    const rows = sites
+      .filter((s) => s.replan_candidate)
+      .map((s) => {
+        const { a, m } = assessOf(s.id, 2, c.landing_unix as number, c.mission_days as number, DEFAULT_REQ);
+        return { siteId: s.id, name: s.short_name, assessment: a, sunPct: m.sunPct, earthPct: m.earthPct };
+      });
+    expect(rankCandidates(rows).map((r) => r.siteId), `#${i}`).toEqual(c.site_ids);
   });
 });

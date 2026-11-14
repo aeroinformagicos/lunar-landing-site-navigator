@@ -3,7 +3,7 @@
 ``map/regions.json`` and ``manifest.json``.
 
 docs/spec/06_horizonte.md §5, §8 and §9; 09_contrato_datos.md §3.1, §4-§6 and §8.2;
-04_catalogo_sitios.md §6. Where the files go (decision D-81):
+04_catalogo_sitios.md §6. Where the files go (decision D-84):
 
 - ``site-mask`` and ``sites`` write the light outputs to ``<out>/light/`` (same paths as the
   contract); ``publish`` copies them to ``web/public/data/``, writes ``manifest.json`` and checks
@@ -50,14 +50,14 @@ EPHEMERIS_BYTES = 5_260_176  # 09 §3.1
 EL_DECIMALS = 4
 LATLON_DECIMALS = 5
 HEIGHT_DECIMALS = 1
-USAGE_DECIMALS = 6  # grid_usage fractions (09 §5 does not fix it; decision D-81)
+USAGE_DECIMALS = 6  # grid_usage fractions (09 §5 does not fix it; decision D-84)
 
 
 StackFactory = Callable[[dict], DemStack | None]
 
 
 def light_dir_of(out_dir: str | Path) -> Path:
-    """Light outputs before ``publish``: ``<out>/light`` (decision D-81)."""
+    """Light outputs before ``publish``: ``<out>/light`` (decision D-84)."""
     return Path(out_dir) / "light"
 
 

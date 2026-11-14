@@ -4,7 +4,7 @@
 docs/spec/04_catalogo_sitios.md. A2 keeps the catalog; the pipeline turns it into ``sites.json``
 (09_contrato_datos.md §4) by adding ``height_m``, ``relief_label``, ``has_mask`` and
 ``has_profile``. Besides ``defaults`` and ``sites``, the catalog has a ``regions`` list (side and
-status of each candidate region, decision D-81): ``python -m pipeline.cli regions`` and the cube
+status of each candidate region, decision D-84): ``python -m pipeline.cli regions`` and the cube
 plan read the boxes from it, so the table of 04 §3 lives in one place only (decision D-52).
 """
 

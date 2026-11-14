@@ -148,7 +148,7 @@ Constantes nuevas (todas en `pipeline/horizon/site_mask.py` salvo indicación):
 | Nombre | Valor | Fuente |
 | --- | --- | --- |
 | `EL_DECIMALS`, `LATLON_DECIMALS`, `HEIGHT_DECIMALS`; `dist_m` entero | 4, 5, 1 | `06_horizonte.md` §5, `09_contrato_datos.md` §5 |
-| `USAGE_DECIMALS` (`stats.grid_usage`) | 6 | Elegido (D-81 g) |
+| `USAGE_DECIMALS` (`stats.grid_usage`) | 6 | Elegido (D-84 g) |
 | `EPHEMERIS_BYTES` | 5.260.176 | `09_contrato_datos.md` §3.1 |
 | `DEFAULT_LAW` | `full` | `06_horizonte.md` §1 |
 | Orden del lote (`pipeline/common/catalog.py`) | Grupos 1–3 | `04_catalogo_sitios.md` §6 |

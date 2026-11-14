@@ -6,6 +6,7 @@ import { t, type TextKey } from '../../i18n/t';
 import { assess } from '../../core/requirements';
 import { useAppStore, type Scenario } from '../../state/store';
 import { Summary } from '../summary/Summary';
+import { STATUS_ICON, STATUS_TEXT } from '../replan/texts';
 import { formatDeg, formatHours, formatMargin, formatPct } from '../common/format';
 import type { ScenarioModel } from '../common/model';
 import { countdownText, cursorState, requirementChecks } from './derive';
@@ -83,6 +84,11 @@ export function MetricsPanel({ model, mission, scenario }: { model: ScenarioMode
       </div>
       {metrics.truncated && <p className="field__warn">{t('warn.truncated')}</p>}
 
+      {assessment && (
+        <p className={`status-chip status-chip--${assessment.status}`} data-testid="status-chip">
+          <span aria-hidden="true">{STATUS_ICON[assessment.status]}</span> {STATUS_TEXT[assessment.status]}
+        </p>
+      )}
       <ul className="checks" aria-label={t('metrics.status')}>
         {checks.map((c) => (
           <li key={c.key} className={c.ok ? 'check check--ok' : 'check check--fail'}>
