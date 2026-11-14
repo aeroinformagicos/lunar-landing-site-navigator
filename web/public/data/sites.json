@@ -2,85 +2,200 @@
   "contract_version": "1.0.0",
   "defaults": {
     "demo_pair": [
-      "demo-a",
-      "demo-b"
+      "change-7-candidate",
+      "shackleton-floor"
     ],
     "demo_landing_utc": "2027-08-01T00:00:00Z",
     "demo_mission_days": 14
   },
   "sites": [
     {
-      "id": "demo-a",
-      "name": "Demo site A (example data)",
-      "short_name": "Demo A",
-      "type": "demo",
-      "lat_deg": -88.8,
-      "lon_deg": 123.4,
-      "height_m": 0.0,
-      "mission": null,
-      "operator": null,
-      "landing_utc": null,
-      "landing_date": null,
-      "relief": "lola_polar",
-      "relief_label": "LOLA polar 40 m + 120 m",
-      "has_mask": true,
-      "has_profile": true,
-      "observer_heights_m": [
-        2
-      ],
-      "replan_candidate": false,
-      "region_id": null,
-      "source": {
-        "label": "Synthetic example data (task T-02)",
-        "url": ""
-      },
-      "note": "Example data: formula horizon, not real terrain."
-    },
-    {
-      "id": "demo-b",
-      "name": "Demo site B (example data)",
-      "short_name": "Demo B",
-      "type": "demo",
-      "lat_deg": -89.67,
-      "lon_deg": 129.78,
-      "height_m": 0.0,
-      "mission": null,
-      "operator": null,
-      "landing_utc": null,
-      "landing_date": null,
-      "relief": "lola_polar",
-      "relief_label": "LOLA polar 40 m + 120 m",
-      "has_mask": true,
-      "has_profile": false,
-      "observer_heights_m": [
-        2
-      ],
-      "replan_candidate": false,
-      "region_id": null,
-      "source": {
-        "label": "Synthetic example data (task T-02)",
-        "url": ""
-      },
-      "note": "Example data: formula horizon, not real terrain."
-    },
-    {
-      "id": "blue-ghost-1",
-      "name": "Blue Ghost Mission 1",
-      "short_name": "Blue Ghost 1",
+      "id": "luna-9",
+      "name": "Luna 9",
+      "short_name": "Luna 9",
       "type": "landing",
-      "lat_deg": 18.562,
-      "lon_deg": 61.81,
+      "lat_deg": 7.13,
+      "lon_deg": -64.37,
       "height_m": null,
-      "mission": "Blue Ghost Mission 1",
-      "operator": "Firefly Aerospace (NASA CLPS)",
-      "landing_utc": "2025-03-02T08:34:00Z",
-      "landing_date": "2025-03-02",
+      "mission": "Luna 9",
+      "operator": "Soviet Union",
+      "landing_utc": null,
+      "landing_date": "1966-02-03",
       "relief": "smooth",
       "relief_label": "Smooth Moon (no terrain)",
       "has_mask": false,
       "has_profile": false,
       "observer_heights_m": [
-        2
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": "Published coordinates are approximate (lander not located in LROC images)."
+    },
+    {
+      "id": "surveyor-1",
+      "name": "Surveyor 1",
+      "short_name": "Surveyor 1",
+      "type": "landing",
+      "lat_deg": -2.4745,
+      "lon_deg": -43.3398,
+      "height_m": null,
+      "mission": "Surveyor 1",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1966-06-02",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "luna-13",
+      "name": "Luna 13",
+      "short_name": "Luna 13",
+      "type": "landing",
+      "lat_deg": 18.87,
+      "lon_deg": -62.05,
+      "height_m": null,
+      "mission": "Luna 13",
+      "operator": "Soviet Union",
+      "landing_utc": null,
+      "landing_date": "1966-12-24",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "surveyor-3",
+      "name": "Surveyor 3",
+      "short_name": "Surveyor 3",
+      "type": "landing",
+      "lat_deg": -3.0162,
+      "lon_deg": -23.418,
+      "height_m": null,
+      "mission": "Surveyor 3",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1967-04-20",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "surveyor-5",
+      "name": "Surveyor 5",
+      "short_name": "Surveyor 5",
+      "type": "landing",
+      "lat_deg": 1.4551,
+      "lon_deg": 23.1943,
+      "height_m": null,
+      "mission": "Surveyor 5",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1967-09-11",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "surveyor-6",
+      "name": "Surveyor 6",
+      "short_name": "Surveyor 6",
+      "type": "landing",
+      "lat_deg": 0.4742,
+      "lon_deg": -1.4275,
+      "height_m": null,
+      "mission": "Surveyor 6",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1967-11-10",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "surveyor-7",
+      "name": "Surveyor 7",
+      "short_name": "Surveyor 7",
+      "type": "landing",
+      "lat_deg": -40.9812,
+      "lon_deg": -11.5127,
+      "height_m": null,
+      "mission": "Surveyor 7",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1968-01-10",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
       ],
       "replan_candidate": false,
       "region_id": null,
@@ -107,13 +222,938 @@
       "has_mask": false,
       "has_profile": false,
       "observer_heights_m": [
-        2
+        2,
+        10
       ],
       "replan_candidate": false,
       "region_id": null,
       "source": {
         "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
         "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "apollo-12",
+      "name": "Apollo 12",
+      "short_name": "Apollo 12",
+      "type": "landing",
+      "lat_deg": -3.0128,
+      "lon_deg": -23.4219,
+      "height_m": null,
+      "mission": "Apollo 12",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1969-11-19",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "luna-16",
+      "name": "Luna 16",
+      "short_name": "Luna 16",
+      "type": "landing",
+      "lat_deg": -0.5137,
+      "lon_deg": 56.3638,
+      "height_m": null,
+      "mission": "Luna 16",
+      "operator": "Soviet Union",
+      "landing_utc": null,
+      "landing_date": "1970-09-20",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "luna-17",
+      "name": "Luna 17 (Lunokhod 1)",
+      "short_name": "Luna 17",
+      "type": "landing",
+      "lat_deg": 38.23764,
+      "lon_deg": -35.00163,
+      "height_m": null,
+      "mission": "Luna 17 (Lunokhod 1)",
+      "operator": "Soviet Union",
+      "landing_utc": null,
+      "landing_date": "1970-11-17",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "apollo-14",
+      "name": "Apollo 14",
+      "short_name": "Apollo 14",
+      "type": "landing",
+      "lat_deg": -3.64589,
+      "lon_deg": -17.47194,
+      "height_m": null,
+      "mission": "Apollo 14",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1971-02-05",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "apollo-15",
+      "name": "Apollo 15",
+      "short_name": "Apollo 15",
+      "type": "landing",
+      "lat_deg": 26.13239,
+      "lon_deg": 3.6333,
+      "height_m": null,
+      "mission": "Apollo 15",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1971-07-30",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "luna-20",
+      "name": "Luna 20",
+      "short_name": "Luna 20",
+      "type": "landing",
+      "lat_deg": 3.7863,
+      "lon_deg": 56.6242,
+      "height_m": null,
+      "mission": "Luna 20",
+      "operator": "Soviet Union",
+      "landing_utc": null,
+      "landing_date": "1972-02-21",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "apollo-16",
+      "name": "Apollo 16",
+      "short_name": "Apollo 16",
+      "type": "landing",
+      "lat_deg": -8.9734,
+      "lon_deg": 15.5011,
+      "height_m": null,
+      "mission": "Apollo 16",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1972-04-21",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "apollo-17",
+      "name": "Apollo 17",
+      "short_name": "Apollo 17",
+      "type": "landing",
+      "lat_deg": 20.1911,
+      "lon_deg": 30.7723,
+      "height_m": null,
+      "mission": "Apollo 17",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1972-12-11",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "luna-21",
+      "name": "Luna 21 (Lunokhod 2)",
+      "short_name": "Luna 21",
+      "type": "landing",
+      "lat_deg": 25.9994,
+      "lon_deg": 30.4076,
+      "height_m": null,
+      "mission": "Luna 21 (Lunokhod 2)",
+      "operator": "Soviet Union",
+      "landing_utc": null,
+      "landing_date": "1973-01-15",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": "Landing date is outside the ephemeris table; the site can be used for any date in 2024-2044."
+    },
+    {
+      "id": "luna-24",
+      "name": "Luna 24",
+      "short_name": "Luna 24",
+      "type": "landing",
+      "lat_deg": 12.7142,
+      "lon_deg": 62.2129,
+      "height_m": null,
+      "mission": "Luna 24",
+      "operator": "Soviet Union",
+      "landing_utc": null,
+      "landing_date": "1976-08-18",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "change-3",
+      "name": "Chang'e 3",
+      "short_name": "Chang'e 3",
+      "type": "landing",
+      "lat_deg": 44.1214,
+      "lon_deg": -19.5117,
+      "height_m": null,
+      "mission": "Chang'e 3",
+      "operator": "CNSA",
+      "landing_utc": null,
+      "landing_date": "2013-12-14",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "change-4",
+      "name": "Chang'e 4",
+      "short_name": "Chang'e 4",
+      "type": "landing",
+      "lat_deg": -45.4561,
+      "lon_deg": 177.5885,
+      "height_m": null,
+      "mission": "Chang'e 4",
+      "operator": "CNSA",
+      "landing_utc": null,
+      "landing_date": "2019-01-03",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "change-5",
+      "name": "Chang'e 5",
+      "short_name": "Chang'e 5",
+      "type": "landing",
+      "lat_deg": 43.0576,
+      "lon_deg": -51.9161,
+      "height_m": null,
+      "mission": "Chang'e 5",
+      "operator": "CNSA",
+      "landing_utc": null,
+      "landing_date": "2020-12-01",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "chandrayaan-3",
+      "name": "Chandrayaan-3",
+      "short_name": "Chandrayaan-3",
+      "type": "landing",
+      "lat_deg": -69.3741,
+      "lon_deg": 32.32,
+      "height_m": 528.4,
+      "mission": "Chandrayaan-3",
+      "operator": "ISRO",
+      "landing_utc": null,
+      "landing_date": "2023-08-23",
+      "relief": "lola_60s",
+      "relief_label": "LOLA 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "slim",
+      "name": "SLIM",
+      "short_name": "SLIM",
+      "type": "landing",
+      "lat_deg": -13.316,
+      "lon_deg": 25.251,
+      "height_m": -912.5,
+      "mission": "SLIM",
+      "operator": "JAXA",
+      "landing_utc": "2024-01-19T15:20:00Z",
+      "landing_date": "2024-01-19",
+      "relief": "sldem2015",
+      "relief_label": "SLDEM2015 59 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "im-1",
+      "name": "IM-1 Odysseus",
+      "short_name": "IM-1 Odysseus",
+      "type": "landing",
+      "lat_deg": -80.13,
+      "lon_deg": 1.44,
+      "height_m": 2594.1,
+      "mission": "IM-1 Odysseus",
+      "operator": "Intuitive Machines (NASA CLPS)",
+      "landing_utc": null,
+      "landing_date": "2024-02-22",
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "change-6",
+      "name": "Chang'e 6",
+      "short_name": "Chang'e 6",
+      "type": "landing",
+      "lat_deg": -41.6385,
+      "lon_deg": -153.9852,
+      "height_m": null,
+      "mission": "Chang'e 6",
+      "operator": "CNSA",
+      "landing_utc": null,
+      "landing_date": "2024-06-01",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "blue-ghost-1",
+      "name": "Blue Ghost Mission 1",
+      "short_name": "Blue Ghost 1",
+      "type": "landing",
+      "lat_deg": 18.562,
+      "lon_deg": 61.81,
+      "height_m": -3652.4,
+      "mission": "Blue Ghost Mission 1",
+      "operator": "Firefly Aerospace (NASA CLPS)",
+      "landing_utc": "2025-03-02T08:34:00Z",
+      "landing_date": "2025-03-02",
+      "relief": "sldem2015",
+      "relief_label": "SLDEM2015 59 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "im-2",
+      "name": "IM-2 Athena",
+      "short_name": "IM-2 Athena",
+      "type": "landing",
+      "lat_deg": -84.7906,
+      "lon_deg": 29.1957,
+      "height_m": 5321.7,
+      "mission": "IM-2 Athena",
+      "operator": "Intuitive Machines (NASA CLPS)",
+      "landing_utc": null,
+      "landing_date": "2025-03-06",
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": "Lander came to rest inside a 20 m crater that the terrain model does not resolve."
+    },
+    {
+      "id": "region-de-gerlache-rim-2",
+      "name": "de Gerlache Rim 2",
+      "short_name": "de Gerlache Rim 2",
+      "type": "candidate_region",
+      "lat_deg": -88.2,
+      "lon_deg": -64.6,
+      "height_m": -266.7,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": "de-gerlache-rim-2",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
+    },
+    {
+      "id": "region-haworth",
+      "name": "Haworth",
+      "short_name": "Haworth",
+      "type": "candidate_region",
+      "lat_deg": -86.8,
+      "lon_deg": -22.8,
+      "height_m": 1690.9,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": "haworth",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
+    },
+    {
+      "id": "region-malapert-massif",
+      "name": "Malapert Massif",
+      "short_name": "Malapert Massif",
+      "type": "candidate_region",
+      "lat_deg": -86.0,
+      "lon_deg": -0.2,
+      "height_m": 4769.5,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": "malapert-massif",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
+    },
+    {
+      "id": "region-mons-mouton",
+      "name": "Mons Mouton",
+      "short_name": "Mons Mouton",
+      "type": "candidate_region",
+      "lat_deg": -85.4,
+      "lon_deg": 31.7,
+      "height_m": 6457.2,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": "mons-mouton",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
+    },
+    {
+      "id": "region-mons-mouton-plateau",
+      "name": "Mons Mouton Plateau",
+      "short_name": "Mouton Plateau",
+      "type": "candidate_region",
+      "lat_deg": -84.3,
+      "lon_deg": 30.6,
+      "height_m": 5290.1,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": "mons-mouton-plateau",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
+    },
+    {
+      "id": "region-nobile-rim-1",
+      "name": "Nobile Rim 1",
+      "short_name": "Nobile Rim 1",
+      "type": "candidate_region",
+      "lat_deg": -85.4,
+      "lon_deg": 37.3,
+      "height_m": 5897.8,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": "nobile-rim-1",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
+    },
+    {
+      "id": "region-nobile-rim-2",
+      "name": "Nobile Rim 2",
+      "short_name": "Nobile Rim 2",
+      "type": "candidate_region",
+      "lat_deg": -84.0,
+      "lon_deg": 58.8,
+      "height_m": 1104.0,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": "nobile-rim-2",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
+    },
+    {
+      "id": "region-peak-near-cabeus-b",
+      "name": "Peak near Cabeus B",
+      "short_name": "Peak near Cabeus B",
+      "type": "candidate_region",
+      "lat_deg": -83.6,
+      "lon_deg": -68.7,
+      "height_m": 4568.4,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": "peak-near-cabeus-b",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
+    },
+    {
+      "id": "region-slater-plain",
+      "name": "Slater Plain",
+      "short_name": "Slater Plain",
+      "type": "candidate_region",
+      "lat_deg": -87.2,
+      "lon_deg": 125.5,
+      "height_m": -2.4,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": "slater-plain",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
+    },
+    {
+      "id": "val-899s",
+      "name": "89.9° S test point",
+      "short_name": "89.9° S test point",
+      "type": "validation",
+      "lat_deg": -89.9,
+      "lon_deg": 0,
+      "height_m": 629.4,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "Project plan (test point)",
+        "url": ""
+      },
+      "note": ""
+    },
+    {
+      "id": "val-equator",
+      "name": "Sub-Earth point (0°, 0°)",
+      "short_name": "Sub-Earth point",
+      "type": "validation",
+      "lat_deg": 0,
+      "lon_deg": 0,
+      "height_m": null,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "Project plan (test point)",
+        "url": ""
+      },
+      "note": ""
+    },
+    {
+      "id": "im-2-planned",
+      "name": "IM-2 planned site",
+      "short_name": "IM-2 planned site",
+      "type": "validation",
+      "lat_deg": -84.78,
+      "lon_deg": 29.13,
+      "height_m": 5312.2,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "Project plan (test point)",
+        "url": ""
+      },
+      "note": ""
+    },
+    {
+      "id": "change-7-candidate",
+      "name": "Chang'e 7 candidate (near Shackleton)",
+      "short_name": "Chang'e 7 site",
+      "type": "validation",
+      "lat_deg": -88.8,
+      "lon_deg": 123.4,
+      "height_m": 1632.0,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": true,
+      "region_id": null,
+      "source": {
+        "label": "Wikipedia, Chang'e 7",
+        "url": "https://en.wikipedia.org/wiki/Chang%27e_7"
+      },
+      "note": "Reported candidate site; not an official landing site."
+    },
+    {
+      "id": "shackleton-floor",
+      "name": "Shackleton crater floor",
+      "short_name": "Shackleton floor",
+      "type": "validation",
+      "lat_deg": -89.67,
+      "lon_deg": 129.78,
+      "height_m": -2788.9,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "Gazetteer of Planetary Nomenclature, feature 5450",
+        "url": "https://planetarynames.wr.usgs.gov/Feature/5450"
       },
       "note": ""
     }
