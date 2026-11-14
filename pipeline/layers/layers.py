@@ -361,7 +361,7 @@ def units_of_counts(counts: np.ndarray, n_steps) -> np.ndarray:
     """``v = round(pct / 0.4)`` with ``pct = 100 · count / n`` (09 §9.2), as uint8.
 
     In integers, so that a value exactly halfway rounds up the same on every machine:
-    ``v = floor(250·count/n + 1/2) = (500·count + n) // (2n)`` (decision D-97).
+    ``v = floor(250·count/n + 1/2) = (500·count + n) // (2n)`` (decision D-98).
     A period without steps in this run (a shortened run of the tests) gives 255.
     """
     c = np.asarray(counts, dtype=np.int64)

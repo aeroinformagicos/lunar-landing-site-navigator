@@ -366,7 +366,7 @@ def diff_colours(diff: np.ndarray) -> np.ndarray:
     """RGB [..., 3] of a difference in points, diverging from −30 (blue) through 0 to +30 (vermillion).
 
     In 13 classes of 5 points (the nearest multiple of 5, |diff| < 2.5 is the neutral class): easier to
-    read than a continuous ramp, and the PNG stays within the 300 kB of 09 §7.1 (decision D-97).
+    read than a continuous ramp, and the PNG stays within the 300 kB of 09 §7.1 (decision D-98).
     """
     step = np.floor(np.nan_to_num(diff) / DIFF_CLASS_PTS + 0.5) * DIFF_CLASS_PTS
     t = np.clip(step / DIFF_RANGE_PTS, -1.0, 1.0)
