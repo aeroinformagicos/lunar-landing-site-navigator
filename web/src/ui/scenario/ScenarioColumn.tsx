@@ -93,7 +93,7 @@ export function ScenarioCard({ scenario, sites, onChangeSite }: CardProps) {
     : ref.kind === 'custom'
       ? formatLatLon(ref.latDeg, ref.lonDeg)
       : '';
-  // Custom points are smooth Moon until the mesh lookup (core/grid.ts) exists (D-67).
+  // Custom points are smooth Moon until the mesh lookup (core/grid.ts) exists (D-69).
   const smooth = site ? site.relief === 'smooth' || !site.has_mask : true;
   const reliefLabel = site && !smooth ? site.relief_label : t('relief.smooth');
   const horizonId = site && !smooth ? site.id : null;

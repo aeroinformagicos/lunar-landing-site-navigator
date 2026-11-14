@@ -72,6 +72,18 @@ fuente (CLAUDE.md §2).
 | Paso de búsqueda de cruces | 600 | s | `07_visibilidad.md` §6.1 | `web/src/core/events.ts` (`SCAN_STEP_S`) |
 | Horizonte de la cuenta atrás | 60 | días | `07_visibilidad.md` §7 | `web/src/core/metrics.ts` (`NEXT_EVENT_HORIZON_S`) |
 | Ley de muestreo `full` / `fast` (web) | 20 m × 1.000 + 1,001ⁿ (3.709) / 40 m × 500 + 1,002ⁿ (1.855) | m | `06_horizonte.md` §3 | `web/src/core/law.ts` (`LAWS`) |
+| `R_SUN_KM`, `R_EARTH_KM` | 695.700; 6.378,137 | km | `05_efemerides.md` §1 (plan; cabecera de Horizons: `Target radii` y `R_eq`) | `pipeline/common/constants.py` |
+| `FRAME`, `ABCORR` | `MOON_ME`; `LT+S` | — | `05` §1 (`moon_de440_250416.tf`; plan) | `pipeline/common/constants.py` |
+| `STEP_S`, `OBSERVER_HEIGHT_M` | 3.600; 2,0 | s; m | `05` §1 (plan) | `pipeline/common/constants.py` |
+| `ZENITH_REL` (umbral del convenio del cénit, Python) | 10⁻¹² (fracción de la longitud del vector) | — | D-62 (mismo valor que `web/src/core/frames.ts`) | `pipeline/common/constants.py`, `pipeline/common/geo.py` (`azel_from_vector`) |
+| `KERNEL_FILES` (los cuatro núcleos, en orden de carga) | `naif0012.tls`, `de440.bsp`, `moon_pa_de440_200625.bpc`, `moon_de440_250416.tf` | — | `03_datos_y_fuentes.md` §2 | `pipeline/ephem/kernels.py` |
+| Prueba del propio `.tf`: Tierra respecto a la Luna en ET = 717768000,0, sin corrección, en `MOON_ME` y en `MOON_PA`; tolerancia | (374008,654; −23435,970; 10141,334) y (373997,028; −23558,987; 10284,057); 0,001 | km | `03` §2; `05` §8.1 | `pipeline/tests/test_ephem_frames.py` |
+| `HORIZONS_TOL_DEG` (referencia `azel_spice` frente a Horizons, acimut y elevación) | 0,0005 | ° | `05` §8.3 | `pipeline/tests/test_ephem_frames.py` |
+| `MOON_ME` frente a `MOON_PA`, máximo de \|Δ elevación\| en 2025: IM-2 previsto; Blue Ghost 1; tolerancia; mínimo exigido | 0,0227; 0,0156; ± 0,002; > 0,010 | ° | `05` §8.5 (cifras medidas del plan) | `pipeline/tests/test_ephem_frames.py` |
+| TDB − UTC desde 2017: 32,184 s + 37 s; término periódico (tolerancia) | 69,184; 0,002 | s | `naif0012.tls` (`DELTET/DELTA_T_A`, `DELTET/DELTA_AT`, `DELTET/K` = 1,657 ms); `05` §2 (ΔAT = 37 s) | `pipeline/tests/test_ephem_frames.py` |
+| Puesta del centro del Sol en Blue Ghost 1 con Luna lisa: 2025-03-16T20:10:39Z (± 1 s, redondeo al segundo) | 39 | s tras las 20:10 | `05` §8.3 | `pipeline/tests/test_ephem_frames.py` |
+| Tabla ENU a mano: tolerancias | 10⁻⁹; 10⁻⁶ | °; km | `05` §8.2 | `pipeline/tests/test_enu.py` |
+| Blue Ghost 1 en `MOON_ME`: (778,06; 1451,68; 553,01) km a mano y `Dxy` = 1647,03931 km, `Dz` = 553,01019 km de Horizons (tolerancia: media unidad de la última cifra impresa) | — | km | `03` §3.4 | `pipeline/tests/test_enu.py` |
 | Rangos de fecha de aterrizaje admitidos | 1969-01-01 – 1973-01-01 y 2024-01-01 – 2045-01-01 (UTC) | — | Validez de los tramos de `ephemeris.meta.json` (`09` §3.2, `05` §4.5) | `web/src/state/selectors.ts` (`SUPPORTED_RANGES`) |
 | Duración de la misión | 0,5 – 60, paso 0,5 | días | `10_interfaz.md` §4, `01_alcance.md` F2 | `web/src/state/selectors.ts` |
 | Paso del deslizador del cursor | 600 (flechas); 86.400 (PageUp/PageDown); 3.600 (botones y `[` `]`) | s | `10_interfaz.md` §4, §12 | `web/src/state/selectors.ts`, `ui/controls/TimeControls.tsx` |
@@ -167,3 +179,19 @@ en unos 40 min; no sustituye a la medida.
 | Lectura de P1 y P2 y copia a la GPU | 1,2 s | — | — |
 
 Regla de decisión de `08` §4 aplicada en D-59: ley `full`, niveles 1 a 4.
+
+### T-04 · Referencia SPICE y marcos (2026-11-14)
+
+Medido en el portátil de I1 con los cuatro núcleos de `$LLSN_DATA_DIR/kernels` (`pytest -s
+pipeline/tests/test_ephem_frames.py`).
+
+| Qué | Valor medido | Esperado | Fuente del esperado |
+| --- | --- | --- | --- |
+| Prueba del `.tf`: Tierra respecto a la Luna en ET = 717768000,0, `MOON_ME`, sin corrección | (374008,6544; −23435,9701; 10141,3339) km | (374008,654; −23435,970; 10141,334) ± 0,001 km | `03_datos_y_fuentes.md` §2 |
+| `azel_spice` frente a Horizons, 15 filas de `horizons_smoke.csv`: máximo de \|Δ acimut\| y de \|Δ elevación\| | 3,6·10⁻⁷° y 4,6·10⁻⁷° | < 0,0005° (cifra del plan: < 0,000001°) | `05_efemerides.md` §8.3 |
+| Ídem, distancia (9 filas que la llevan): máximo de \|Δ distancia\| | 0,004 km | — (se informa; no hay tolerancia en la especificación) | — |
+| `MOON_ME` frente a `MOON_PA`, máximo de \|Δ elevación\| (Sol o Tierra) en las 8.760 horas de 2025: IM-2 previsto (84,78° S, 29,13° E) | 0,02274° | 0,0227° ± 0,002° | `05` §8.5 |
+| Ídem, Blue Ghost 1 (18,56° N, 61,81° E) | 0,01558° | 0,0156° ± 0,002° | `05` §8.5 |
+| Puesta del centro del Sol en Blue Ghost 1, Luna lisa (interpolación lineal entre 20:10 y 20:11 UTC del 2025-03-16) | 20:10:39,08 UTC (elevaciones 0,005209176° y −0,002787842°) | 20:10:39 UTC | `05` §8.3 |
+| `utc_iso_to_et('2022-09-30T00:00:00Z')` − 717768000 | 69,18235 s | 69,184 s ± 0,002 s | `naif0012.tls` |
+| `test_enu.py` + `test_ephem_frames.py` (37 pruebas; unas 70.000 llamadas a `spkcpo` en la prueba de marcos), ejecutadas solas | 2,9 s | — | — |
