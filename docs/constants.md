@@ -93,6 +93,8 @@ fuente (CLAUDE.md §2).
 | Rango admitido de `maxNightHours` en un enlace | 0 – 400 | h | `07_visibilidad.md` §8.1 («editable: 0–400») | `web/src/state/url.ts` (`MAX_NIGHT_HOURS_RANGE`) |
 | Móvil: objetivo táctil mínimo; alto de la vista principal; columnas del panel de cifras | 44 × 44; 55 % del alto de pantalla; 3 | px; —; — | `10_interfaz.md` §12 («Táctil»), §3.2 | `web/src/styles/app.css` (bloque T-20) |
 | Móvil: hueco reservado bajo la página para la barra de tiempo fija (`--timebar-h`) | 144 | px | Medido (T-20): la barra mide 136 px a 390 × 844 con controles de 44 px (tres filas); 8 px de margen | `web/src/styles/app.css` |
+| B1: tolerancia del % de disco en pantalla (más el medio paso del redondeo entero) | 10⁻⁴ (10⁻⁶ en fracción) | % | `07_visibilidad.md` §12.4 (fracciones 10⁻⁶); B1 solo da `B1_deg` y `B1_min` | `web/e2e/b1.spec.ts` |
+| B1: tolerancia de un % de tiempo en pantalla (más el medio paso del redondeo entero) | `B1_min` / (D·24 h) × 100 | % | `tests/golden/tolerances.json` (`B1_min`) llevado al porcentaje de la misión (`07` §7: horas ÷ duración × 100) | `web/e2e/b1.spec.ts` |
 
 ## Valores medidos
 
@@ -338,7 +340,7 @@ Constantes nuevas (`pipeline/tests/test_a3_blueghost_sunset.py`, `test_a8_sanity
 | A10 con relieve: observador | 2 m (máscara LOLA polar) | `07_visibilidad.md` §1 (alturas de las máscaras) |
 | Informe: titulares y su orden; figuras de `A7B7` | B3, A3, A7B7; `validation/a7b7_scatter.png`, `validation/a7b7_diff_map.png` | `09_contrato_datos.md` §7 y §7.1 |
 | Informe: casos manuales | A5, A11, B8, B9, B10, B11 | `11` §7.1 |
-| Informe: hora de los titulares | Redondeada al minuto (medio minuto hacia arriba) | Elegido (D-90 d) |
+| Informe: hora de los titulares | Redondeada al minuto (medio minuto hacia arriba) | Elegido (D-91 d) |
 
 Medido (tabla publicada, máscaras publicadas de T-21, cuatro núcleos):
 
