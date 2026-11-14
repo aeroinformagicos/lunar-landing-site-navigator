@@ -203,7 +203,7 @@ input[aria-invalid='true'] {
   display: grid;
   grid-template-columns: var(--col-left) minmax(0, 1fr) var(--col-right);
   gap: var(--gap);
-  padding: var(--gap) 16px;
+  padding: var(--gap) 16px 6px;
 }
 
 .app__left h2 {
@@ -868,11 +868,18 @@ input[aria-invalid='true'] {
   font-size: 14px;
 }
 
-.pano__row {
+.pano__main {
   display: flex;
   flex-wrap: wrap;
   gap: var(--gap);
   align-items: flex-start;
+}
+
+.pano__side {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 236px;
 }
 
 .pano__zoom {
@@ -894,12 +901,34 @@ input[aria-invalid='true'] {
   background: var(--c-bg);
   border: 1px solid var(--c-border);
   border-radius: var(--radius);
-  padding: 8px 10px;
-  min-width: 220px;
+  padding: 6px 10px;
 }
 
 .pano__effect h3 {
   margin: 0 0 4px;
   font-size: 14px;
   color: var(--c-text-muted);
+}
+
+/* ---- Plain summary (10 §8) ---- */
+.summary {
+  border-left: 3px solid var(--c-border);
+  padding-left: 10px;
+}
+
+.summary p {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+/* Desktop: the right panel scrolls inside its column so the page stays on one screen (10 §1). */
+@media (min-width: 1024px) {
+  .app__body {
+    align-items: start;
+  }
+  .app__right {
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+    padding-right: 4px;
+  }
 }

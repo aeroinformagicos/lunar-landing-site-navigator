@@ -167,7 +167,7 @@ function ActiveView({ tab }: { tab: Tab | 'panel' }) {
     >
       {(d: { model: ScenarioModel; mission: MissionResult }) =>
         tab === 'panel' ? (
-          <MetricsPanel model={d.model} mission={d.mission} />
+          <MetricsPanel model={d.model} mission={d.mission} scenario={scenario} />
         ) : tab === 'panorama' ? (
           <Panorama model={d.model} mission={d.mission} scenario={scenario} />
         ) : (
