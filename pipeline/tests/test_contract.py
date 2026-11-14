@@ -270,8 +270,23 @@ def test_cli_exit_codes(broken, capsys):
 # --- The committed examples are what the generator writes -----------------------------------
 
 
+def _content(path: Path) -> bytes:
+    """What a file holds, independent of the compressor build (zlib and Pillow differ by platform).
+
+    PNG: mode, size and pixels. gzip: the uncompressed bytes. Anything else: the bytes as they are.
+    """
+    if path.suffix == ".png":
+        from PIL import Image
+
+        with Image.open(path) as im:
+            return f"{im.mode} {im.size}".encode() + im.tobytes()
+    if path.suffix == ".gz":
+        return contract_check.gunzip_single_member(path.read_bytes())
+    return path.read_bytes()
+
+
 def _tree(root: Path) -> dict[str, bytes]:
-    return {p.relative_to(root).as_posix(): p.read_bytes() for p in sorted(root.rglob("*")) if p.is_file()}
+    return {p.relative_to(root).as_posix(): _content(p) for p in sorted(root.rglob("*")) if p.is_file()}
 
 
 def test_examples_are_up_to_date(tmp_path):
