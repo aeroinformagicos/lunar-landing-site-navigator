@@ -6,6 +6,7 @@ import { t, type TextKey } from '../../i18n/t';
 import { assess } from '../../core/requirements';
 import { useAppStore, type Scenario } from '../../state/store';
 import { Summary } from '../summary/Summary';
+import { ChartData } from './ChartData';
 import { STATUS_ICON, STATUS_TEXT } from '../replan/texts';
 import { formatDeg, formatHours, formatMargin, formatPct } from '../common/format';
 import type { ScenarioModel } from '../common/model';
@@ -132,6 +133,8 @@ export function MetricsPanel({ model, mission, scenario }: { model: ScenarioMode
       </section>
 
       {now && assessment && <Summary model={model} mission={mission} scenario={scenario} now={now} assessment={assessment} />}
+
+      <ChartData mission={mission} />
 
       <p className="provenance">{t('metrics.provenance', { terrain: model.reliefLabel })}</p>
     </>
