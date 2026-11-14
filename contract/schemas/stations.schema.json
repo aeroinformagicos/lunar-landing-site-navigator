@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stations.schema.json",
+  "title": "stations.json (09_contrato_datos.md §12; only with F14)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "stations"],
+  "properties": {
+    "contract_version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "stations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "lat_deg", "lon_deg", "height_m", "min_elevation_deg", "source"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "name": { "type": "string", "minLength": 1 },
+          "lat_deg": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
+          "lon_deg": { "type": ["number", "null"], "exclusiveMinimum": -180, "maximum": 180 },
+          "height_m": { "type": ["number", "null"] },
+          "min_elevation_deg": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "url"],
+            "properties": { "label": { "type": "string" }, "url": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}
