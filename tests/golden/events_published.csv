@@ -1,0 +1,7 @@
+case,event,utc,source_url,quote
+B3,eclipse_start,2025-03-14T05:00:00Z,https://fireflyspace.com/?p=3379,The eclipse will last nearly 5 hours starting at 12 am CST through 4:52 am CST
+B3,totality_start,2025-03-14T06:18:00Z,https://fireflyspace.com/?p=3379,"approximately 2 hours and 16 minutes of totality, starting at 1:18 am CST"
+B3,totality_end,2025-03-14T08:34:00Z,https://fireflyspace.com/?p=3379,1:18 am + 2 h 16 min
+B3,eclipse_end,2025-03-14T09:52:00Z,https://fireflyspace.com/?p=3379,through 4:52 am CST
+A3,last_data,2025-03-16T23:15:00Z,https://fireflyspace.com/news/firefly-aerospace-successfully-completes-14-days-of-surface-operations-on-the-moon,the final data received around 6:15 pm CDT on March 16
+A3,sunset_latest,2025-03-16T18:15:00Z,https://fireflyspace.com/news/firefly-aerospace-successfully-completes-14-days-of-surface-operations-on-the-moon,operated for 5 hours into the lunar night
