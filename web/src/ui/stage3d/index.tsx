@@ -1,28 +1,31 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Stage3D (16_vista_3d.md; common contract in annex A). T-71: the realistic polar scene. T-72: orbit,
-// fly and ground cameras, Go to flights, the signals of §8 and the click on the terrain. Fills its
-// container, reads everything from the store and the scenario model, draws only the camera controls
-// as its own panel. A WebGL failure is thrown so the shell's error boundary shows the 2D view.
+// fly and ground cameras, Go to flights, the signals of §8 and the click on the terrain. T-73: the
+// profile, horizon-ring and smooth-Moon scenes for sites off the polar mesh (§2.1, §4.2–§4.4) with a
+// fade between scenes, the projected map layers (§9) and the quality checks. Fills its container,
+// reads everything from the store and the scenario model, draws only the camera controls as its own
+// panel. A WebGL failure is thrown so the shell's error boundary shows the 2D view.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { enuBasis } from '../../core/frames';
 import { GRID, cellOfXY, gridRef, inGrid, xyOfLatLon } from '../../core/grid';
 import { blockerAt, horizonAt, smoothHorizon, type Mask } from '../../core/horizon';
-import { joinUrl, loader } from '../../core/loaders';
+import { DataError, joinUrl, loader } from '../../core/loaders';
 import type { Site } from '../../core/types';
 import { evaluate, type SkyState } from '../../core/visibility';
-import { t } from '../../i18n/t';
+import { t, type TextKey } from '../../i18n/t';
 import { activeScenario, parseSiteRef } from '../../state/selectors';
-import { missionEnd, useAppStore, type Scenario } from '../../state/store';
+import { missionEnd, useAppStore, type MapLayer, type Scenario } from '../../state/store';
 import { useBoot } from '../common/data';
 import { useResource } from '../common/DataState';
 import { formatDeg, formatInt, formatLatLon, formatMargin } from '../common/format';
 import { useScenarioModel } from '../common/model';
-import { loadCellMask, meshPointLabel, NotComputed } from '../map/mapData';
+import { loadCellMask, loadLayer, meshPointLabel, NotComputed, type Band, type LayersInfo, type LayerPeriod } from '../map/mapData';
 import { bodyTrace, pointerReadout, ridgeLabel } from '../panorama/texts';
 import { startOrbit, wrapDeg } from './camera';
-import { Controls, type GoToItem, type LiveRefs } from './Controls';
+import { Controls, type GoToItem, type LiveRefs, type OverlayControl } from './Controls';
 import {
   POLAR_FRAME,
+  R_M,
   add,
   azElToMe,
   dirToScene,
@@ -43,15 +46,30 @@ import {
 import { Labels, placeLabels, type LabelView } from './Labels';
 import { buildRadialMesh, ringDistances } from './meshes';
 import { GROUND, raycastGround, segmentBlocked, type CameraMode, type FlyInput, type LookState } from './navigation';
+import { bandBytes, overlayChoices, overlayLutLinear, overlayRamp, shownLayer } from './overlay';
 import { pickTier, TIER_SETTINGS, type Tier } from './quality';
-import { bodyStatus, chooseScene, describeView, inPolarMesh, reliefLine, siteLatLon, type DemStatus, type SceneKind } from './scenePlan';
+import { RADIAL_MAX_M, buildRingPanels, ringGroundAt } from './radial';
+import { bodyStatus, describeView, inPolarMesh, pickScene, reliefLine, siteLatLon, type DemStatus, type SceneKind, type Source } from './scenePlan';
 import { Engine, type Ground, type LineItem } from './scene/engine';
-import { litFraction } from './shadow';
+import { litFraction, radialLitFraction } from './shadow';
 import { crestIndices, crestLine, pathOnDome, regionOutline, scaleBar } from './signals';
-import { loadPolarDem, meshJob, polarGround, polarHeightAt, sphereGround, surfacePoint } from './terrain';
+import {
+  loadPolarDem,
+  meshJob,
+  polarGround,
+  polarHeightAt,
+  polarHeights,
+  profileHeightFn,
+  radialGround,
+  radialHeights,
+  sphereGround,
+  type TerrainHeights,
+} from './terrain';
 import './stage3d.css';
 
-const CAP_M = 300_000;
+const CAP_M = RADIAL_MAX_M;
+/** Fade to black between two scenes (§7.4). */
+const FADE_MS = 250;
 const DESC_EVERY_MS = 10_000;
 /** Radius of the dome that carries the Sun and Earth paths (§8.3). */
 const DOME_M = 20_000;
@@ -88,6 +106,12 @@ function urlParam(name: string): string | null {
   }
 }
 
+/**
+ * Whether the viewer turned the projected layer on, for the life of the page: the view unmounts when
+ * another tab opens, and the store keeps no 3D state (§10.2).
+ */
+const overlaySession = { on: false };
+
 const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const FLY_KEYS: Record<string, keyof FlyInput | 'back' | 'left' | 'down'> = {
@@ -113,8 +137,11 @@ export default function Stage3D() {
   const showSmooth = useAppStore((s) => s.showSmooth);
   const mode = useAppStore((s) => s.mode);
   const storyStep = useAppStore((s) => s.storyStep);
+  const mapLayer = useAppStore((s) => s.mapLayer);
+  const mapPeriod = useAppStore((s) => s.mapPeriod);
   const setActiveScenario = useAppStore((s) => s.setActiveScenario);
   const updateScenario = useAppStore((s) => s.updateScenario);
+  const setMapLayer = useAppStore((s) => s.setMapLayer);
   const [model] = useScenarioModel(active);
 
   const test = urlParam('test3d') === '1';
@@ -126,6 +153,10 @@ export default function Stage3D() {
   const heightsRef = useRef<Float32Array | null>(null);
   const holesRef = useRef<Uint8Array | null>(null);
   const groundRef = useRef<Ground | null>(null);
+  /** Terrain heights of the built scene (polar DEM, profile, ring ground; null on a sphere). */
+  const terrRef = useRef<TerrainHeights | null>(null);
+  /** Time of the last mesh job in the worker (ms, §12.3), for the test hooks. */
+  const meshMsRef = useRef<number | null>(null);
   const labelEls = useRef(new Map<string, HTMLElement>());
   const labelsRef = useRef<LabelView[]>([]);
   const occluded = useRef(new Set<string>());
@@ -141,12 +172,25 @@ export default function Stage3D() {
     scaleText: useRef<HTMLSpanElement>(null),
     readout: useRef<HTMLSpanElement>(null),
     skyNote: useRef<HTMLParagraphElement>(null),
+    beyond: useRef<HTMLParagraphElement>(null),
   };
   const [fatal, setFatal] = useState<Error | null>(null);
   const [engineKey, setEngineKey] = useState(0);
   const [engineReady, setEngineReady] = useState(false);
   const [tier, setTier] = useState<Tier>('alto');
-  const [built, setBuilt] = useState<{ key: string; frame: SceneFrame } | null>(null);
+  const tierRef = useRef(tier);
+  tierRef.current = tier;
+  /** The scene on screen: `key` includes the level of detail, `group` is the scene and its site. */
+  const [built, setBuilt] = useState<{ key: string; group: string; frame: SceneFrame } | null>(null);
+  /** Scene group whose build may run: it lags the wanted one by the fade to black (§7.4). */
+  const [shownGroup, setShownGroup] = useState<string | null>(null);
+  const [fading, setFading] = useState(false);
+  /** The projected map layer is on (it starts at `None` in the 3D view, §9; kept while the page lives). */
+  const [overlayOn, setOverlayOnState] = useState(overlaySession.on);
+  const setOverlayOn = useCallback((on: boolean) => {
+    overlaySession.on = on;
+    setOverlayOnState(on);
+  }, []);
   const [camMode, setCamMode] = useState<CameraMode>('orbit');
   const [fpsText, setFpsText] = useState<string | null>(null);
   const [desc, setDesc] = useState('');
@@ -165,12 +209,60 @@ export default function Stage3D() {
     loader.json(joinUrl(config.heavy_base_url, 'map/regions.json'), (_u, j) => (j as { regions: RegionRow[] }).regions),
   );
   const dem: DemStatus = demRes.status === 'ready' ? 'ready' : demRes.status === 'error' ? 'error' : 'loading';
-  const kind: SceneKind | null = loc ? chooseScene(loc.latDeg, loc.lonDeg, dem) : null;
-  const sceneKey = kind === 'polar' ? 'polar' : kind === 'smooth' && loc ? `smooth:${loc.latDeg},${loc.lonDeg}` : null;
+  // Off the polar mesh (or without its DEM): the site's profile (§2.3), then its mask (§2.4).
+  const ref = parseSiteRef(active.siteRef);
+  const site = ref.kind === 'catalogue' ? sites.sites.find((s) => s.id === ref.id) : undefined;
+  const withRelief = site !== undefined && site.relief !== 'smooth';
+  const offPolar = !wantsPolar || dem === 'error';
+  const profileFile = offPolar && withRelief && site.has_profile ? `profile/${site.id}.bin.gz` : null;
+  const [profileRes, retryProfile] = useResource(profileFile ? `stage3d-profile:${config.data_base_url}/${profileFile}` : null, () =>
+    loader.loadProfile(config.data_base_url, profileFile!),
+  );
+  const resSource = (r: { status: string }): Source => (r.status === 'ready' ? 'ready' : r.status === 'error' ? 'error' : 'loading');
+  const profileSrc: Source = profileFile ? resSource(profileRes) : 'none';
+  const maskWanted = (withRelief && site.has_mask) || ref.kind === 'grid';
+  const maskSrc: Source = !maskWanted ? 'none' : model.status === 'ready' ? (model.data.smooth ? 'none' : 'ready') : resSource(model);
+  const pick = loc ? pickScene({ latDeg: loc.latDeg, lonDeg: loc.lonDeg, dem, profile: profileSrc, mask: maskSrc }) : null;
+  const kind: SceneKind | null = pick?.kind ?? null;
+  const lod = TIER_SETTINGS[tier].lod;
+  const sceneGroup = !kind || !loc ? null : kind === 'polar' ? 'polar' : kind === 'profile' ? `profile:${site!.id}` : kind === 'ring' ? `ring:${active.siteRef}:${active.observerHeightM}` : `smooth:${loc.latDeg},${loc.lonDeg}`;
+  const sceneKey = sceneGroup && kind === 'profile' ? `${sceneGroup}:${lod}` : sceneGroup;
   const frame = built && built.key === sceneKey ? built.frame : null;
   const polarReady = frame?.polar === true && built?.key === 'polar';
   const regions = regionsRes.status === 'ready' && polarReady ? regionsRes.data : [];
   const mask: Mask | null = model.status === 'ready' ? model.data.mask : null;
+
+  // Fade to black before mounting another scene, and back in once it is built (§7.4); a jump with
+  // reduced motion and for the first scene.
+  useEffect(() => {
+    if (!sceneGroup || sceneGroup === shownGroup) return;
+    if (shownGroup === null || reducedMotion()) {
+      setShownGroup(sceneGroup);
+      return;
+    }
+    setFading(true);
+    const id = window.setTimeout(() => setShownGroup(sceneGroup), FADE_MS);
+    return () => window.clearTimeout(id);
+  }, [sceneGroup, shownGroup]);
+  useEffect(() => {
+    if (fading && built?.group === shownGroup && shownGroup === sceneGroup) setFading(false);
+  }, [fading, built, shownGroup, sceneGroup]);
+
+  // ---- Map layers projected on the terrain (§9), polar scene only ------------------------------
+  const [layersRes] = useResource(wantsPolar ? `stage3d-layers:${config.heavy_base_url}` : null, () =>
+    loader.json(joinUrl(config.heavy_base_url, 'layers/layers.json'), (url, j): LayersInfo => {
+      const l = j as { source: LayersInfo['source']; periods: LayerPeriod[]; encoding: { bands: Band[] } };
+      if (!Array.isArray(l.periods) || l.periods.length === 0) throw new DataError('format', url, 'No layer periods');
+      return { source: l.source, periods: l.periods, bands: l.encoding.bands };
+    }),
+  );
+  const layers = layersRes.status === 'ready' ? layersRes.data : null;
+  const period = layers ? (layers.periods.find((p) => p.id === mapPeriod) ?? layers.periods[0]) : null;
+  const band = layers ? shownLayer(overlayOn, mapLayer, layers.source, layers.bands) : null;
+  // Same resource key as the map view, so a layer it loaded is not asked for twice (§2.7).
+  const [layerRes, retryLayer] = useResource(polarReady && band && period ? `layer:${config.heavy_base_url}/${period.file}` : null, () =>
+    loadLayer(loader, config.heavy_base_url, period!),
+  );
 
   const flash = useCallback((text: string) => {
     setMessage(text);
@@ -260,21 +352,27 @@ export default function Stage3D() {
   // ---- Scene build ---------------------------------------------------------------------------
   useEffect(() => {
     const engine = engineRef.current;
-    if (!engine || !engineReady || !kind || !loc) return;
+    if (!engine || !engineReady || !kind || !loc || !pick || !sceneKey || !sceneGroup) return;
+    // During the fade to black the previous scene stays on screen.
+    if (shownGroup !== sceneGroup) return;
     let alive = true;
-    const setGround = (g: Ground) => {
+    const setGround = (g: Ground, h: TerrainHeights | null) => {
       groundRef.current = g;
+      terrRef.current = h;
       engine.setGround(g);
     };
+    /** A bare sphere around `f` while the scene's data loads: never an empty view (§13). */
+    const placeholder = (f: SceneFrame) => {
+      engine.setPlaceholder(f);
+      setGround(sphereGround(f), null);
+      setBuilt({ key: `${sceneKey}:placeholder`, group: sceneGroup, frame: f });
+    };
+    if (built?.key === sceneKey) return;
     if (kind === 'polar') {
-      if (dem !== 'ready' || demRes.status !== 'ready') {
-        engine.setPlaceholder(POLAR_FRAME);
-        setGround(sphereGround(POLAR_FRAME));
-        setBuilt({ key: 'polar-placeholder', frame: POLAR_FRAME });
+      if (pick.pending || demRes.status !== 'ready') {
+        placeholder(POLAR_FRAME);
         return;
       }
-      if (built?.key === 'polar') return;
-      const lod = TIER_SETTINGS[tier].lod;
       const job = heightsRef.current
         ? meshJob({ heights: heightsRef.current, holes: holesRef.current ?? undefined, lod })
         : meshJob({ dem: demRes.data.slice(), lod });
@@ -282,22 +380,53 @@ export default function Stage3D() {
         if (!alive || engineRef.current !== engine) return;
         heightsRef.current = a.heights;
         holesRef.current = a.holes;
+        meshMsRef.current = a.ms;
         engine.setPolar(a.tiles, a.heights, a.holes);
-        setGround(polarGround(a.heights));
-        setBuilt({ key: 'polar', frame: POLAR_FRAME });
+        setGround(polarGround(a.heights), polarHeights(a.heights));
+        setBuilt({ key: 'polar', group: 'polar', frame: POLAR_FRAME });
       });
+    } else if (kind === 'profile') {
+      if (pick.pending || profileRes.status !== 'ready') {
+        placeholder(makeSceneFrame(loc.latDeg, loc.lonDeg, 0));
+        return;
+      }
+      const p = profileRes.data;
+      // Profile mesh (§4.2) in the worker; the anchor sits at the site's height (§3.1).
+      meshJob({ kind: 'profile', raw: p.heightM, law: p.law, latDeg: loc.latDeg, lonDeg: loc.lonDeg, siteHeightM: p.siteHeightM, lod }).then((a) => {
+        if (!alive || engineRef.current !== engine) return;
+        const f = makeSceneFrame(loc.latDeg, loc.lonDeg, p.siteHeightM);
+        meshMsRef.current = a.ms;
+        engine.setRadialScene(f, [a.mesh], CAP_M, a.drawn);
+        const fn = profileHeightFn(a.terrain);
+        setGround(radialGround(f, fn), radialHeights(f, fn));
+        setBuilt({ key: sceneKey, group: sceneGroup, frame: f });
+      });
+    } else if (kind === 'ring') {
+      if (pick.pending || !mask) {
+        placeholder(makeSceneFrame(loc.latDeg, loc.lonDeg, 0));
+        return;
+      }
+      // Horizon ring (§4.3): flat ground at the site's height, panels at the mask's distances.
+      const siteH = mask.siteHeightM;
+      const f = makeSceneFrame(loc.latDeg, loc.lonDeg, siteH);
+      const dist = ringDistances();
+      const ground = buildRadialMesh(f, 256, dist, (_j, b) => ringGroundAt(siteH, dist[b]), siteH, false);
+      engine.setRadialScene(f, [ground, buildRingPanels(f, mask)], CAP_M);
+      const fn = (d: number) => ringGroundAt(siteH, d);
+      setGround(radialGround(f, fn), radialHeights(f, fn));
+      setBuilt({ key: sceneKey, group: sceneGroup, frame: f });
     } else {
       const f = makeSceneFrame(loc.latDeg, loc.lonDeg, 0);
       const cap = buildRadialMesh(f, 256, ringDistances(), () => 0, 0, true);
       engine.setSmooth(f, cap, CAP_M);
-      setGround(sphereGround(f));
-      setBuilt({ key: sceneKey!, frame: f });
+      setGround(sphereGround(f), null);
+      setBuilt({ key: sceneKey, group: sceneGroup, frame: f });
     }
     return () => {
       alive = false;
     };
     // `built` is read to skip a rebuild of the same scene; listing it would loop.
-  }, [engineReady, engineKey, kind, sceneKey, dem, demRes, tier]);
+  }, [engineReady, engineKey, kind, sceneKey, sceneGroup, shownGroup, pick?.pending, demRes, profileRes, mask, lod]);
 
   // A lower tier after slow frames (§12.2): new level of detail and shadow resolution.
   const lastTier = useRef(tier);
@@ -316,6 +445,33 @@ export default function Stage3D() {
     engine.setSize(r.w, r.h, window.devicePixelRatio || 1);
   }, [tier, built]);
 
+  // The projected layer (§9): one band of the period's file on the polar terrain; none elsewhere.
+  useEffect(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    if (!polarReady || !band || !layers || layerRes.status !== 'ready') engine.setOverlay(null, null);
+    else engine.setOverlay(bandBytes(layerRes.data, layers.bands.indexOf(band)), overlayLutLinear(band));
+  }, [polarReady, band, layers, layerRes, built, engineReady]);
+
+  const overlay = useMemo((): OverlayControl | null => {
+    if (!polarReady || !layers || !period) return null;
+    return {
+      choices: overlayChoices(layers.source).map((layer) => ({ layer, label: t(layer === 'none' ? 'stage3d.overlay_none' : (`map.layer.${layer}` as TextKey)) })),
+      current: band ?? 'none',
+      onPick(layer: MapLayer) {
+        // A layer chosen here is the map's layer too (§9); `None` only hides it in the 3D view.
+        if (layer === 'none') setOverlayOn(false);
+        else {
+          setOverlayOn(true);
+          setMapLayer(layer);
+        }
+      },
+      legend: band
+        ? { ramp: overlayRamp(band), periodLabel: period.label, planB: layers.source === 'nasa_avgvisib', status: layerRes.status, onRetry: retryLayer }
+        : null,
+    };
+  }, [polarReady, layers, period, band, layerRes.status, retryLayer, setMapLayer, setOverlayOn]);
+
   // ---- Positions in the scene ---------------------------------------------------------------
   /** Scene point of a latitude, longitude and height above the sphere. */
   const pointAt = useCallback(
@@ -331,12 +487,8 @@ export default function Stage3D() {
   );
   /** Terrain height (m) under a latitude and longitude in the current scene. */
   const groundAt = useCallback(
-    (latDeg: number, lonDeg: number): number => {
-      if (!frame?.polar || !heightsRef.current) return 0;
-      const { x, y } = xyOfLatLon(latDeg, lonDeg);
-      return polarHeightAt(heightsRef.current, x, y);
-    },
-    // `built` changes when the polar heights arrive.
+    (latDeg: number, lonDeg: number): number => (frame && terrRef.current ? terrRef.current.heightAt(latDeg, lonDeg) : 0),
+    // `built` changes when the scene's heights arrive.
     [frame, built],
   );
   /** The observer's eye at the active site (§7.3): terrain or mask height + observer height. */
@@ -396,13 +548,13 @@ export default function Stage3D() {
   }, [eye, focusAz, mask]);
   const startFor = useCallback(() => {
     if (!frame || !loc) return null;
-    const target = surfacePoint(frame, loc.latDeg, loc.lonDeg, frame.polar ? heightsRef.current : null);
+    const target = pointAt(loc.latDeg, loc.lonDeg, groundAt(loc.latDeg, loc.lonDeg));
+    if (!target) return null;
     const other = scenarios.find((x) => x.id !== active.id);
     const ol = other ? siteLatLon(other.siteRef, sites.sites) : null;
     const sep = ol ? surfaceDistanceM(loc.latDeg, loc.lonDeg, ol.latDeg, ol.lonDeg) : null;
     return startOrbit(target, focusAz(), sep);
-    // `built` changes when the polar heights arrive.
-  }, [frame, loc, scenarios, active.id, sites.sites, focusAz, built]);
+  }, [frame, loc, scenarios, active.id, sites.sites, focusAz, pointAt, groundAt]);
 
   const changeMode = useCallback(
     (m: CameraMode) => {
@@ -435,14 +587,15 @@ export default function Stage3D() {
   useEffect(() => {
     const engine = engineRef.current;
     if (!engine || !frame || !loc) return;
-    const key = `${built?.key}|${active.id}|${active.siteRef}|${sky ? 1 : 0}`;
+    // By scene group, not key: a new level of detail of the same scene keeps the camera.
+    const key = `${built?.group}|${active.id}|${active.siteRef}|${sky ? 1 : 0}`;
     if (framedFor.current === key) return;
     const prevScene = framedFor.current.split('|')[0];
     const prevSite = framedFor.current.split('|').slice(1, 3).join('|');
     framedFor.current = key;
     const s = startFor();
     if (!s) return;
-    if (prevScene !== built?.key) engine.setOrbit(s, true);
+    if (prevScene !== built?.group) engine.setOrbit(s, true);
     else if (prevSite !== `${active.id}|${active.siteRef}`) engine.goTo(s);
     else engine.setOrbit(s, false); // the sky arrived: turn toward the focus body
     if (engine.getMode() === 'ground') {
@@ -607,12 +760,12 @@ export default function Stage3D() {
       if (!l) continue;
       const inScene = frame.polar ? inPolarMesh(l.latDeg, l.lonDeg) : surfaceDistanceM(l.latDeg, l.lonDeg, frame.latDeg, frame.lonDeg) < CAP_M;
       if (!inScene) continue;
-      const base = surfacePoint(frame, l.latDeg, l.lonDeg, frame.polar ? heightsRef.current : null);
+      const base = pointAt(l.latDeg, l.lonDeg, groundAt(l.latDeg, l.lonDeg));
+      if (!base) continue;
       out.push({ s, base, up: localBasisAt(frame, base).u });
     }
     return out;
-    // `built` changes when the polar heights arrive.
-  }, [frame, built, scenarios, sites.sites]);
+  }, [frame, scenarios, sites.sites, pointAt, groundAt]);
 
   useEffect(() => {
     engineRef.current?.setMasts(camMode === 'ground' ? pinBases.filter((p) => p.s.id !== active.id) : pinBases);
@@ -791,8 +944,8 @@ export default function Stage3D() {
   // ---- Live readouts and labels after each frame ---------------------------------------------------
   const camModeRef = useRef(camMode);
   camModeRef.current = camMode;
-  const liveCtx = useRef({ frame, mask, eye, loc, letter: active.id });
-  liveCtx.current = { frame, mask, eye, loc, letter: active.id };
+  const liveCtx = useRef({ frame, mask, eye, loc, letter: active.id, polarBuilt: polarReady });
+  liveCtx.current = { frame, mask, eye, loc, letter: active.id, polarBuilt: polarReady };
   useEffect(() => {
     const engine = engineRef.current;
     if (!engine) return;
@@ -855,6 +1008,23 @@ export default function Stage3D() {
           live.skyNote.current.hidden = !far;
           if (far) live.skyNote.current.textContent = t('stage3d.sky_from', { letter: ctx.letter });
         }
+        // §4.1: when the smooth sphere beyond the polar mesh is in view, the relief line says so.
+        if (live.beyond.current) {
+          let beyond = false;
+          if (ctx.frame?.polar && ctx.polarBuilt) {
+            // Nine rays against the reference sphere (cheap; the relief changes little at that scale).
+            for (const fx of [0.05, 0.5, 0.95]) {
+              for (const fy of [0.05, 0.5, 0.95]) {
+                const r = engine.rayAt(w * fx, h * fy);
+                const hit = raySphere(r.o, r.d, POLAR_CENTRE, R_M);
+                if (!hit) continue;
+                const m = meToLatLonH(fromScene(ctx.frame, hit));
+                if (!inPolarMesh(m.latDeg, m.lonDeg)) beyond = true;
+              }
+            }
+          }
+          live.beyond.current.hidden = !beyond;
+        }
       }
       const wrap = wrapRef.current;
       if (wrap && test) {
@@ -883,29 +1053,48 @@ export default function Stage3D() {
     w.__stage3d = {
       compareShadow(n: number) {
         const engine = engineRef.current;
-        const hts = heightsRef.current;
         const s = engine?.lastSky();
         const size = engine?.shadowSize();
-        if (!engine || !hts || !s || !size) return null;
+        if (!engine || !s || !size) return null;
+        const hts = heightsRef.current;
+        const radial = size.kind === 'radial' ? engine.radialShadowSource() : null;
+        const f = liveCtx.current.frame;
+        if (size.kind === 'polar' ? !hts : !radial || !f) return null;
         let agree = 0;
         let maxDiff = 0;
         let lit = 0;
+        /** The first texels that disagree (diagnostics of the test). */
+        const worst: { i: number; j: number; gpu: number; cpu: number }[] = [];
         let seed = 7;
         const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+        const rho = (s.sunRadiusDeg * Math.PI) / 180;
         for (let k = 0; k < n; k++) {
           const i = Math.floor(rnd() * size.w);
           const j = Math.floor(rnd() * size.h);
           const gpu = engine.readShadow(i, j);
           if (gpu === null) return null;
-          const x = GRID.xMinM + (i + 0.5) * size.div * GRID.cellM;
-          const y = GRID.yMaxM - (j + 0.5) * size.div * GRID.cellM;
-          const cpu = litFraction(hts, x, y, s.sunMe, (s.sunRadiusDeg * Math.PI) / 180);
+          let cpu: number;
+          if (radial && f) {
+            // Radial texel (bin i, azimuth j) of the profile scene.
+            cpu = radialLitFraction(radial, f, j, i, s.sunMe, rho);
+          } else {
+            const x = GRID.xMinM + (i + 0.5) * size.div * GRID.cellM;
+            const y = GRID.yMaxM - (j + 0.5) * size.div * GRID.cellM;
+            cpu = litFraction(hts!, x, y, s.sunMe, rho);
+          }
           const d = Math.abs(gpu - cpu);
           if (d <= 0.05) agree++;
+          else if (worst.length < 8) worst.push({ i, j, gpu, cpu });
           maxDiff = Math.max(maxDiff, d);
           if (cpu > 0.5) lit++;
         }
-        return { n, agree: agree / n, maxDiff, litShare: lit / n };
+        return { n, agree: agree / n, maxDiff, litShare: lit / n, kind: size.kind, worst };
+      },
+      /** Figures of §12.3: GPU memory (MB), last mesh job in the worker (ms), mean shadow pass (ms), tier. */
+      perf(passes = 10) {
+        const engine = engineRef.current;
+        if (!engine) return null;
+        return { gpuMB: engine.gpuMemoryMB(), meshMs: meshMsRef.current, shadowMs: engine.benchShadow(passes), tier: tierRef.current };
       },
       /** Looks straight down at a map point (m) from 3 km, in orbit (the tests then press Enter). */
       focusMap(x: number, y: number) {
@@ -931,6 +1120,8 @@ export default function Stage3D() {
   }, [test]);
 
   // ---- Description for screen readers (§13): at most every 10 s, never during playback ----------
+  const shownLabel = overlay?.legend ? (overlay.choices.find((c) => c.layer === overlay.current)?.label ?? null) : null;
+  const descOverlay = useMemo(() => (shownLabel && period ? { layer: shownLabel, period: period.label } : null), [shownLabel, period]);
   const descAt = useRef(0);
   /** The last description had the sky and the camera: later ones wait for the 10 s step. */
   const descComplete = useRef(false);
@@ -956,6 +1147,8 @@ export default function Stage3D() {
           distM: m === 'orbit' ? (goal?.distM ?? Number.NaN) : m === 'fly' && look && g ? g.clearance(look.pos) : Number.NaN,
           headingDeg: m === 'orbit' ? (goal?.headingDeg ?? 0) : (look?.yawDeg ?? 0),
           eyeM: active.observerHeightM,
+          scene: kind ?? undefined,
+          overlay: descOverlay,
         }),
       );
     };
@@ -966,7 +1159,7 @@ export default function Stage3D() {
     }
     const id = window.setTimeout(make, wait);
     return () => window.clearTimeout(id);
-  }, [sky, active, loc, mask, playing, sites.sites, built, camMode]);
+  }, [sky, active, loc, mask, playing, sites.sites, built, camMode, kind, descOverlay]);
 
   // ---- Input (§7) -----------------------------------------------------------------------------------
   useEffect(() => {
@@ -1079,8 +1272,14 @@ export default function Stage3D() {
   const smoothSite = model.status === 'ready' ? model.data.smooth : false;
   const figures = model.status === 'ready' ? model.data.reliefLabel : '';
   const relief = reliefLine(kind ?? 'smooth', smoothSite, figures);
-  const terrain = kind === 'polar' ? (built?.key === 'polar' ? 'ready' : demRes.status === 'error' ? 'error' : 'loading') : demRes.status === 'error' && wantsPolar ? 'error' : 'none';
+  // A failed source moved the site one scene down (§2.1): the controls say so, with Retry.
+  const dataError = (wantsPolar && demRes.status === 'error') || (profileFile !== null && profileRes.status === 'error');
+  const terrain = pick?.pending || (kind !== null && !frame) ? 'loading' : dataError ? 'error' : kind === 'smooth' ? 'none' : 'ready';
   const state = !engineReady ? 'loading' : terrain === 'loading' ? 'terrain' : frame ? 'ready' : 'loading';
+  const retryTerrain = () => {
+    retryDem();
+    retryProfile();
+  };
 
   return (
     <div
@@ -1092,6 +1291,8 @@ export default function Stage3D() {
       tabIndex={0}
       data-state={state}
       data-mode={camMode}
+      data-scene={frame ? (kind ?? undefined) : undefined}
+      data-overlay={polarReady && band && layerRes.status === 'ready' ? band : 'none'}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
       onBlur={() => held.current.clear()}
@@ -1113,11 +1314,13 @@ export default function Stage3D() {
           {t('stage3d.loading')}
         </p>
       )}
+      <div className={`stage3d__fade${fading ? ' stage3d__fade--on' : ''}`} aria-hidden="true" />
       <Labels labels={labels} register={registerLabel} />
       <Controls
         relief={relief}
+        overlay={overlay}
         terrain={terrain}
-        onRetry={retryDem}
+        onRetry={retryTerrain}
         onRecenter={recenter}
         onNorthUp={northUp}
         mode={camMode}
@@ -1130,6 +1333,21 @@ export default function Stage3D() {
       />
     </div>
   );
+}
+
+/** Centre of the Moon in the polar scene (16 §3.1). */
+const POLAR_CENTRE: V3 = [0, -R_M, 0];
+
+/** First intersection of the ray o + t·d (unit d, t > 0) with a sphere, or null. */
+function raySphere(o: V3, d: V3, c: V3, r: number): V3 | null {
+  const oc = sub(o, c);
+  const b = oc[0] * d[0] + oc[1] * d[1] + oc[2] * d[2];
+  const q = oc[0] * oc[0] + oc[1] * oc[1] + oc[2] * oc[2] - r * r;
+  const disc = b * b - q;
+  if (disc < 0) return null;
+  const s = Math.sqrt(disc);
+  const t = -b - s > 0 ? -b - s : -b + s;
+  return t > 0 ? add(o, scale(d, t)) : null;
 }
 
 /** Bodies whose blocking ridge is drawn (§8.4): the focus body (as the panorama), and the Sun whenever it is hidden. */

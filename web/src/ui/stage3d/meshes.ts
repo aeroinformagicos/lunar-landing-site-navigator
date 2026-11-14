@@ -219,52 +219,59 @@ export function ringDistances(d0 = 50, dMax = 300_000, ratio = 1.075): number[] 
 }
 
 /**
- * Radial mesh around the anchor of `f` (§4.2, §4.4): `nAz` azimuths × `dist` rings, heights from
- * `heightAt(azIndex, ringIndex)` (m above the sphere) and a centre vertex at `centreH`. With
- * `sphereNormals`, normals are radial (a smooth Moon); otherwise from the neighbours.
+ * Radial mesh around the anchor of `f` (§4.2, §4.4): a regular grid of (`nAz` + 1) azimuth columns
+ * (the last one repeats the first, so a texture indexed by azimuth wraps without a seam) × (1 +
+ * `dist.length`) rings, ring 0 being the anchor itself at `centreH`. Heights from
+ * `heightAt(azIndex, ringIndex)` (m above the sphere). `uv` = ((b + 0.5)/nb, (j + 0.5)/nAz): the
+ * texel of bin b and azimuth j of a radial texture (the shadow pass of the profile scene, §6.3).
+ * With `sphereNormals`, normals are radial (a smooth Moon); otherwise from the neighbours.
  */
 export function buildRadialMesh(
   f: SceneFrame,
   nAz: number,
-  dist: readonly number[],
+  dist: ArrayLike<number>,
   heightAt: (j: number, b: number) => number,
   centreH: number,
   sphereNormals: boolean,
 ): TileMesh {
   const nb = dist.length;
-  const nv = 1 + nAz * nb;
+  const nr = nb + 1;
+  const nv = (nAz + 1) * nr;
   const position = new Float32Array(nv * 3);
   const normal = new Float32Array(nv * 3);
   const uv = new Float32Array(nv * 2);
-  const me: V3[] = new Array(nv);
-  me[0] = scale(f.u, R_M + centreH);
+  const centre = scale(f.u, R_M + centreH);
+  const me: V3[] = new Array(nAz * nr);
   for (let j = 0; j < nAz; j++) {
     const a = (2 * Math.PI * j) / nAz;
     const T = add(scale(f.n, Math.cos(a)), scale(f.e, Math.sin(a)));
+    me[j * nr] = centre;
     for (let b = 0; b < nb; b++) {
       const th = dist[b] / R_M;
-      const r = R_M + heightAt(j, b);
-      me[1 + j * nb + b] = scale(add(scale(f.u, Math.cos(th)), scale(T, Math.sin(th))), r);
+      me[j * nr + 1 + b] = scale(add(scale(f.u, Math.cos(th)), scale(T, Math.sin(th))), R_M + heightAt(j, b));
     }
   }
-  const offset = toScene(f, me[0]);
-  const vid = (j: number, b: number) => 1 + (((j % nAz) + nAz) % nAz) * nb + b;
-  for (let v = 0; v < nv; v++) {
-    const s = toScene(f, me[v]);
-    position.set([s[0] - offset[0], s[1] - offset[1], s[2] - offset[2]], 3 * v);
-  }
-  for (let v = 0; v < nv; v++) {
-    let n: V3;
-    if (sphereNormals || v === 0) n = rotToScene(f, unit(me[v]));
-    else {
-      const j = Math.floor((v - 1) / nb);
-      const b = (v - 1) % nb;
-      const along = sub(me[vid(j, Math.min(b + 1, nb - 1))], b > 0 ? me[vid(j, b - 1)] : me[0]);
-      const across = sub(me[vid(j + 1, b)], me[vid(j - 1, b)]);
-      n = rotToScene(f, unit(cross(across, along)));
-      if (dot(n, rotToScene(f, unit(me[v]))) < 0) n = scale(n, -1); // always the outward side
+  const at = (j: number, r: number) => me[(((j % nAz) + nAz) % nAz) * nr + r];
+  const offset = toScene(f, centre);
+  const vid = (j: number, r: number) => j * nr + r;
+  for (let j = 0; j <= nAz; j++) {
+    for (let r = 0; r < nr; r++) {
+      const v = vid(j, r);
+      const p = at(j, r);
+      const s = toScene(f, p);
+      position.set([s[0] - offset[0], s[1] - offset[1], s[2] - offset[2]], 3 * v);
+      let n: V3;
+      if (sphereNormals || r === 0) n = rotToScene(f, unit(p));
+      else {
+        const along = sub(at(j, Math.min(r + 1, nr - 1)), at(j, r - 1));
+        const across = sub(at(j + 1, r), at(j - 1, r));
+        n = rotToScene(f, unit(cross(across, along)));
+        if (dot(n, rotToScene(f, unit(p))) < 0) n = scale(n, -1); // always the outward side
+      }
+      normal.set(n, 3 * v);
+      uv[2 * v] = (Math.max(r - 1, 0) + 0.5) / nb;
+      uv[2 * v + 1] = (j + 0.5) / nAz;
     }
-    normal.set(n, 3 * v);
   }
   const idx: number[] = [];
   const up = rotToScene(f, f.u);
@@ -277,10 +284,11 @@ export function buildRadialMesh(
     else idx.push(a, c, b);
   };
   for (let j = 0; j < nAz; j++) {
-    ccw(0, vid(j, 0), vid(j + 1, 0));
-    for (let b = 0; b < nb - 1; b++) {
-      ccw(vid(j, b), vid(j, b + 1), vid(j + 1, b));
-      ccw(vid(j + 1, b), vid(j, b + 1), vid(j + 1, b + 1));
+    // Ring 0 is the anchor in every column: the first band is a fan of single triangles.
+    ccw(vid(j, 0), vid(j, 1), vid(j + 1, 1));
+    for (let r = 1; r < nr - 1; r++) {
+      ccw(vid(j, r), vid(j, r + 1), vid(j + 1, r));
+      ccw(vid(j + 1, r), vid(j, r + 1), vid(j + 1, r + 1));
     }
   }
   return { offset, position, normal, uv, index: Uint32Array.from(idx) };

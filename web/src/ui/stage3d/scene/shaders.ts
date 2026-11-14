@@ -1,6 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Shaders of the 3D view (16_vista_3d.md §5, §6). three.js `ShaderMaterial` chunks give logarithmic
 // depth, tone mapping and the output colour space.
+import { RAMP_STEPS } from '../overlay';
 
 /** Hash noise shared by the regolith and the Earth's clouds (decorative). */
 const NOISE = /* glsl */ `
@@ -59,10 +60,14 @@ uniform vec3 frameN;
 uniform vec3 frameU;
 uniform float clipCos;
 uniform float R;
+uniform float useOverlay;    // projected map layer (§9), polar scene only
+uniform sampler2D overlayTex; // R8 stored values (pct / 0.4; 255 = no data), the polar grid
+uniform vec3 overlayLut[${RAMP_STEPS}]; // the map's ramp, linear RGB
 varying vec3 vNormal;
 varying vec3 vWorld;
 varying vec2 vUv;
 ${NOISE}
+bool dots() { vec2 g = fract(gl_FragCoord.xy / 6.0) - 0.5; return dot(g, g) < 0.04; }
 void main() {
   #include <logdepthbuf_fragment>
   if (clipMode > 0) {
@@ -89,12 +94,20 @@ void main() {
     if (f > 0.0) A *= 1.0 + f * 0.1 * (2.0 * (0.5 * vnoise(vWorld.xz / 40.0) + 0.3 * vnoise(vWorld.xz / 12.0) + 0.2 * vnoise(vWorld.xz / 3.0)) - 1.0);
   }
   vec3 col = vec3(A) * (sunI * lit * ll + ambient) + A * earthI * max(dot(n, earthDir), 0.0) * earthColour;
-  if (useHoles > 0.5 && texture2D(holeTex, vUv).r > 0.5) {
-    vec2 g = fract(gl_FragCoord.xy / 6.0) - 0.5;
-    if (dot(g, g) < 0.04) col = mix(col, vec3(0.35), 0.6);
-  }
+  if (useHoles > 0.5 && texture2D(holeTex, vUv).r > 0.5 && dots()) col = mix(col, vec3(0.35), 0.6);
   gl_FragColor = vec4(col, 1.0);
   #include <tonemapping_fragment>
+  // The map layer is mixed after tone mapping, so its colours stay those of the 2D map's ramp:
+  // mix(lit regolith, ramp × (0.55 + 0.45·cos i), 0.7); «no data» is transparent with the dot pattern.
+  if (useOverlay > 0.5) {
+    float v = floor(texture2D(overlayTex, vUv).r * 255.0 + 0.5);
+    if (v > 250.5) {
+      if (dots()) gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.5), 0.6);
+    } else {
+      int k = int(min(10.0, floor(v * 0.4 / 10.0 + 0.5)));
+      gl_FragColor.rgb = mix(gl_FragColor.rgb, overlayLut[k] * (0.55 + 0.45 * max(ci, 0.0)), 0.7);
+    }
+  }
   #include <colorspace_fragment>
 }
 `;

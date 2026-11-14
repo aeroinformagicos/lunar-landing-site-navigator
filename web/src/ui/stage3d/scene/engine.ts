@@ -1,7 +1,8 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
-// three.js side of the 3D view (16_vista_3d.md §4–§6, §7.1, §12): renderer, terrain, smooth sphere,
-// sky, Sun, Earth, cast-shadow pass, scenario masts and the orbit camera. Imperative; the React
-// component feeds it and draws the DOM labels from `project`.
+// three.js side of the 3D view (16_vista_3d.md §4–§6, §7.1, §9, §12): renderer, terrain (polar tiles
+// or a radial mesh around the site), smooth sphere, sky, Sun, Earth, cast-shadow pass (polar or
+// radial), projected map layer, scenario masts and the cameras. Imperative; the React component
+// feeds it and draws the DOM labels from `project`.
 import * as THREE from 'three';
 import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
@@ -13,7 +14,9 @@ import { flightAt, flyStep, lookDir, makeFlight, orbitToLook, turn, type CameraM
 import { LOOK } from '../look';
 import type { TileMesh } from '../meshes';
 import { FpsMonitor, TIER_SETTINGS, type Tier } from '../quality';
-import { SHADOW_FRAG, SHADOW_VERT } from '../shadow';
+import { RAMP_STEPS } from '../overlay';
+import type { RadialTerrain } from '../radial';
+import { BIN_LUT_SIZE, RADIAL_SHADOW_FRAG, SHADOW_FRAG, SHADOW_VERT, binLut } from '../shadow';
 import { EARTH_FRAG, SKY_VERT, STAR_FRAG, STAR_VERT, SUN_FRAG, TERRAIN_FRAG, TERRAIN_VERT } from './shaders';
 
 export interface SkyInput {
@@ -89,7 +92,17 @@ export class Engine {
   private readonly sun: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
   private readonly earth: THREE.Mesh<THREE.SphereGeometry, THREE.ShaderMaterial>;
   private readonly masts: THREE.LineSegments;
-  private shadow: { rt: THREE.WebGLRenderTarget; scene: THREE.Scene; cam: THREE.Camera; mat: THREE.RawShaderMaterial; dem: THREE.DataTexture } | null = null;
+  private shadow: {
+    kind: 'polar' | 'radial';
+    rt: THREE.WebGLRenderTarget;
+    scene: THREE.Scene;
+    cam: THREE.Camera;
+    mat: THREE.RawShaderMaterial;
+    textures: THREE.Texture[];
+  } | null = null;
+  /** Source of the radial shadow pass (the profile scene). */
+  private radialSrc: RadialTerrain | null = null;
+  private overlayTex: THREE.DataTexture | null = null;
   private holeTex: THREE.DataTexture | null = null;
   private frame: SceneFrame = POLAR_FRAME;
   private ground: Ground | null = null;
@@ -153,6 +166,9 @@ export class Engine {
       frameU: { value: new THREE.Vector3() },
       clipCos: { value: 1 },
       R: { value: R_M },
+      useOverlay: { value: 0 },
+      overlayTex: { value: null as THREE.Texture | null },
+      overlayLut: { value: Array.from({ length: RAMP_STEPS }, () => new THREE.Vector3()) },
     });
     this.terrainMat = new THREE.ShaderMaterial({ vertexShader: TERRAIN_VERT, fragmentShader: TERRAIN_FRAG, uniforms: uniforms() });
     this.sphereMat = new THREE.ShaderMaterial({ vertexShader: TERRAIN_VERT, fragmentShader: TERRAIN_FRAG, uniforms: uniforms() });
@@ -279,6 +295,7 @@ export class Engine {
   /** Polar scene (§4.1): tiles, the DEM and hole textures, the shadow pass and the clipped sphere. */
   setPolar(tiles: TileMesh[], heights: Float32Array, holes: Uint8Array) {
     this.frame = POLAR_FRAME;
+    this.radialSrc = null;
     this.applyFrameUniforms();
     this.clearTerrain();
     for (const t of tiles) this.addMesh(t);
@@ -304,19 +321,30 @@ export class Engine {
     this.dirty = true;
   }
 
-  /** Smooth Moon around an anchor (§4.4): the fine cap and the sphere beyond it. */
-  setSmooth(frame: SceneFrame, cap: TileMesh, capRadiusM: number) {
+  /**
+   * A scene around a site (§4.2–§4.4): its meshes (profile mesh, ring ground and panels, or the smooth
+   * cap) and the sphere beyond `capRadiusM`; with `shadow`, the radial cast-shadow pass of §6.3.
+   */
+  setRadialScene(frame: SceneFrame, meshes: TileMesh[], capRadiusM: number, shadow: RadialTerrain | null = null) {
     this.frame = frame;
     this.applyFrameUniforms();
     this.clearTerrain();
-    this.addMesh(cap);
+    for (const m of meshes) this.addMesh(m);
     const u = this.sphereMat.uniforms;
     u.clipMode.value = 2;
     u.clipCos.value = Math.cos((capRadiusM - 2000) / R_M);
     this.disposeShadow();
+    this.radialSrc = shadow;
     this.terrainMat.uniforms.useShadow.value = 0;
     this.terrainMat.uniforms.useHoles.value = 0;
+    this.setOverlay(null, null);
+    if (shadow) this.setRadialShadow(shadow);
     this.dirty = true;
+  }
+
+  /** Smooth Moon around an anchor (§4.4): the fine cap and the sphere beyond it. */
+  setSmooth(frame: SceneFrame, cap: TileMesh, capRadiusM: number) {
+    this.setRadialScene(frame, [cap], capRadiusM);
   }
 
   /** Just the sphere (polar anchor) while the terrain loads: never an empty view (§13). */
@@ -326,14 +354,16 @@ export class Engine {
     this.clearTerrain();
     this.sphereMat.uniforms.clipMode.value = 0;
     this.disposeShadow();
+    this.radialSrc = null;
     this.terrainMat.uniforms.useShadow.value = 0;
+    this.setOverlay(null, null);
     this.dirty = true;
   }
 
   private disposeShadow() {
     if (!this.shadow) return;
     this.shadow.rt.dispose();
-    this.shadow.dem.dispose();
+    for (const t of this.shadow.textures) t.dispose();
     this.shadow.mat.dispose();
     this.shadow = null;
   }
@@ -368,15 +398,96 @@ export class Engine {
     // `demSize` is an ivec2 in GLSL: three uploads a Vector2 to it with uniform2i.
     const scene = new THREE.Scene();
     scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
-    this.shadow = { rt, scene, cam: new THREE.Camera(), mat, dem };
+    this.shadow = { kind: 'polar', rt, scene, cam: new THREE.Camera(), mat, textures: [dem] };
     this.terrainMat.uniforms.shadowTex.value = rt.texture;
     this.terrainMat.uniforms.useShadow.value = this.skyIn ? 1 : 0;
+  }
+
+  /**
+   * Radial cast-shadow pass of the profile scene (§6.3): one texel per (bin, azimuth) of the drawn
+   * terrain, the uv of the radial mesh; the azimuth wraps, so there is no seam at north.
+   */
+  private setRadialShadow(t: RadialTerrain) {
+    this.disposeShadow();
+    const nb = t.dist.length;
+    const floatTex = (data: Float32Array, w: number, h: number) => {
+      const tex = new THREE.DataTexture(data, w, h, THREE.RedFormat, THREE.FloatType);
+      tex.minFilter = THREE.NearestFilter;
+      tex.magFilter = THREE.NearestFilter;
+      tex.needsUpdate = true;
+      return tex;
+    };
+    const prof = floatTex(t.heights, nb, t.nAz);
+    const dist = floatTex(Float32Array.from(t.dist), nb, 1);
+    const lut = floatTex(binLut(t.dist), BIN_LUT_SIZE, 1);
+    const rt = new THREE.WebGLRenderTarget(nb, t.nAz, { depthBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
+    rt.texture.wrapT = THREE.RepeatWrapping;
+    const f = this.frame;
+    const mat = new THREE.RawShaderMaterial({
+      glslVersion: THREE.GLSL3,
+      vertexShader: SHADOW_VERT,
+      fragmentShader: RADIAL_SHADOW_FRAG,
+      uniforms: {
+        prof: { value: prof },
+        binDist: { value: dist },
+        binLut: { value: lut },
+        nAz: { value: t.nAz },
+        nb: { value: nb },
+        dist0: { value: t.dist[0] },
+        distMax: { value: t.dist[nb - 1] },
+        centreH: { value: t.centreH },
+        siteE: { value: new THREE.Vector3(...f.e) },
+        siteN: { value: new THREE.Vector3(...f.n) },
+        siteU: { value: new THREE.Vector3(...f.u) },
+        sunMe: { value: new THREE.Vector3(0, 0, 1) },
+        rhoSun: { value: 0.27 * DEG },
+        R: { value: R_M },
+      },
+      depthTest: false,
+      depthWrite: false,
+    });
+    const scene = new THREE.Scene();
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
+    this.shadow = { kind: 'radial', rt, scene, cam: new THREE.Camera(), mat, textures: [prof, dist, lut] };
+    this.terrainMat.uniforms.shadowTex.value = rt.texture;
+    this.terrainMat.uniforms.useShadow.value = this.skyIn ? 1 : 0;
+    if (this.skyIn) {
+      mat.uniforms.sunMe.value.set(...this.skyIn.sunMe);
+      mat.uniforms.rhoSun.value = this.skyIn.sunRadiusDeg * DEG;
+    }
+    this.shadowDirty = true;
+  }
+
+  /**
+   * Projected map layer (§9): one band of `layers/<period>.bin.gz` as an R8 texture on the polar
+   * grid, coloured with the map's ramp (`lut`: 11 linear RGB triplets); null hides it.
+   */
+  setOverlay(band: Uint8Array | null, lut: Float32Array | null) {
+    const u = this.terrainMat.uniforms;
+    this.overlayTex?.dispose();
+    this.overlayTex = null;
+    if (!band || !lut) {
+      u.useOverlay.value = 0;
+      u.overlayTex.value = null;
+      this.dirty = true;
+      return;
+    }
+    const tex = new THREE.DataTexture(band, GRID.nx, GRID.ny, THREE.RedFormat, THREE.UnsignedByteType);
+    tex.minFilter = THREE.NearestFilter;
+    tex.magFilter = THREE.NearestFilter;
+    tex.unpackAlignment = 1;
+    tex.needsUpdate = true;
+    this.overlayTex = tex;
+    u.overlayTex.value = tex;
+    (u.overlayLut.value as THREE.Vector3[]).forEach((v, k) => v.set(lut[3 * k], lut[3 * k + 1], lut[3 * k + 2]));
+    u.useOverlay.value = 1;
+    this.dirty = true;
   }
 
   setTier(t: Tier, heights: Float32Array | null) {
     this.tier = t;
     this.terrainMat.uniforms.detail.value = TIER_SETTINGS[t].detail ? 1 : 0;
-    if (heights && this.shadow) {
+    if (heights && this.shadow?.kind === 'polar') {
       this.setShadowSource(heights);
       this.shadowDirty = true;
     }
@@ -792,9 +903,52 @@ export class Engine {
     return buf[0] / 255;
   }
 
-  shadowSize(): { w: number; h: number; div: number } | null {
+  shadowSize(): { w: number; h: number; div: number; kind: 'polar' | 'radial' } | null {
     if (!this.shadow) return null;
-    return { w: this.shadow.rt.width, h: this.shadow.rt.height, div: TIER_SETTINGS[this.tier].shadowDiv };
+    return { w: this.shadow.rt.width, h: this.shadow.rt.height, div: TIER_SETTINGS[this.tier].shadowDiv, kind: this.shadow.kind };
+  }
+
+  /**
+   * Test hook (§12.3, «cursor → shadows»): mean time of `n` shadow passes (ms), each one waited for
+   * with a one-pixel read-back; null without a shadow pass or a sky.
+   */
+  benchShadow(n: number): number | null {
+    if (!this.shadow || !this.skyIn) return null;
+    const buf = new Uint8Array(4);
+    const t0 = performance.now();
+    for (let k = 0; k < n; k++) {
+      this.renderer.setRenderTarget(this.shadow.rt);
+      this.renderer.render(this.shadow.scene, this.shadow.cam);
+      this.renderer.setRenderTarget(null);
+      this.renderer.readRenderTargetPixels(this.shadow.rt, k % this.shadow.rt.width, 0, 1, 1, buf);
+    }
+    return (performance.now() - t0) / n;
+  }
+
+  /** Source terrain of the radial shadow pass (test hook). */
+  radialShadowSource(): RadialTerrain | null {
+    return this.radialSrc;
+  }
+
+  /** Rough GPU memory of the scene (MB): vertex and index buffers and the data textures (§12.3). */
+  gpuMemoryMB(): number {
+    let bytes = 0;
+    const geo = (g: THREE.BufferGeometry) => {
+      for (const a of Object.values(g.attributes)) bytes += (a as THREE.BufferAttribute).array.byteLength;
+      if (g.index) bytes += g.index.array.byteLength;
+    };
+    for (const m of this.terrain.children as THREE.Mesh[]) geo(m.geometry);
+    geo(this.sphere.geometry);
+    const tex = (t: THREE.Texture | null | undefined) => {
+      const img = t?.image as { data?: ArrayBufferView } | undefined;
+      return img?.data ? img.data.byteLength : 0;
+    };
+    if (this.shadow) {
+      bytes += this.shadow.rt.width * this.shadow.rt.height * 4;
+      for (const t of this.shadow.textures) bytes += tex(t);
+    }
+    bytes += tex(this.holeTex) + tex(this.overlayTex);
+    return bytes / 1e6;
   }
 
   lastSky(): SkyInput | null {
@@ -820,6 +974,7 @@ export class Engine {
     this.clearTerrain();
     this.disposeShadow();
     this.holeTex?.dispose();
+    this.overlayTex?.dispose();
     this.sphere.geometry.dispose();
     this.terrainMat.dispose();
     this.sphereMat.dispose();

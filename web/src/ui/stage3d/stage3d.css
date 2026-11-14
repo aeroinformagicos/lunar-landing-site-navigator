@@ -362,3 +362,41 @@
   color: var(--c-text, #f8fafc);
   white-space: nowrap;
 }
+/* Smooth Moon notice (16 §2.1 d, CLAUDE.md §11): red with its triangle. */
+.stage3d__relief--red {
+  color: var(--c-nogo, #f87171);
+}
+/* Legend of the projected map layer (§9). */
+.stage3d__legend {
+  display: grid;
+  gap: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--c-line, #334155);
+}
+.stage3d__ramp {
+  display: flex;
+  height: 10px;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid var(--c-line, #334155);
+}
+.stage3d__ramp span {
+  flex: 1 1 0;
+}
+/* Fade to black between two scenes (§7.4); none with reduced motion. */
+.stage3d__fade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+.stage3d__fade--on {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage3d__fade {
+    transition: none;
+  }
+}

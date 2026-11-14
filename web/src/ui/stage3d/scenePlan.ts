@@ -5,14 +5,16 @@ import { GRID, latLonOfCell, xyOfLatLon } from '../../core/grid';
 import { blockerAt, type Mask } from '../../core/horizon';
 import type { Site } from '../../core/types';
 import type { SkyState } from '../../core/visibility';
-import { t } from '../../i18n/t';
+import { t, type TextKey } from '../../i18n/t';
 import { parseSiteRef } from '../../state/selectors';
 import { formatDeg, formatLatLon } from '../common/format';
 import { compassWord, distanceWords } from '../summary/summarize';
 
-/** T-71 knows the polar scene (a) and the smooth Moon (d); (b) and (c) arrive with T-73. */
-export type SceneKind = 'polar' | 'smooth';
+/** The four scenes of §2.1: polar mesh, profile mesh, horizon ring, smooth Moon. */
+export type SceneKind = 'polar' | 'profile' | 'ring' | 'smooth';
 export type DemStatus = 'loading' | 'ready' | 'error';
+/** A data source of a scene: not wanted for this site, loading, ready, or failed. */
+export type Source = 'none' | 'loading' | 'ready' | 'error';
 
 export function siteLatLon(siteRef: string, sites: readonly Site[]): { latDeg: number; lonDeg: number } | null {
   const ref = parseSiteRef(siteRef);
@@ -29,16 +31,54 @@ export function inPolarMesh(latDeg: number, lonDeg: number): boolean {
   return x >= GRID.xMinM && x <= GRID.xMinM + GRID.nx * GRID.cellM && y <= GRID.yMaxM && y >= GRID.yMaxM - GRID.ny * GRID.cellM;
 }
 
-/** §2.1: polar while its DEM loads or once it is ready; smooth Moon otherwise (until T-73). */
-export function chooseScene(latDeg: number, lonDeg: number, dem: DemStatus): SceneKind {
-  return inPolarMesh(latDeg, lonDeg) && dem !== 'error' ? 'polar' : 'smooth';
+export interface SceneInput {
+  latDeg: number;
+  lonDeg: number;
+  /** `map/dem_500m.bin.gz` of the heavy origin. */
+  dem: DemStatus;
+  /** `profile/<site_id>.bin.gz`: `none` unless the site is from the catalogue, has a profile and relief. */
+  profile: Source;
+  /** The site's horizon mask with relief (`has_mask`, or a mesh point): `none` on a smooth Moon. */
+  mask: Source;
 }
 
-/** Relief line of the controls (§6.7): what the 3D shows and what the figures use. */
-export function reliefLine(kind: SceneKind, smoothSite: boolean, figuresRelief: string): { text: string; warn: boolean } {
-  if (kind === 'polar') return { text: t('stage3d.relief_polar', { relief: figuresRelief }), warn: false };
-  if (smoothSite) return { text: t('relief.smooth'), warn: true };
-  return { text: t('stage3d.relief_none', { relief: figuresRelief }), warn: true };
+/** The scene and whether its data is still on its way (§2.1); a data error moves one scene down. */
+export interface ScenePick {
+  kind: SceneKind;
+  /** The scene's data is still loading: a placeholder sphere is drawn meanwhile (§13, state 2). */
+  pending: boolean;
+}
+
+/**
+ * §2.1 (D-97 b), in order: polar if the site is inside the mesh and its DEM loads; else the profile
+ * mesh; else the horizon ring from the mask; else the smooth Moon. A failed source moves down one
+ * case, never to the 2D view.
+ */
+export function pickScene(i: SceneInput): ScenePick {
+  if (inPolarMesh(i.latDeg, i.lonDeg) && i.dem !== 'error') return { kind: 'polar', pending: i.dem === 'loading' };
+  if (i.profile === 'ready' || i.profile === 'loading') return { kind: 'profile', pending: i.profile === 'loading' };
+  if (i.mask === 'ready' || i.mask === 'loading') return { kind: 'ring', pending: i.mask === 'loading' };
+  return { kind: 'smooth', pending: false };
+}
+
+/** Short form used by the T-71 tests: polar while its DEM loads or once ready, smooth Moon otherwise. */
+export function chooseScene(latDeg: number, lonDeg: number, dem: DemStatus): SceneKind {
+  return pickScene({ latDeg, lonDeg, dem, profile: 'none', mask: 'none' }).kind;
+}
+
+export type ReliefLevel = 'ok' | 'warn' | 'red';
+
+/**
+ * Relief line of the controls (§2.1, §6.7): what the 3D shows and what the figures use. A smooth site
+ * gets the red smooth-Moon notice with its triangle; a site with relief drawn as a smooth Moon (its
+ * data failed) says so in the warning colour (D-107 b).
+ */
+export function reliefLine(kind: SceneKind, smoothSite: boolean, figuresRelief: string): { text: string; warn: boolean; level: ReliefLevel } {
+  if (kind === 'polar') return { text: t('stage3d.relief_polar', { relief: figuresRelief }), warn: false, level: 'ok' };
+  if (kind === 'profile') return { text: t('stage3d.relief_profile', { relief: figuresRelief }), warn: false, level: 'ok' };
+  if (kind === 'ring') return { text: t('stage3d.relief_ring', { relief: figuresRelief }), warn: false, level: 'ok' };
+  if (smoothSite) return { text: t('relief.smooth'), warn: true, level: 'red' };
+  return { text: t('stage3d.relief_none', { relief: figuresRelief }), warn: true, level: 'warn' };
 }
 
 /** One body of the pin's status line: `✓ Sun 0.24°` or `✕ Sun hidden` (icon and word, §8.1). */
@@ -60,11 +100,24 @@ export interface DescribeInput {
   headingDeg: number;
   /** Observer height in Ground (m). */
   eyeM?: number;
+  /** The scene on screen (§2.1); the polar one needs no sentence. */
+  scene?: SceneKind;
+  /** The projected map layer and its period, when shown (§9). */
+  overlay?: { layer: string; period: string } | null;
 }
+
+const SCENE_SENTENCE: Partial<Record<SceneKind, TextKey>> = {
+  profile: 'stage3d.desc.scene_profile',
+  ring: 'stage3d.desc.scene_ring',
+  smooth: 'stage3d.desc.scene_smooth',
+};
 
 /** Text description of the view for screen readers (§13). Never prints NaN or identifiers. */
 export function describeView(d: DescribeInput): string {
   const parts = [t('stage3d.desc.site', { letter: d.letter, name: d.name, coords: formatLatLon(d.latDeg, d.lonDeg) })];
+  const scene = d.scene ? SCENE_SENTENCE[d.scene] : undefined;
+  if (scene) parts.push(t(scene));
+  if (d.overlay) parts.push(t('stage3d.desc.overlay', d.overlay));
   if (d.sky) {
     const s = d.sky.sun;
     if (s.visible) parts.push(t('stage3d.desc.sun_up', { el: formatDeg(s.elDeg) }));
