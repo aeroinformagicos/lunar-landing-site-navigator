@@ -23,6 +23,7 @@ from pathlib import Path
 
 import numpy as np
 
+from pipeline.common.catalog import catalog_regions, default_catalog
 from pipeline.common.constants import R_MOON_M
 from pipeline.dem.stack import polar_xy_m
 from pipeline.horizon.law import N_AZ, law_n_samples, law_params
@@ -59,20 +60,10 @@ DEFAULT_OBSERVER_HEIGHT_M = 2.0
 REGION_MARGIN_M = 2000.0  # level 1: chunks that cut a region box enlarged by 2 km
 LEVEL2_LAT_DEG = -88.0
 LEVEL3_LAT_DEG = -85.0
-# Candidate regions: id, latitude, longitude (degrees) and side (km), from 04_catalogo_sitios.md §3.
+# Candidate regions: id, latitude, longitude (degrees) and side (km), read from the single source
+# contract/sites.catalog.json (04_catalogo_sitios.md §3; decision D-52, done in T-09).
 # The boxes are squares centred on the published point and aligned with the map axes (D-28).
-# Temporary copy (decision D-52): T-09 creates contract/sites.catalog.json, the single source.
-REGIONS = (
-    ("de-gerlache-rim-2", -88.2, -64.6, 11.0),
-    ("haworth", -86.8, -22.8, 17.0),
-    ("malapert-massif", -86.0, -0.2, 12.0),
-    ("mons-mouton", -85.4, 31.7, 9.0),
-    ("mons-mouton-plateau", -84.3, 30.6, 38.0),
-    ("nobile-rim-1", -85.4, 37.3, 11.0),
-    ("nobile-rim-2", -84.0, 58.8, 11.0),
-    ("peak-near-cabeus-b", -83.6, -68.7, 11.0),
-    ("slater-plain", -87.2, 125.5, 11.0),
-)
+REGIONS = catalog_regions(default_catalog())
 
 # --- Cost measurement (08 §4): the four fixed chunks, as (row, col) ---
 BENCH_CHUNKS = ((23, 25), (4, 36), (14, 2), (41, 0))
@@ -167,8 +158,13 @@ def chunk_frames(row: int, col: int) -> Frames:
 
 def region_boxes() -> dict[str, tuple[float, float, float, float]]:
     """``box_m = (x0, y0, x1, y1)`` of each candidate region, in map metres, with every decimal."""
+    return region_boxes_of(REGIONS)
+
+
+def region_boxes_of(regions) -> dict[str, tuple[float, float, float, float]]:
+    """The same for any ``(region_id, lat_deg, lon_deg, size_km)`` list (``regions`` uses it)."""
     boxes = {}
-    for region_id, lat, lon, size_km in REGIONS:
+    for region_id, lat, lon, size_km in regions:
         x, y = polar_xy_m(lat, lon)
         half = size_km * 500.0
         boxes[region_id] = (x - half, y - half, x + half, y + half)
