@@ -3,9 +3,13 @@
 // sky, Sun, Earth, cast-shadow pass, scenario masts and the orbit camera. Imperative; the React
 // component feeds it and draws the DOM labels from `project`.
 import * as THREE from 'three';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import { GRID } from '../../../core/grid';
 import { clampOrbit, easeOrbit, orbitPosition, orbitsClose, type OrbitState } from '../camera';
 import { POLAR_FRAME, R_M, localBasisAt, rotToScene, type Basis, type SceneFrame, type V3 } from '../frame';
+import { flightAt, flyStep, lookDir, makeFlight, orbitToLook, turn, type CameraMode, type Flight, type FlyInput, type LookState } from '../navigation';
 import { LOOK } from '../look';
 import type { TileMesh } from '../meshes';
 import { FpsMonitor, TIER_SETTINGS, type Tier } from '../quality';
@@ -27,6 +31,17 @@ export interface Ground {
   clearance(p: V3): number;
   /** The terrain point under a scene point. */
   surface(p: V3): V3;
+}
+
+export interface LineItem {
+  points: V3[];
+  colour: [number, number, number];
+  widthPx: number;
+  opacity: number;
+  /** World-unit dash and gap (m); solid when absent. */
+  dash?: [number, number];
+  /** Drawn over the terrain, without depth test (§8.3). */
+  overlay?: boolean;
 }
 
 export interface EngineOptions {
@@ -81,10 +96,20 @@ export class Engine {
   private skyIn: SkyInput | null = null;
   private cur: OrbitState | null = null;
   private goal: OrbitState | null = null;
+  private mode: CameraMode = 'orbit';
+  private look: LookState | null = null;
+  private flight: Flight | null = null;
+  private flyAfterFlight = false;
+  private readonly lineGroups = new Map<string, THREE.Group>();
+  private readonly lineMats = new Set<LineMaterial>();
+  private size = { w: 1, h: 1 };
+  /** Held keys of the fly mode (set by the component). */
+  input: () => FlyInput = () => ({ forward: 0, right: 0, up: 0, fast: false });
   private dirty = true;
   private shadowDirty = false;
   private lastShadowMs = -Infinity;
   private lastFrameMs = 0;
+  private lastLoopMs = 0;
   private raf = 0;
   private disposed = false;
   private readonly fps: FpsMonitor;
@@ -445,6 +470,7 @@ export class Engine {
   }
 
   setOrbit(s: OrbitState, jump: boolean) {
+    this.flight = null;
     this.goal = this.clamp(s);
     if (jump || !this.cur || this.o.reducedMotion) this.cur = this.goal;
     this.dirty = true;
@@ -455,17 +481,33 @@ export class Engine {
   }
 
   orbitBy(dHeadingDeg: number, dPitchDeg: number) {
+    if (this.mode !== 'orbit') {
+      this.lookBy(dHeadingDeg, dPitchDeg);
+      return;
+    }
     if (!this.goal) return;
     this.setOrbit({ ...this.goal, headingDeg: this.goal.headingDeg + dHeadingDeg, pitchDeg: this.goal.pitchDeg + dPitchDeg }, false);
   }
 
   zoomBy(factor: number) {
+    if (this.mode === 'ground') {
+      this.lookBy(0, 0, factor);
+      return;
+    }
+    if (this.mode === 'fly') {
+      this.flyImpulse(factor < 1 ? 1 : -1, Math.abs(Math.log(factor)));
+      return;
+    }
     if (!this.goal) return;
     this.setOrbit({ ...this.goal, distM: this.goal.distM * factor }, false);
   }
 
   /** Moves the target across the terrain by a drag of (dx, dy) pixels. */
   panBy(dx: number, dy: number) {
+    if (this.mode !== 'orbit') {
+      if (this.mode === 'fly') this.flyImpulse(0, 0, -dy * 0.004);
+      return;
+    }
     if (!this.goal || !this.ground) return;
     const b = this.basisAt(this.goal.target);
     const h = this.goal.headingDeg * DEG;
@@ -478,15 +520,165 @@ export class Engine {
   }
 
   private applyCamera() {
-    if (!this.cur) return;
-    const b = this.basisAt(this.cur.target);
-    const p = orbitPosition(this.cur, b);
-    this.cam.position.set(...p);
-    this.cam.up.set(...b.u);
-    this.cam.lookAt(v3(this.cur.target));
+    let fov = 50;
+    if (this.mode !== 'orbit' && this.look) {
+      const b = this.basisAt(this.look.pos);
+      const d = lookDir(this.look.yawDeg, this.look.pitchDeg, b);
+      this.cam.position.set(...this.look.pos);
+      this.cam.up.set(...b.u);
+      this.cam.lookAt(this.look.pos[0] + d[0], this.look.pos[1] + d[1], this.look.pos[2] + d[2]);
+      fov = this.look.fovDeg;
+    } else if (this.cur) {
+      const b = this.basisAt(this.cur.target);
+      const p = orbitPosition(this.cur, b);
+      this.cam.position.set(...p);
+      this.cam.up.set(...b.u);
+      this.cam.lookAt(v3(this.cur.target));
+    } else return;
+    if (this.cam.fov !== fov) {
+      for (const c of [this.cam, this.skyCam]) {
+        c.fov = fov;
+        c.updateProjectionMatrix();
+      }
+    }
     this.cam.updateMatrixWorld();
     this.skyCam.quaternion.copy(this.cam.quaternion);
     this.skyCam.updateMatrixWorld();
+  }
+
+  // ---- Camera modes (§7.2–§7.4) -------------------------------------------------------------
+
+  getMode(): CameraMode {
+    return this.mode;
+  }
+
+  /** Orbit → Fly keeps the current view; Ground needs its eye (`look`). */
+  setMode(mode: CameraMode, look?: LookState) {
+    this.flight = null;
+    if (mode === 'fly' && !look) {
+      this.applyCamera();
+      const p = this.cam.position;
+      if (this.mode === 'orbit' && this.cur) this.look = orbitToLook(this.cur, [p.x, p.y, p.z], 50);
+      else if (this.look) this.look = { ...this.look, fovDeg: 50 };
+    } else if (look) this.look = look;
+    this.mode = mode;
+    this.dirty = true;
+  }
+
+  getLook(): LookState | null {
+    return this.look;
+  }
+
+  setLook(l: LookState) {
+    this.look = l;
+    this.dirty = true;
+  }
+
+  lookBy(dYawDeg: number, dPitchDeg: number, fovFactor = 1) {
+    if (!this.look) return;
+    this.look = turn(this.look, dYawDeg, dPitchDeg, fovFactor);
+    this.dirty = true;
+  }
+
+  /** One push of the fly camera (wheel, pinch, two-finger drag). */
+  flyImpulse(forward: number, amount: number, up = 0) {
+    if (this.mode !== 'fly' || !this.look || !this.ground) return;
+    const g = this.ground;
+    this.look = flyStep(this.look, { forward, right: 0, up: Math.sign(up), fast: false }, Math.min(0.1, amount * 0.4 + Math.abs(up)), {
+      clearance: (p) => g.clearance(p),
+      basisAt: (p) => this.basisAt(p),
+    });
+    this.dirty = true;
+  }
+
+  /** A smooth flight of the orbit camera (§7.4); a jump with reduced motion. */
+  goTo(to: OrbitState) {
+    const target = this.clamp(to);
+    const wasFly = this.mode === 'fly';
+    if (this.o.reducedMotion || !this.cur || this.mode === 'ground') {
+      this.flight = null;
+      this.goal = target;
+      this.cur = target;
+      if (wasFly) {
+        this.mode = 'orbit';
+        this.setMode('fly');
+      }
+      this.dirty = true;
+      return;
+    }
+    this.flyAfterFlight = wasFly;
+    this.mode = 'orbit';
+    this.flight = makeFlight(this.frame, this.cur, target, performance.now());
+    this.goal = target;
+    this.dirty = true;
+  }
+
+  isFlying(): boolean {
+    return this.flight !== null;
+  }
+
+  cameraPosition(): V3 {
+    const p = this.cam.position;
+    return [p.x, p.y, p.z];
+  }
+
+  /** Heading of the view (deg clockwise from local north), and what the scale bar needs. */
+  viewInfo(): { headingDeg: number; distM: number; fovDeg: number; heightPx: number } {
+    if (this.mode !== 'orbit' && this.look) return { headingDeg: this.look.yawDeg, distM: Number.NaN, fovDeg: this.look.fovDeg, heightPx: this.size.h };
+    return { headingDeg: this.cur?.headingDeg ?? 0, distM: this.cur?.distM ?? Number.NaN, fovDeg: this.cam.fov, heightPx: this.size.h };
+  }
+
+  /** Ray through a CSS pixel of the view. */
+  rayAt(x: number, y: number): { o: V3; d: V3 } {
+    const ndc = new THREE.Vector3((x / this.size.w) * 2 - 1, -(y / this.size.h) * 2 + 1, 0.5).unproject(this.cam);
+    const o = this.cam.position;
+    const d = ndc.sub(o).normalize();
+    return { o: [o.x, o.y, o.z], d: [d.x, d.y, d.z] };
+  }
+
+  // ---- Lines (§8): fat lines of three/addons, offset to their first point for precision -------
+
+  setLines(group: string, items: LineItem[]) {
+    const old = this.lineGroups.get(group);
+    if (old) {
+      for (const l of old.children as Line2[]) {
+        l.geometry.dispose();
+        l.material.dispose();
+        this.lineMats.delete(l.material);
+      }
+      this.scene.remove(old);
+    }
+    const g = new THREE.Group();
+    for (const it of items) {
+      if (it.points.length < 2) continue;
+      const o = it.points[0];
+      const flat: number[] = [];
+      for (const p of it.points) flat.push(p[0] - o[0], p[1] - o[1], p[2] - o[2]);
+      const geo = new LineGeometry();
+      geo.setPositions(flat);
+      const mat = new LineMaterial({
+        color: new THREE.Color(...it.colour),
+        linewidth: it.widthPx,
+        transparent: it.opacity < 1 || !!it.overlay,
+        opacity: it.opacity,
+        dashed: !!it.dash,
+        dashSize: it.dash?.[0] ?? 1,
+        gapSize: it.dash?.[1] ?? 0,
+        depthTest: !it.overlay,
+        depthWrite: !it.overlay,
+      });
+      mat.resolution.set(this.size.w, this.size.h);
+      this.lineMats.add(mat);
+      const line = new Line2(geo, mat);
+      line.position.set(...o);
+      if (it.dash) line.computeLineDistances();
+      line.frustumCulled = false;
+      if (it.overlay) line.renderOrder = 10;
+      g.add(line);
+    }
+    this.lineGroups.set(group, g);
+    this.scene.add(g);
+    this.dirty = true;
   }
 
   setSize(w: number, h: number, dpr: number) {
@@ -498,6 +690,8 @@ export class Engine {
       c.updateProjectionMatrix();
     }
     (this.stars.material as THREE.ShaderMaterial).uniforms.pixelRatio.value = ratio;
+    this.size = { w, h };
+    for (const m of this.lineMats) m.resolution.set(w, h);
     this.dirty = true;
   }
 
@@ -522,8 +716,31 @@ export class Engine {
     if (this.disposed) return;
     this.raf = requestAnimationFrame(this.loop);
     let animating = false;
-    if (this.cur && this.goal && !orbitsClose(this.cur, this.goal)) {
-      this.cur = this.clamp(easeOrbit(this.cur, this.goal, 0.22));
+    const dtS = this.lastLoopMs > 0 ? (now - this.lastLoopMs) / 1000 : 0;
+    this.lastLoopMs = now;
+    if (this.flight && this.ground) {
+      const g = this.ground;
+      const { state, done } = flightAt(this.flight, this.frame, now, (p) => g.surface(p));
+      this.cur = this.clamp(state);
+      if (done) this.goal = this.cur;
+      animating = true;
+      this.dirty = true;
+      if (done) {
+        this.flight = null;
+        if (this.flyAfterFlight) this.setMode('fly');
+        this.flyAfterFlight = false;
+      }
+    } else if (this.mode === 'fly' && this.look && this.ground) {
+      const inp = this.input();
+      if (inp.forward || inp.right || inp.up) {
+        const g = this.ground;
+        this.look = flyStep(this.look, inp, dtS, { clearance: (p) => g.clearance(p), basisAt: (p) => this.basisAt(p) });
+        animating = true;
+        this.dirty = true;
+      }
+    } else if (this.cur && this.goal && !orbitsClose(this.cur, this.goal)) {
+      // Time-based smoothing (τ = 65 ms): the same feel at 60 fps and on a slow device.
+      this.cur = this.clamp(easeOrbit(this.cur, this.goal, 1 - Math.exp(-Math.min(Math.max(dtS, 0.016), 0.1) / 0.065)));
       animating = true;
       this.dirty = true;
     } else if (this.cur !== this.goal) {
@@ -589,6 +806,10 @@ export class Engine {
   }
 
   cameraState(): string {
+    if (this.mode !== 'orbit' && this.look) {
+      const l = this.look;
+      return `${this.mode}:${l.yawDeg.toFixed(1)},${l.pitchDeg.toFixed(1)},${l.fovDeg.toFixed(0)},${l.pos.map((v) => v.toFixed(0)).join('/')}`;
+    }
     const c = this.cur;
     return c ? `${c.headingDeg.toFixed(1)},${c.pitchDeg.toFixed(1)},${Math.round(c.distM)}` : '';
   }
@@ -603,6 +824,7 @@ export class Engine {
     this.terrainMat.dispose();
     this.sphereMat.dispose();
     this.masts.geometry.dispose();
+    for (const k of [...this.lineGroups.keys()]) this.setLines(k, []);
     this.stars.geometry.dispose();
     this.sun.geometry.dispose();
     this.earth.geometry.dispose();

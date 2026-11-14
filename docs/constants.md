@@ -98,7 +98,11 @@ fuente (CLAUDE.md §2).
 
 | Vista 3D: función de fase lunar-Lambert de McEwen `L(α) = 1 + A1·α + A2·α² + A3·α³` (α en grados), recortada a [0, 1] | A1 = −0,019; A2 = 0,000242; A3 = −0,00000146 | 1/°, 1/°², 1/°³ | USGS ISIS, modelo fotométrico `LunarLambertMcEwen` (`LunarLambertMcEwen.cpp`, ISIS 8.1/9.0), a partir de McEwen (1991), *Icarus* 92, 298–311 (`16_vista_3d.md` §6.2) | `web/src/ui/stage3d/scene/shaders.ts` (`TERRAIN_FRAG`) |
 | Vista 3D: muestras de la sombra proyectada (primera distancia, razón, alcance, altura del ojo) | 250; 1,04; 300.000; 2 | m; —; m; m | `16_vista_3d.md` §6.3 (medio píxel de 500 m; la razón del código de distancia del cubo, `09` §10.2; el alcance del perfil, `06` §8; observador de CLAUDE.md §2) | `web/src/ui/stage3d/shadow.ts` |
-| Vista 3D: órbita (distancia mínima y máxima, inclinación, holgura, encuadre inicial) | 300 m – 800 km; 3°–89°; 50 m; 18 km a 14° | m; °; m | `16_vista_3d.md` §7.1, §7.6 | `web/src/ui/stage3d/camera.ts` (`ORBIT`) |
+| Vista 3D: órbita (distancia mínima y máxima, inclinación, holgura, encuadre inicial) | 300 m – 800 km; 3°–89°; 50 m; 45 km a 22° | m; °; m | `16_vista_3d.md` §7.1, §7.6; encuadre de D-110 a | `web/src/ui/stage3d/camera.ts` (`ORBIT`) |
+| Vista 3D: vuelo (holgura, altura máxima, velocidad = 0,8·AGL entre 20 m/s y 80 km/s, ×5 con Mayúsculas, paso máximo) y a ras de suelo (holgura, campo de visión 20°–90°, 60° al entrar) | 5 m; 2.000 km; 0,8 /s, 20 m/s, 80 km/s, 5; 0,1 s; 2 m; 20°–90°; 60° | m; m; 1/s, m/s; s; m; ° | `16_vista_3d.md` §7.2, §7.3, §7.6 | `web/src/ui/stage3d/navigation.ts` (`FLY`, `GROUND`) |
+| Vista 3D: vuelos «Go to» (duración = clamp(0,8 + 0,4·log10(km + 1), 0,8, 3) s; altura máxima = max(d0, d1, 0,6 × separación)) y suavizado de la órbita (τ) | 0,8–3 s; 0,6; 65 ms | s; —; ms | `16_vista_3d.md` §7.4; τ de D-110 f | `web/src/ui/stage3d/navigation.ts`, `scene/engine.ts` |
+| Vista 3D: señales (cúpula de las trayectorias, elevación de contornos y crestas, distancias de los rótulos, máximo de rótulos, refrescos) | 20 km; 15 m y 30 m; 250 km y 60 km; 14; 200 ms y 100 ms | m; m; m; —; ms | `16_vista_3d.md` §8; D-110 | `web/src/ui/stage3d/index.tsx`, `Labels.tsx`, `signals.ts` |
+| Vista 3D: barra de escala | 1, 2 o 5 × 10ⁿ m entre 60 y 150 px | px | `16_vista_3d.md` §8.6; D-110 e | `web/src/ui/stage3d/signals.ts` (`scaleBar`) |
 | Vista 3D: niveles de calidad (malla, sombra, frecuencia, píxeles) y umbral adaptativo | `16` §12.2; 45 fps durante 2 s, una bajada cada 10 s | — | `16_vista_3d.md` §12.2 | `web/src/ui/stage3d/quality.ts` |
 | Vista 3D: parámetros visuales (intensidades, albedo, colores del Sol y la Tierra, estrellas) | `LOOK` | — | Solo visuales, sin significado físico ni efecto en ninguna cifra (D-97 h) | `web/src/ui/stage3d/look.ts` |
 ## Valores medidos
@@ -507,7 +511,7 @@ Constantes nuevas (`pipeline/tests/test_a6_shackleton.py`, `test_a7_nasa_points.
 | `SHARE_WITHIN`, `ALL_FACTOR` (B6) | 99 % de los acimuts dentro de `B6_el_deg`; todos dentro de 2 × `B6_el_deg` (0,02°) | `11` §5, B6 |
 | `SITE`, `T_FROM`, `T_TO` (B4) | (0°, 0°); 2025-01-01 a 2031-01-01 | `11` §5, B4 |
 | `MATCH_S`, `N_TOTAL`, `MAX_INTERVALS` (B4) | ± 3 h; 6; 14 | `11` §5, B4 |
-| `SCREEN_MARGIN_DEG`, `SEARCH_PAD_S` (B4) | 1°; 2 h | D-110 a (el Sol se mueve ~0,51°/h frente a la Tierra: 360° en el mes sinódico de 29,53 días, `11` §2.4) |
+| `SCREEN_MARGIN_DEG`, `SEARCH_PAD_S` (B4) | 1°; 2 h | D-111 a (el Sol se mueve ~0,51°/h frente a la Tierra: 360° en el mes sinódico de 29,53 días, `11` §2.4) |
 
 Cifras medidas (B4 corre en `make test`; A6, A7 y B6 son `slow` y no se han ejecutado con los datos reales en
 la sesión):
