@@ -84,6 +84,9 @@ fuente (CLAUDE.md §2).
 | Puesta del centro del Sol en Blue Ghost 1 con Luna lisa: 2025-03-16T20:10:39Z (± 1 s, redondeo al segundo) | 39 | s tras las 20:10 | `05` §8.3 | `pipeline/tests/test_ephem_frames.py` |
 | Tabla ENU a mano: tolerancias | 10⁻⁹; 10⁻⁶ | °; km | `05` §8.2 | `pipeline/tests/test_enu.py` |
 | Blue Ghost 1 en `MOON_ME`: (778,06; 1451,68; 553,01) km a mano y `Dxy` = 1647,03931 km, `Dz` = 553,01019 km de Horizons (tolerancia: media unidad de la última cifra impresa) | — | km | `03` §3.4 | `pipeline/tests/test_enu.py` |
+| Rangos de fecha de aterrizaje admitidos | 1969-01-01 – 1973-01-01 y 2024-01-01 – 2045-01-01 (UTC) | — | Validez de los tramos de `ephemeris.meta.json` (`09` §3.2, `05` §4.5) | `web/src/state/selectors.ts` (`SUPPORTED_RANGES`) |
+| Duración de la misión | 0,5 – 60, paso 0,5 | días | `10_interfaz.md` §4, `01_alcance.md` F2 | `web/src/state/selectors.ts` |
+| Paso del deslizador del cursor | 600 (flechas); 86.400 (PageUp/PageDown); 3.600 (botones y `[` `]`) | s | `10_interfaz.md` §4, §12 | `web/src/state/selectors.ts`, `ui/controls/TimeControls.tsx` |
 
 ## Valores medidos
 
@@ -204,11 +207,11 @@ Constantes nuevas (`pipeline/ephem/table.py`, `pipeline/tests/test_ephem_table.p
 | `RECORD_BYTES`, `RECORD_FIELDS` | 24 B; `sun_x … earth_z` | `05` §4.3, `09` §3.2 |
 | `FRAME_SPICE` | `MOON_ME_DE440_ME421` | `09` §3.2 (`moon_de440_250416.tf`) |
 | `TABLE_TOL_DEG` | 0,001° | `05` §8.3 y §8.4 |
-| `GRID_TOL_DEG` | 0,00003° | `05` §8.4 con la decisión D-69 (antes 0,00002°) |
+| `GRID_TOL_DEG` | 0,00003° | `05` §8.4 con la decisión D-73 (antes 0,00002°) |
 | `SUN_KM`, `EARTH_KM`, `LIBRATION_MAX_DEG`, `SAMPLE_REL_TOL` | (1,45–1,53)·10⁸ km; (3,5–4,1)·10⁵ km; 12°; 10⁻⁷ | `05` §8.7 |
 | `SUN_RADIUS_DEG`, `EARTH_RADIUS_DEG` | 0,26–0,28°; 0,89–1,05° | `05` §5 |
-| `DIAM_TOL_ARCSEC` | 0,05″ | Misma cifra que la prueba web de T-12 (D-70 e) |
-| `SAMPLE_COUNT`, `SAMPLE_SEED` | 50; 6 | `11_validacion.md` §3 (50 muestras); semilla elegida (D-70 b) |
+| `DIAM_TOL_ARCSEC` | 0,05″ | Misma cifra que la prueba web de T-12 (D-74 e) |
+| `SAMPLE_COUNT`, `SAMPLE_SEED` | 50; 6 | `11_validacion.md` §3 (50 muestras); semilla elegida (D-74 b) |
 | c (solo en la cota de `05` §4.1) | 299.792.458 m/s | Definición del SI |
 
 Medido con los cuatro núcleos de `$LLSN_DATA_DIR/kernels` y la tabla publicada:
@@ -220,10 +223,10 @@ Medido con los cuatro núcleos de `$LLSN_DATA_DIR/kernels` y la tabla publicada:
 | Máximo de acos(earth_x/\|earth\|) | 10,47° | < 12° | `05` §8.7 |
 | Muestra k = 1 de `main` frente a `spkpos`: error relativo máximo por componente | 2,2·10⁻⁸ | < 10⁻⁷ | `05` §8.7 |
 | Tabla frente a `spkcpo`, 2.000 pares al azar: máximo de \|Δaz\|·cos(el) y \|Δel\| | 0,0000268° | < 0,001° | `05` §8.4 |
-| Ídem, 200 instantes en la rejilla | 0,0000263° | < 0,00003° (D-69) | `05` §8.4 |
-| Término de aberración trasladada (`V − p` con `LT+S`), sitio a 1.739,4 km del centro | 0,175 km; 0,000026° para la Tierra | Cota \|p\|·β ≈ 0,000028° | `05` §4.1 (D-69) |
+| Ídem, 200 instantes en la rejilla | 0,0000263° | < 0,00003° (D-73) | `05` §8.4 |
+| Término de aberración trasladada (`V − p` con `LT+S`), sitio a 1.739,4 km del centro | 0,175 km; 0,000026° para la Tierra | Cota \|p\|·β ≈ 0,000028° | `05` §4.1 (D-73) |
 | Tierra con `float64` (sin redondeo a `float32`) en la rejilla | 0,0000263° (igual) | — | — |
 | Velocidad angular en el cielo lunar, 2024–2044 (rejilla horaria) | Sol 0,505–0,511°/h; Tierra 0,062°/h de mediana y 0,113°/h como mucho | — | — |
 | `sky_at` frente a las 15 filas de Horizons: máximo de \|Δaz\| y \|Δel\| | 0,0000181° | < 0,001° | `05` §8.3 |
-| Ídem, diámetro aparente (9 filas) | 0,0033″ | < 0,05″ | D-70 e |
+| Ídem, diámetro aparente (9 filas) | 0,0033″ | < 0,05″ | D-74 e |
 | `test_ephem_table.py` (24 pruebas) ejecutada sola | 0,8 s | — | — |

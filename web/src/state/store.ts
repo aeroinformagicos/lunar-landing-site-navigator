@@ -61,6 +61,8 @@ export interface AppState {
   mapPeriod: string;
   /** Step of the guided story, or null outside Learn. */
   storyStep: number | null;
+  /** `Link dates` (10_interfaz.md §4, on by default): landing and duration apply to every scenario. */
+  linkDates: boolean;
 }
 
 export interface AppActions {
@@ -84,6 +86,13 @@ export interface AppActions {
   updateScenario(id: ScenarioId, patch: Partial<Omit<Scenario, 'id'>>): void;
   /** Removes a scenario; the last one cannot be removed. */
   removeScenario(id: ScenarioId): void;
+  /** Copies scenario `id` into a free letter (no-op with 4). Returns the new id. */
+  duplicateScenario(id: ScenarioId): ScenarioId | null;
+  setLinkDates(link: boolean): void;
+  /** Landing of the active scenario, or of all with `linkDates`; the cursor keeps its offset. */
+  setLanding(unix: number): void;
+  /** Mission length (days) of the active scenario, or of all with `linkDates`. */
+  setMissionDays(days: number): void;
 }
 
 export type AppStore = AppState & AppActions & { initialised: boolean };
@@ -121,6 +130,7 @@ export function initialState(defaults: SiteDefaults): AppState {
     mapLayer: 'both',
     mapPeriod: 'mean186',
     storyStep: null,
+    linkDates: true,
   };
 }
 
@@ -137,6 +147,16 @@ function activeOf(s: AppState): Scenario {
 function clampCursor(s: AppState, unix: number): number {
   const a = activeOf(s);
   return Math.min(Math.max(unix, a.landingUnix), missionEnd(a));
+}
+
+/** Scenarios after adding a copy of `base` with a free letter and `siteRef`; null with 4. */
+function withCopy(s: AppState, base: Scenario, siteRef: string): { scenarios: Scenario[]; id: ScenarioId } | null {
+  if (s.scenarios.length >= MAX_SCENARIOS) return null;
+  const used = new Set(s.scenarios.map((x) => x.id));
+  const id = SCENARIO_LETTERS.find((l) => !used.has(l));
+  if (!id) return null;
+  const scenarios = [...s.scenarios, { ...base, id, siteRef }].sort((a, b) => a.id.localeCompare(b.id));
+  return { scenarios, id };
 }
 
 export const useAppStore = create<AppStore>()((set, get) => ({
@@ -166,16 +186,31 @@ export const useAppStore = create<AppStore>()((set, get) => ({
 
   addScenario: (siteRef) => {
     const s = get();
-    if (s.scenarios.length >= MAX_SCENARIOS) return null;
-    const used = new Set(s.scenarios.map((x) => x.id));
-    const id = SCENARIO_LETTERS.find((l) => !used.has(l));
-    if (!id) return null;
-    const base = activeOf(s);
-    const scenario: Scenario = { ...base, id, siteRef };
-    const scenarios = [...s.scenarios, scenario].sort((a, b) => a.id.localeCompare(b.id));
-    set({ scenarios });
-    return id;
+    const r = withCopy(s, activeOf(s), siteRef);
+    if (r) set({ scenarios: r.scenarios });
+    return r?.id ?? null;
   },
+  duplicateScenario: (id) => {
+    const s = get();
+    const base = s.scenarios.find((x) => x.id === id);
+    const r = base ? withCopy(s, base, base.siteRef) : null;
+    if (r) set({ scenarios: r.scenarios });
+    return r?.id ?? null;
+  },
+  setLinkDates: (linkDates) => set({ linkDates }),
+  setLanding: (unix) =>
+    set((s) => {
+      const active = activeOf(s);
+      const offset = s.cursorUnix - active.landingUnix;
+      const scenarios = s.scenarios.map((x) => (s.linkDates || x.id === active.id ? { ...x, landingUnix: unix } : x));
+      return { scenarios, cursorUnix: clampCursor({ ...s, scenarios }, unix + offset) };
+    }),
+  setMissionDays: (days) =>
+    set((s) => {
+      const active = activeOf(s);
+      const scenarios = s.scenarios.map((x) => (s.linkDates || x.id === active.id ? { ...x, missionDays: days } : x));
+      return { scenarios, cursorUnix: clampCursor({ ...s, scenarios }, s.cursorUnix) };
+    }),
   updateScenario: (id, patch) =>
     set((s) => {
       const scenarios = s.scenarios.map((x) => (x.id === id ? { ...x, ...patch } : x));

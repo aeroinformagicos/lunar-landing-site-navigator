@@ -534,7 +534,7 @@ def main(argv: list[str] | None = None) -> int:
     if holds_real_data(web_public / "data"):
         print(
             f"example data written to {examples}; {web_public / 'data'} NOT overwritten: its manifest.json "
-            "has ephemeris.synthetic = false (real data, decision D-71). Move it away first if you "
+            "has ephemeris.synthetic = false (real data, decision D-75). Move it away first if you "
             "really want the example copy there."
         )
         return 1
