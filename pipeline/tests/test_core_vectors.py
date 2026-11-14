@@ -98,37 +98,80 @@ def test_every_reason_code_appears(vectors):
 
 
 # ---- The reference still gives the file's values (a sample of the slow blocks, all of the fast ones)
+# Compared with the tolerances of 07 §12 (4): the file is written on one machine and checked on others,
+# and libm may differ in the last bit between platforms.
+TOL_DEG = 1e-6
+TOL_FRAC = 1e-6
+TOL_KM = 1e-3
+TOL_S = 1
+TOL_H = 0.001
+
+
+def _tol(key: str) -> float:
+    if key.endswith("_km"):
+        return TOL_KM
+    if key.endswith(("_hours", "_h")):
+        return TOL_H
+    if key.endswith("_unix") or key in ("t_a", "t_b", "t0"):
+        return TOL_S
+    return TOL_DEG if key.endswith("_deg") else TOL_FRAC
+
+
+def assert_close(got, exp, key: str = "") -> None:
+    """Same structure; numbers within the §12 tolerance of their field; everything else identical."""
+    if isinstance(exp, dict):
+        assert isinstance(got, dict) and set(got) == set(exp), (key, got, exp)
+        for k in exp:
+            assert_close(got[k], exp[k], k)
+    elif isinstance(exp, (list, tuple)):
+        assert isinstance(got, (list, tuple)) and len(got) == len(exp), (key, got, exp)
+        for g, e in zip(got, exp, strict=True):
+            assert_close(g, e, key)
+    elif isinstance(exp, bool) or exp is None or isinstance(exp, str):
+        assert got == exp, (key, got, exp)
+    elif isinstance(exp, (int, float)):
+        d = abs(got - exp)
+        if key.startswith("az"):
+            d = min(d, 360 - d)
+        assert d <= _tol(key), (key, got, exp)
+    else:
+        assert got == exp, (key, got, exp)
 
 
 def test_fast_blocks_reproduce(vectors, ctx):
     for c in vectors["horizon_at"]:
-        assert horizon_at(ctx.mask(c["mask"]).el, c["az_deg"]) == c["el_deg"]
+        assert_close(horizon_at(ctx.mask(c["mask"]).el, c["az_deg"]), c["el_deg"], "el_deg")
     for c in vectors["disc_fraction"]:
-        assert disc_fraction(ctx.mask(c["mask"]), c["az_c"], c["el_c"], c["rho"]) == c["fraction"]
+        f = disc_fraction(ctx.mask(c["mask"]), c["az_c"], c["el_c"], c["rho"])
+        assert_close(f, c["fraction"], "fraction")
     for c in vectors["sky"]:
         s = sky_at(ctx.table, site_frame(c["lat_deg"], c["lon_deg"], c["height_m"]), c["t_unix"])
         for body in ("sun", "earth"):
-            assert s[body] == c[body]
+            assert_close(s[body], c[body], body)
     for c in vectors["evaluate"]:
         m, f = ctx.site_mask_frame(c["site_id"], c["observer_height_m"])
         s = evaluate(ctx.table, f, m, c["t_unix"])
-        assert (s.sun.margin_deg, s.sun.disc_fraction, s.earth.margin_deg, s.both) == (
-            c["sun"]["margin_deg"], c["sun"]["disc_fraction"], c["earth"]["margin_deg"], c["both"])
+        assert_close({"sun_margin_deg": s.sun.margin_deg, "sun_fraction": s.sun.disc_fraction,
+                      "earth_margin_deg": s.earth.margin_deg, "both": s.both},
+                     {"sun_margin_deg": c["sun"]["margin_deg"], "sun_fraction": c["sun"]["disc_fraction"],
+                      "earth_margin_deg": c["earth"]["margin_deg"], "both": c["both"]})
     for c in vectors["eclipse"]:
         _, f = ctx.site_mask_frame(c["site_id"], c["observer_height_m"])
         e = eclipse_state(sky_at(ctx.table, f, c["t_unix"]))
-        assert (e.kind, e.covered, e.sep_deg) == (c["kind"], c["covered"], c["sep_deg"])
+        assert e.kind == c["kind"]
+        assert_close({"covered": e.covered, "sep_deg": e.sep_deg},
+                     {"covered": c["covered"], "sep_deg": c["sep_deg"]})
 
 
 def test_slow_blocks_reproduce_a_sample(vectors, ctx):
     c = min(vectors["events"], key=lambda x: x["t_b"] - x["t_a"])
     m, f = ctx.site_mask_frame(c["site_id"], c["observer_height_m"])
     got = find_events(ctx.table, f, m, c["t_a"], c["t_b"])
-    assert [{"t_unix": e.t_unix, "kind": e.kind} for e in got] == c["events"]
+    assert_close([{"t_unix": e.t_unix, "kind": e.kind} for e in got], c["events"])
 
     c = min(vectors["metrics"], key=lambda x: x["mission_days"])
     keys = ("site_id", "observer_height_m", "landing_unix", "mission_days", "cursor_unix")
-    assert metrics_case(ctx, *(c[k] for k in keys)) == c
+    assert_close(metrics_case(ctx, *(c[k] for k in keys)), c)
 
     c = next(x for x in vectors["assess"] if "requirements" in x and x["mission_days"] <= 7)
     m, f = ctx.site_mask_frame(c["site_id"], c["observer_height_m"])
