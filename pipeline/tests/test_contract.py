@@ -301,4 +301,6 @@ def test_examples_are_up_to_date(tmp_path):
     if json.loads((WEB_DATA / "manifest.json").read_text(encoding="utf-8"))["ephemeris"]["synthetic"]:
         assert fresh == _tree(WEB_DATA), "web/public/data is not a copy of the examples: run `make examples`"
     config = json.loads((REPO_ROOT / "web" / "public" / "config.json").read_text(encoding="utf-8"))
-    assert config == {"data_base_url": "data", "heavy_base_url": "data"}
+    # heavy_base_url is "data" until `make deploy-heavy` (T-25) writes the URL of the heavy origin.
+    assert config["data_base_url"] == "data" and set(config) == {"data_base_url", "heavy_base_url"}
+    assert config["heavy_base_url"] == "data" or config["heavy_base_url"].startswith("https://")
