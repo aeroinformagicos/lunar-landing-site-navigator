@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import json
 import os
 import sys
 import time
@@ -94,6 +95,10 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("regions", help="map/regions.json from the catalog into <out>/heavy/map")
     pub = sub.add_parser("publish", help="copy <out>/light to web/public/data and write manifest.json")
     pub.add_argument("--web-dir", type=Path, default=None, help="default: web/public/data")
+    rep = sub.add_parser(
+        "report", help="validation_report.json from <out>/test_results and docs/manual_checks.json (11 §7.1)"
+    )
+    rep.add_argument("--web-dir", type=Path, default=None, help="default: web/public/data")
     check = sub.add_parser("check-contract", help="validate data directories against the contract (09)")
     check.add_argument(
         "dirs", nargs="*", type=Path, help="default: contract/examples/data and web/public/data"
@@ -492,6 +497,33 @@ def cmd_publish(args: argparse.Namespace) -> int:
     return contract_check.main([web])
 
 
+def cmd_report(args: argparse.Namespace) -> int:
+    """Gather the recorded cases into validation_report.json and check the contract (09 §7)."""
+    from pipeline.cli import contract_check, report
+
+    web = args.web_dir if args.web_dir is not None else report.WEB_DATA_DIR
+    results = out_dir(args) / "test_results"
+    try:
+        doc = report.build_report(results, report.MANUAL_CHECKS, web)
+    except (ValueError, KeyError, json.JSONDecodeError) as exc:
+        print(f"report: {exc}")
+        return 1
+    path = report.write_report(doc, web)
+    s = doc["summary"]
+    print(f"{s['total']} cases from {results}: {s['passed']} pass, {s['failed']} fail, {s['manual']} manual, "
+          f"{s['skipped']} skipped; Horizons: {s['horizons_comparisons']} values, "
+          f"max |error| {s['horizons_max_abs_err_deg']} deg")
+    for h in doc["headline"]:
+        rows = "; ".join(f"{r['label']} {r['predicted']} vs {r['observed']}" for r in h["rows"])
+        print(f"  headline {h['id']}: {h['status']}" + (f" ({rows})" if rows else ""))
+    for c in doc["cases"]:
+        if c["status"] == "fail":
+            print(f"  FAIL {c['id']}: {c['obtained']}")
+    print(f"written to {path}")
+    report.mark_in_manifest(web)
+    return contract_check.main([web])
+
+
 def cmd_check_contract(args: argparse.Namespace) -> int:
     """Schemas, sizes, headers and cross references of the contract files (09_contrato_datos.md)."""
     from pipeline.cli import contract_check
@@ -512,6 +544,7 @@ def main(argv: list[str] | None = None) -> int:
         "sites": cmd_sites,
         "regions": cmd_regions,
         "publish": cmd_publish,
+        "report": cmd_report,
         "check-contract": cmd_check_contract,
     }
     return handlers[args.command](args)

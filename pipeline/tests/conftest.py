@@ -94,6 +94,31 @@ def example_table():
     return load_table(EXAMPLE_DATA)
 
 
+@pytest.fixture(scope="session")
+def results_dir() -> Path:
+    """``<data>/out/test_results``: where the cases are recorded (11_validacion.md §7.1)."""
+    from pipeline.cli.report import results_dir_of
+
+    return results_dir_of(data_dir())
+
+
+@pytest.fixture(scope="session")
+def record_case(results_dir):
+    """``record_case(case_id, status, expected, obtained, tolerance, source, details, note, part=None)``.
+
+    Writes ``<data>/out/test_results/<case_id>.json`` (or ``<case_id>.<part>.json`` when two tests
+    measure one case), which ``python -m pipeline.cli report`` gathers into validation_report.json.
+    A test records before it asserts, so that a failure is reported as ``fail``.
+    """
+    from pipeline.cli.report import write_case
+
+    def record(case_id, status, expected, obtained, tolerance, source, details, note="", part=None):
+        return write_case(results_dir, case_id, status, expected, obtained, tolerance, source, details,
+                          note, part)
+
+    return record
+
+
 def pytest_runtest_setup(item):
     if item.get_closest_marker("kernels") is None or kernels_present():
         return
