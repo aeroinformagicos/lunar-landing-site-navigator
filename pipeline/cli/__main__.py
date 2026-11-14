@@ -93,6 +93,27 @@ def build_parser() -> argparse.ArgumentParser:
     sites.add_argument("--no-publish", action="store_true", help="do not copy to web/public/data")
     sites.add_argument("--web-dir", type=Path, default=None, help="default: web/public/data")
     sub.add_parser("regions", help="map/regions.json from the catalog into <out>/heavy/map")
+    layers = sub.add_parser(
+        "layers", help="visibility layers and map/grid.json from the cube into <out>/heavy (resumable, 08 §5)"
+    )
+    layers.add_argument(
+        "--source",
+        choices=("computed", "nasa_avgvisib"),
+        default="computed",
+        help="computed (from the cube) or nasa_avgvisib (plan B-4 of 08 §9: the NASA maps on the mesh)",
+    )
+    layers.add_argument(
+        "--device", choices=("auto", "cuda", "cpu", "numpy"), default=None,
+        help="default: $LLSN_DEVICE or auto (PyTorch if installed, GPU if any); numpy forces the reference",
+    )
+    layers.add_argument("--batch-chunks", type=int, default=None, help="cube chunks per batch (default 64)")
+    layers.add_argument("--block-steps", type=int, default=None, help="hourly steps per block (default 512)")
+    layers.add_argument("--force", action="store_true", help="recompute every chunk, not only the new ones")
+    layers.add_argument("--web-dir", type=Path, default=None, help="ephemeris; default: web/public/data")
+    sub.add_parser("hillshade", help="map/hillshade_250m.png and map/dem_500m.bin.gz from P2 (08 §6)")
+    sub.add_parser(
+        "compare-nasa", help="mean186_any vs the NASA AVGVISIB maps: case B7 and its two figures (08 §8)"
+    )
     pub = sub.add_parser("publish", help="copy <out>/light to web/public/data and write manifest.json")
     pub.add_argument("--web-dir", type=Path, default=None, help="default: web/public/data")
     vec = sub.add_parser(
@@ -487,6 +508,114 @@ def cmd_regions(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_layers(args: argparse.Namespace) -> int:
+    """Layers of 08 §5 from the cube (resumable), or the NASA layers of plan B-4 (08 §9)."""
+    from pipeline.horizon import cube
+    from pipeline.horizon.site_mask import heavy_dir_of
+    from pipeline.layers import layers as lay
+
+    heavy = heavy_dir_of(out_dir(args))
+    log = open_log(args, "layers")
+    t0 = time.perf_counter()
+    if args.source == lay.SOURCE_NASA:
+        from pipeline.dem.pds_label import LabelError
+        from pipeline.layers import compare_nasa
+
+        try:
+            products = compare_nasa.open_products(args.data_dir)
+        except (compare_nasa.NasaDataMissing, LabelError) as exc:
+            log(f"layers: {exc}")
+            return 1
+        files, n_points = lay.write_nasa_layers(heavy, products)
+        log(f"layers (plan B-4, source nasa_avgvisib): {n_points} cells with NASA values, {len(files)} files "
+            f"in {heavy} ({time.perf_counter() - t0:.1f} s)")
+        return 0
+    for name, value in (("--batch-chunks", args.batch_chunks), ("--block-steps", args.block_steps)):
+        if value is not None and value < 1:
+            print(f"{name} must be at least 1")
+            return 2
+    from pipeline.ephem.interp import load_table
+
+    web = args.web_dir if args.web_dir is not None else WEB_DATA_DIR
+    try:
+        table = load_table(web)
+        steps = lay.table_steps(table)
+        bk = lay.pick_backend(args.device)
+    except (OSError, ValueError, RuntimeError) as exc:
+        log(f"layers: {exc}")
+        return 1
+    cube_dir = cube.cube_dir_of(out_dir(args))
+    if not (cube_dir / "done.bin").is_file():
+        log(f"layers: {cube_dir / 'done.bin'} does not exist: run make cube first")
+        return 1
+    try:
+        summary = lay.run_layers(
+            cube_dir, heavy, lay.partial_dir_of(out_dir(args)), steps, bk,
+            batch_chunks=args.batch_chunks or lay.DEFAULT_BATCH_CHUNKS,
+            block_steps=args.block_steps or lay.DEFAULT_BLOCK_STEPS,
+            force=args.force, progress=log,
+        )
+    except KeyboardInterrupt:
+        log("interrupted: run the same command again to resume (finished chunks are kept)")
+        return 130
+    log(
+        f"layers: {len(summary.computed)} chunks computed, {len(summary.skipped)} kept, {len(summary.bad)} "
+        f"unreadable; {summary.computed_points}/{cube.POINTS_TOTAL} points; {len(summary.files)} files in "
+        f"{heavy} in {cube.format_duration(summary.seconds)}"
+    )
+    return 1 if summary.bad else 0
+
+
+def cmd_hillshade(args: argparse.Namespace) -> int:
+    """Hillshade and 500 m heights of the map background from P2 (08 §6), plus map/grid.json."""
+    from pipeline.dem.grids import read_pds_image
+    from pipeline.dem.stack import P2_NAME
+    from pipeline.horizon.site_mask import heavy_dir_of
+    from pipeline.layers import hillshade
+    from pipeline.layers import layers as lay
+
+    lbl = args.data_dir / "raw" / "lola" / f"{P2_NAME}.LBL"
+    if not lbl.is_file() or not lbl.with_suffix(".IMG").is_file():
+        print(f"hillshade: missing {P2_NAME}.IMG or its .LBL in {lbl.parent}; run make data-fetch")
+        return 1
+    t0 = time.perf_counter()
+    heavy = heavy_dir_of(out_dir(args))
+    png, dem, s = hillshade.write_background(heavy, read_pds_image(lbl))
+    lay.write_grid(heavy)
+    print(f"{png} ({png.stat().st_size} B), {dem} ({dem.stat().st_size} B); heights {s['dem_min_m']}.."
+          f"{s['dem_max_m']} m, {s['dem_nodata']} cells without data; {time.perf_counter() - t0:.1f} s")
+    return 0
+
+
+def cmd_compare_nasa(args: argparse.Namespace) -> int:
+    """mean186_any against the NASA AVGVISIB maps (08 §8.2): records case B7 and writes its figures."""
+    from pipeline.cli.report import write_case
+    from pipeline.dem.pds_label import LabelError
+    from pipeline.horizon.site_mask import heavy_dir_of
+    from pipeline.layers import compare_nasa
+    from pipeline.layers import layers as lay
+
+    t0 = time.perf_counter()
+    try:
+        ours = compare_nasa.read_any_layer(lay.layers_dir_of(heavy_dir_of(out_dir(args))))
+        products = compare_nasa.open_products(args.data_dir)
+    except (OSError, ValueError, LabelError) as exc:
+        print(f"compare-nasa: {exc}")
+        return 1
+    comp = compare_nasa.compare(ours, compare_nasa.mesh_dn_sums(products))
+    results = out_dir(args) / "test_results"
+    figures = compare_nasa.write_figures(results, comp)
+    case = compare_nasa.case_b7(comp)
+    path = write_case(results, **case)
+    for line in compare_nasa.summary_lines(comp):
+        print(line)
+    print(f"B7: {case['status']} (r > {compare_nasa.r_min():g} for Sun and Earth over the 85° S maps) "
+          f"-> {path}")
+    print(f"figures: {', '.join(f'{p.name} ({p.stat().st_size} B)' for p in figures)}; "
+          f"{time.perf_counter() - t0:.1f} s. Then: make report")
+    return 0
+
+
 def cmd_publish(args: argparse.Namespace) -> int:
     """Copy <out>/light to web/public/data, write manifest.json and check the contract (09 §3.1)."""
     from pipeline.cli import contract_check
@@ -567,6 +696,9 @@ def main(argv: list[str] | None = None) -> int:
         "profile-csv": cmd_profile_csv,
         "sites": cmd_sites,
         "regions": cmd_regions,
+        "layers": cmd_layers,
+        "hillshade": cmd_hillshade,
+        "compare-nasa": cmd_compare_nasa,
         "publish": cmd_publish,
         "core-vectors": cmd_core_vectors,
         "report": cmd_report,

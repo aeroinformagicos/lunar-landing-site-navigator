@@ -186,6 +186,19 @@ const tasks = {
     }
     cli('cube', ...extra);
   },
+  // Map layers (08_mapa_polar.md §5, §6; T-28) into $LLSN_DATA_DIR/out/heavy: map/regions.json, the
+  // hillshade and the 500 m heights from P2, then the layers of every chunk in cube/done.bin with
+  // map/grid.json (resumable: run it again to finish; chunks already done are kept). FORCE=1
+  // recomputes every chunk; SOURCE=nasa_avgvisib writes the NASA layers of plan B-4 (08 §9) instead;
+  // the device comes from LLSN_DEVICE (PyTorch, GPU if any).
+  layers() {
+    cli('regions');
+    cli('hillshade');
+    const extra = [];
+    if (envVar('SOURCE')) extra.push('--source', envVar('SOURCE'));
+    if (envVar('FORCE') === '1') extra.push('--force');
+    cli('layers', ...extra);
+  },
   // Unattended night chain (T-25): `make cube LEVELS=2,3,4`, then `make layers`. Stops at the first
   // failure. Each step's output goes to $LLSN_DATA_DIR/out/logs/night-<UTC>-<n>-<step>.log and the
   // start, end and exit code of each step to night-<UTC>.log.
@@ -203,7 +216,6 @@ const tasks = {
       { task: 'cube', env: { LEVELS: '2,3,4' } },
       { task: 'layers', env: {} },
     ];
-    if (!tasks.layers) note('WARNING: `make layers` does not exist yet (T-28): the chain will stop after the cube');
     note(`start: ${steps.map((s) => s.task).join(' -> ')}; law ${envVar('LAW') ?? 'full (default, D-59)'}`);
     for (const [n, step] of steps.entries()) {
       const label = `${n + 1}-${step.task}`;
