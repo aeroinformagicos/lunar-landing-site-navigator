@@ -53,6 +53,10 @@ fuente (CLAUDE.md §2).
 | Capas: máximo de un valor válido y valor sin dato | 250; 255 | — | `09` §9.2 | Ídem |
 | `map/hillshade_250m.png` | 1.504 × 1.344, gris de 8 bits | px | `09` §8.3 | Ídem, `make_examples.py` |
 | Máscaras compactas: cabecera `LLSNCMP1` de 32 B, 180 acimuts cada 200 centésimas de grado, 368 B por punto | — | — | `09` §11 | Ídem |
+| `DEFAULT_LAW` (ley del cubo cuando no se indica `LAW`) | `full` | — | D-59 | `pipeline/horizon/cube.py` |
+| `CF_MAX_FILES`, `CF_MAX_FILE_BYTES` (límites de Cloudflare Pages, plan gratuito; `deploy-heavy` se niega a publicar si se superan) | 20.000; 25 MiB (26.214.400) | ficheros; B | `02_arquitectura.md` §6.2 (documentación oficial de Cloudflare Pages, «Limits», en `SOURCES.md`) | `ops/tasks.mjs` |
+| `HEAVY_HEADERS` (fichero `_headers` del origen pesado) | `/*` → `Access-Control-Allow-Origin: *` | — | `02` §6.2; formato: documentación de Cloudflare Pages, «Headers» (`SOURCES.md`) | `ops/tasks.mjs` |
+| `heavy_base_url` por defecto de `deploy-heavy` | `https://aeroinformagicos-llsn-data.pages.dev` | — | D-45 (proyecto) y `<proyecto>.pages.dev` (documentación de Cloudflare Pages); `HEAVY_BASE_URL` lo cambia | `ops/tasks.mjs` |
 
 ## Valores medidos
 
