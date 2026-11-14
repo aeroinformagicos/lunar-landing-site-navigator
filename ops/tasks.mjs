@@ -148,6 +148,11 @@ const tasks = {
   ephem() {
     cli('ephem', ...(envVar('SAMPLE') === '1' ? ['--write-sample'] : []));
   },
+  // validation_report.json in web/public/data from $LLSN_DATA_DIR/out/test_results (written by the
+  // case tests: run `make test` or `make test-all` first) and docs/manual_checks.json (11 §7.1, T-22).
+  report() {
+    cli('report');
+  },
   // Site masks, profiles and sites.json in the batch order of 04_catalogo_sitios.md §6, published to
   // web/public/data after each site (T-09; run by I3 in T-21). Sites whose files already exist are
   // kept. SITES=<id,id> computes only those; FORCE=1 recomputes; NO_PUBLISH=1 leaves web/public/data.

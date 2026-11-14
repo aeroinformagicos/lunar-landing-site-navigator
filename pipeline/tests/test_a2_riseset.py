@@ -19,6 +19,7 @@ from collections import defaultdict
 
 import pytest
 
+from pipeline.cli.report import HORIZONS
 from pipeline.common.timeutil import iso_to_unix, unix_to_iso
 from pipeline.ephem.interp import load_table, site_frame, sky_at
 from pipeline.tests.conftest import REPO_ROOT
@@ -133,7 +134,7 @@ def test_raw_responses_have_the_horizons_header():
 
 
 @needs_series
-def test_a2_rise_and_set_against_horizons():
+def test_a2_rise_and_set_against_horizons(record_case):
     try:
         from pipeline.vis.events import find_crossings
     except ImportError:
@@ -144,6 +145,7 @@ def test_a2_rise_and_set_against_horizons():
     table = load_table(WEB_DATA)
     tol_s = 60.0 * TOL["A2_min"]
     worst = 0.0
+    details, bad = [], []
     for site, crossings in reference_crossings().items():
         (lat, lon), _ = A2_SITES[site]
         frame = site_frame(lat, lon, 0.0)
@@ -155,9 +157,17 @@ def test_a2_rise_and_set_against_horizons():
         ours, _ = find_crossings(margin, iso_to_unix(MARCH_START), iso_to_unix(MARCH_END), STEP_S)
         for t_ref, rising in crossings:
             same = [c["t"] for c in ours if c["rising"] == rising]
-            assert same, (site, rising)
-            t = min(same, key=lambda x: abs(x - t_ref))
-            d = abs(t - t_ref)
-            assert d < tol_s, (site, rising, unix_to_iso(t_ref), unix_to_iso(t))
-            worst = max(worst, d)
+            t = min(same, key=lambda x: abs(x - t_ref)) if same else None
+            d = abs(t - t_ref) if t is not None else None
+            details.append({"label": f"{site} {'sunrise' if rising else 'sunset'}",
+                            "expected": unix_to_iso(t_ref), "obtained": None if t is None else unix_to_iso(t),
+                            "abs_err": d, "unit": "s", "ok": d is not None and d < tol_s})
+            if d is None or d >= tol_s:
+                bad.append((site, rising, unix_to_iso(t_ref), t))
+            else:
+                worst = max(worst, d)
+    record_case("A2", "fail" if bad else "pass", "0 deg crossings of the 1-minute Horizons series at 3 sites",
+                f"max |dt| {worst:.1f} s over {len(details)} crossings", f"{TOL['A2_min']} min",
+                HORIZONS, details, "Smooth Moon, observer at 0 m, centre of the Sun.")
     print(f"\nA2: max |d t| = {worst:.1f} s (tolerance {tol_s:.0f} s, expected < {A2_EXPECTED_MAX_S} s)")
+    assert not bad, bad
