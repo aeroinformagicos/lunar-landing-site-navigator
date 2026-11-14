@@ -1,0 +1,521 @@
+{
+  "contract_version": "1.0.0",
+  "source": "computed",
+  "criterion": "center",
+  "observer_height_m": 2,
+  "time_step_s": 3600,
+  "encoding": {
+    "dtype": "uint8",
+    "pct_per_unit": 0.4,
+    "nodata": 255,
+    "bands": [
+      "sun",
+      "earth",
+      "both"
+    ],
+    "layout": "band,row,col"
+  },
+  "periods": [
+    {
+      "id": "mean186",
+      "label": "18.6-year mean",
+      "start_utc": "2026-01-01T00:00:00Z",
+      "end_utc": "2044-08-12T00:00:00Z",
+      "n_steps": 163152,
+      "file": "layers/mean186.bin.gz"
+    },
+    {
+      "id": "2026-01",
+      "label": "Jan 2026",
+      "start_utc": "2026-01-01T00:00:00Z",
+      "end_utc": "2026-02-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2026-01.bin.gz"
+    },
+    {
+      "id": "2026-02",
+      "label": "Feb 2026",
+      "start_utc": "2026-02-01T00:00:00Z",
+      "end_utc": "2026-03-01T00:00:00Z",
+      "n_steps": 672,
+      "file": "layers/2026-02.bin.gz"
+    },
+    {
+      "id": "2026-03",
+      "label": "Mar 2026",
+      "start_utc": "2026-03-01T00:00:00Z",
+      "end_utc": "2026-04-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2026-03.bin.gz"
+    },
+    {
+      "id": "2026-04",
+      "label": "Apr 2026",
+      "start_utc": "2026-04-01T00:00:00Z",
+      "end_utc": "2026-05-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2026-04.bin.gz"
+    },
+    {
+      "id": "2026-05",
+      "label": "May 2026",
+      "start_utc": "2026-05-01T00:00:00Z",
+      "end_utc": "2026-06-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2026-05.bin.gz"
+    },
+    {
+      "id": "2026-06",
+      "label": "Jun 2026",
+      "start_utc": "2026-06-01T00:00:00Z",
+      "end_utc": "2026-07-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2026-06.bin.gz"
+    },
+    {
+      "id": "2026-07",
+      "label": "Jul 2026",
+      "start_utc": "2026-07-01T00:00:00Z",
+      "end_utc": "2026-08-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2026-07.bin.gz"
+    },
+    {
+      "id": "2026-08",
+      "label": "Aug 2026",
+      "start_utc": "2026-08-01T00:00:00Z",
+      "end_utc": "2026-09-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2026-08.bin.gz"
+    },
+    {
+      "id": "2026-09",
+      "label": "Sep 2026",
+      "start_utc": "2026-09-01T00:00:00Z",
+      "end_utc": "2026-10-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2026-09.bin.gz"
+    },
+    {
+      "id": "2026-10",
+      "label": "Oct 2026",
+      "start_utc": "2026-10-01T00:00:00Z",
+      "end_utc": "2026-11-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2026-10.bin.gz"
+    },
+    {
+      "id": "2026-11",
+      "label": "Nov 2026",
+      "start_utc": "2026-11-01T00:00:00Z",
+      "end_utc": "2026-12-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2026-11.bin.gz"
+    },
+    {
+      "id": "2026-12",
+      "label": "Dec 2026",
+      "start_utc": "2026-12-01T00:00:00Z",
+      "end_utc": "2027-01-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2026-12.bin.gz"
+    },
+    {
+      "id": "2027-01",
+      "label": "Jan 2027",
+      "start_utc": "2027-01-01T00:00:00Z",
+      "end_utc": "2027-02-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2027-01.bin.gz"
+    },
+    {
+      "id": "2027-02",
+      "label": "Feb 2027",
+      "start_utc": "2027-02-01T00:00:00Z",
+      "end_utc": "2027-03-01T00:00:00Z",
+      "n_steps": 672,
+      "file": "layers/2027-02.bin.gz"
+    },
+    {
+      "id": "2027-03",
+      "label": "Mar 2027",
+      "start_utc": "2027-03-01T00:00:00Z",
+      "end_utc": "2027-04-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2027-03.bin.gz"
+    },
+    {
+      "id": "2027-04",
+      "label": "Apr 2027",
+      "start_utc": "2027-04-01T00:00:00Z",
+      "end_utc": "2027-05-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2027-04.bin.gz"
+    },
+    {
+      "id": "2027-05",
+      "label": "May 2027",
+      "start_utc": "2027-05-01T00:00:00Z",
+      "end_utc": "2027-06-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2027-05.bin.gz"
+    },
+    {
+      "id": "2027-06",
+      "label": "Jun 2027",
+      "start_utc": "2027-06-01T00:00:00Z",
+      "end_utc": "2027-07-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2027-06.bin.gz"
+    },
+    {
+      "id": "2027-07",
+      "label": "Jul 2027",
+      "start_utc": "2027-07-01T00:00:00Z",
+      "end_utc": "2027-08-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2027-07.bin.gz"
+    },
+    {
+      "id": "2027-08",
+      "label": "Aug 2027",
+      "start_utc": "2027-08-01T00:00:00Z",
+      "end_utc": "2027-09-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2027-08.bin.gz"
+    },
+    {
+      "id": "2027-09",
+      "label": "Sep 2027",
+      "start_utc": "2027-09-01T00:00:00Z",
+      "end_utc": "2027-10-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2027-09.bin.gz"
+    },
+    {
+      "id": "2027-10",
+      "label": "Oct 2027",
+      "start_utc": "2027-10-01T00:00:00Z",
+      "end_utc": "2027-11-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2027-10.bin.gz"
+    },
+    {
+      "id": "2027-11",
+      "label": "Nov 2027",
+      "start_utc": "2027-11-01T00:00:00Z",
+      "end_utc": "2027-12-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2027-11.bin.gz"
+    },
+    {
+      "id": "2027-12",
+      "label": "Dec 2027",
+      "start_utc": "2027-12-01T00:00:00Z",
+      "end_utc": "2028-01-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2027-12.bin.gz"
+    },
+    {
+      "id": "2028-01",
+      "label": "Jan 2028",
+      "start_utc": "2028-01-01T00:00:00Z",
+      "end_utc": "2028-02-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2028-01.bin.gz"
+    },
+    {
+      "id": "2028-02",
+      "label": "Feb 2028",
+      "start_utc": "2028-02-01T00:00:00Z",
+      "end_utc": "2028-03-01T00:00:00Z",
+      "n_steps": 696,
+      "file": "layers/2028-02.bin.gz"
+    },
+    {
+      "id": "2028-03",
+      "label": "Mar 2028",
+      "start_utc": "2028-03-01T00:00:00Z",
+      "end_utc": "2028-04-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2028-03.bin.gz"
+    },
+    {
+      "id": "2028-04",
+      "label": "Apr 2028",
+      "start_utc": "2028-04-01T00:00:00Z",
+      "end_utc": "2028-05-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2028-04.bin.gz"
+    },
+    {
+      "id": "2028-05",
+      "label": "May 2028",
+      "start_utc": "2028-05-01T00:00:00Z",
+      "end_utc": "2028-06-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2028-05.bin.gz"
+    },
+    {
+      "id": "2028-06",
+      "label": "Jun 2028",
+      "start_utc": "2028-06-01T00:00:00Z",
+      "end_utc": "2028-07-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2028-06.bin.gz"
+    },
+    {
+      "id": "2028-07",
+      "label": "Jul 2028",
+      "start_utc": "2028-07-01T00:00:00Z",
+      "end_utc": "2028-08-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2028-07.bin.gz"
+    },
+    {
+      "id": "2028-08",
+      "label": "Aug 2028",
+      "start_utc": "2028-08-01T00:00:00Z",
+      "end_utc": "2028-09-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2028-08.bin.gz"
+    },
+    {
+      "id": "2028-09",
+      "label": "Sep 2028",
+      "start_utc": "2028-09-01T00:00:00Z",
+      "end_utc": "2028-10-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2028-09.bin.gz"
+    },
+    {
+      "id": "2028-10",
+      "label": "Oct 2028",
+      "start_utc": "2028-10-01T00:00:00Z",
+      "end_utc": "2028-11-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2028-10.bin.gz"
+    },
+    {
+      "id": "2028-11",
+      "label": "Nov 2028",
+      "start_utc": "2028-11-01T00:00:00Z",
+      "end_utc": "2028-12-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2028-11.bin.gz"
+    },
+    {
+      "id": "2028-12",
+      "label": "Dec 2028",
+      "start_utc": "2028-12-01T00:00:00Z",
+      "end_utc": "2029-01-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2028-12.bin.gz"
+    },
+    {
+      "id": "2029-01",
+      "label": "Jan 2029",
+      "start_utc": "2029-01-01T00:00:00Z",
+      "end_utc": "2029-02-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2029-01.bin.gz"
+    },
+    {
+      "id": "2029-02",
+      "label": "Feb 2029",
+      "start_utc": "2029-02-01T00:00:00Z",
+      "end_utc": "2029-03-01T00:00:00Z",
+      "n_steps": 672,
+      "file": "layers/2029-02.bin.gz"
+    },
+    {
+      "id": "2029-03",
+      "label": "Mar 2029",
+      "start_utc": "2029-03-01T00:00:00Z",
+      "end_utc": "2029-04-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2029-03.bin.gz"
+    },
+    {
+      "id": "2029-04",
+      "label": "Apr 2029",
+      "start_utc": "2029-04-01T00:00:00Z",
+      "end_utc": "2029-05-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2029-04.bin.gz"
+    },
+    {
+      "id": "2029-05",
+      "label": "May 2029",
+      "start_utc": "2029-05-01T00:00:00Z",
+      "end_utc": "2029-06-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2029-05.bin.gz"
+    },
+    {
+      "id": "2029-06",
+      "label": "Jun 2029",
+      "start_utc": "2029-06-01T00:00:00Z",
+      "end_utc": "2029-07-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2029-06.bin.gz"
+    },
+    {
+      "id": "2029-07",
+      "label": "Jul 2029",
+      "start_utc": "2029-07-01T00:00:00Z",
+      "end_utc": "2029-08-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2029-07.bin.gz"
+    },
+    {
+      "id": "2029-08",
+      "label": "Aug 2029",
+      "start_utc": "2029-08-01T00:00:00Z",
+      "end_utc": "2029-09-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2029-08.bin.gz"
+    },
+    {
+      "id": "2029-09",
+      "label": "Sep 2029",
+      "start_utc": "2029-09-01T00:00:00Z",
+      "end_utc": "2029-10-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2029-09.bin.gz"
+    },
+    {
+      "id": "2029-10",
+      "label": "Oct 2029",
+      "start_utc": "2029-10-01T00:00:00Z",
+      "end_utc": "2029-11-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2029-10.bin.gz"
+    },
+    {
+      "id": "2029-11",
+      "label": "Nov 2029",
+      "start_utc": "2029-11-01T00:00:00Z",
+      "end_utc": "2029-12-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2029-11.bin.gz"
+    },
+    {
+      "id": "2029-12",
+      "label": "Dec 2029",
+      "start_utc": "2029-12-01T00:00:00Z",
+      "end_utc": "2030-01-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2029-12.bin.gz"
+    },
+    {
+      "id": "2030-01",
+      "label": "Jan 2030",
+      "start_utc": "2030-01-01T00:00:00Z",
+      "end_utc": "2030-02-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2030-01.bin.gz"
+    },
+    {
+      "id": "2030-02",
+      "label": "Feb 2030",
+      "start_utc": "2030-02-01T00:00:00Z",
+      "end_utc": "2030-03-01T00:00:00Z",
+      "n_steps": 672,
+      "file": "layers/2030-02.bin.gz"
+    },
+    {
+      "id": "2030-03",
+      "label": "Mar 2030",
+      "start_utc": "2030-03-01T00:00:00Z",
+      "end_utc": "2030-04-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2030-03.bin.gz"
+    },
+    {
+      "id": "2030-04",
+      "label": "Apr 2030",
+      "start_utc": "2030-04-01T00:00:00Z",
+      "end_utc": "2030-05-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2030-04.bin.gz"
+    },
+    {
+      "id": "2030-05",
+      "label": "May 2030",
+      "start_utc": "2030-05-01T00:00:00Z",
+      "end_utc": "2030-06-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2030-05.bin.gz"
+    },
+    {
+      "id": "2030-06",
+      "label": "Jun 2030",
+      "start_utc": "2030-06-01T00:00:00Z",
+      "end_utc": "2030-07-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2030-06.bin.gz"
+    },
+    {
+      "id": "2030-07",
+      "label": "Jul 2030",
+      "start_utc": "2030-07-01T00:00:00Z",
+      "end_utc": "2030-08-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2030-07.bin.gz"
+    },
+    {
+      "id": "2030-08",
+      "label": "Aug 2030",
+      "start_utc": "2030-08-01T00:00:00Z",
+      "end_utc": "2030-09-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2030-08.bin.gz"
+    },
+    {
+      "id": "2030-09",
+      "label": "Sep 2030",
+      "start_utc": "2030-09-01T00:00:00Z",
+      "end_utc": "2030-10-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2030-09.bin.gz"
+    },
+    {
+      "id": "2030-10",
+      "label": "Oct 2030",
+      "start_utc": "2030-10-01T00:00:00Z",
+      "end_utc": "2030-11-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2030-10.bin.gz"
+    },
+    {
+      "id": "2030-11",
+      "label": "Nov 2030",
+      "start_utc": "2030-11-01T00:00:00Z",
+      "end_utc": "2030-12-01T00:00:00Z",
+      "n_steps": 720,
+      "file": "layers/2030-11.bin.gz"
+    },
+    {
+      "id": "2030-12",
+      "label": "Dec 2030",
+      "start_utc": "2030-12-01T00:00:00Z",
+      "end_utc": "2031-01-01T00:00:00Z",
+      "n_steps": 744,
+      "file": "layers/2030-12.bin.gz"
+    }
+  ],
+  "validation": {
+    "file": "layers/mean186_any.bin.gz",
+    "bands": [
+      "sun_any",
+      "earth_any"
+    ],
+    "criterion": "any",
+    "observer_height_m": 2
+  },
+  "coverage": {
+    "computed_points": 505344,
+    "total_points": 505344
+  }
+}

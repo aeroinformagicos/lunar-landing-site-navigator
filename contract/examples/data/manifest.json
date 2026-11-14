@@ -1,0 +1,12 @@
+{
+  "contract_version": "1.0.0",
+  "generated_utc": "2026-11-14T00:00:00Z",
+  "git_commit": "example",
+  "sites": 4,
+  "ephemeris": {
+    "file": "ephemeris.bin",
+    "bytes": 5260176,
+    "synthetic": true
+  },
+  "has_validation_report": true
+}

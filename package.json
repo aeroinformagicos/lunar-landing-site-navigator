@@ -13,6 +13,7 @@
     "deploy": "node ops/tasks.mjs deploy",
     "info": "node ops/tasks.mjs info",
     "cube-bench": "node ops/tasks.mjs cube-bench",
-    "cube-plan": "node ops/tasks.mjs cube-plan"
+    "cube-plan": "node ops/tasks.mjs cube-plan",
+    "examples": "node ops/tasks.mjs examples"
   }
 }

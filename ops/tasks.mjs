@@ -101,6 +101,11 @@ const tasks = {
   'cube-plan'() {
     cli('cube-plan');
   },
+  // Synthetic example data of the contract (09_contrato_datos.md §13, T-02): writes
+  // contract/examples/data, copies it to web/public/data and writes web/public/config.json.
+  examples() {
+    run(venvPython(), ['contract/examples/make_examples.py']);
+  },
 };
 
 const name = process.argv[2];

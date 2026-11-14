@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cube.schema.json",
+  "title": "cube/cube.json (09_contrato_datos.md §10.1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "grid", "law", "observer_height_m", "dem_stack", "el_scale_deg", "dist_code",
+               "chunks_done", "chunks_total", "done"],
+  "properties": {
+    "contract_version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "grid": { "const": "map/grid.json" },
+    "law": { "enum": ["full", "fast"] },
+    "observer_height_m": { "type": "number", "minimum": 0 },
+    "dem_stack": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "el_scale_deg": { "const": 0.01 },
+    "dist_code": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_m", "ratio"],
+      "properties": { "base_m": { "const": 20 }, "ratio": { "const": 1.04 } }
+    },
+    "chunks_done": { "type": "integer", "minimum": 0, "maximum": 1974 },
+    "chunks_total": { "const": 1974 },
+    "done": { "const": "cube/done.bin" }
+  }
+}

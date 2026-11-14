@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "grid.schema.json",
+  "title": "map/grid.json (09_contrato_datos.md §8.1, decision D-13)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "projection", "radius_m", "cell_m", "nx", "ny", "x_min_m", "y_max_m",
+               "chunk", "n_chunk_cols", "n_chunk_rows"],
+  "properties": {
+    "contract_version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "projection": { "const": "polar_stereographic_south" },
+    "radius_m": { "const": 1737400 },
+    "cell_m": { "const": 500 },
+    "nx": { "const": 752 },
+    "ny": { "const": 672 },
+    "x_min_m": { "const": -200000 },
+    "y_max_m": { "const": 184000 },
+    "chunk": { "const": 16 },
+    "n_chunk_cols": { "const": 47 },
+    "n_chunk_rows": { "const": 42 }
+  }
+}

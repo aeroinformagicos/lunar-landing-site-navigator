@@ -45,6 +45,10 @@ def build_parser() -> argparse.ArgumentParser:
     cube.add_argument(
         "--points", type=int, default=None, help="quick check: only the first N points of each chunk"
     )
+    check = sub.add_parser("check-contract", help="validate data directories against the contract (09)")
+    check.add_argument(
+        "dirs", nargs="*", type=Path, help="default: contract/examples/data and web/public/data"
+    )
     return parser
 
 
@@ -172,6 +176,13 @@ def cmd_cube(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_check_contract(args: argparse.Namespace) -> int:
+    """Schemas, sizes, headers and cross references of the contract files (09_contrato_datos.md)."""
+    from pipeline.cli import contract_check
+
+    return contract_check.main(args.dirs)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     handlers = {
@@ -179,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
         "bench-sampler": cmd_bench_sampler,
         "cube-plan": cmd_cube_plan,
         "cube": cmd_cube,
+        "check-contract": cmd_check_contract,
     }
     return handlers[args.command](args)
 

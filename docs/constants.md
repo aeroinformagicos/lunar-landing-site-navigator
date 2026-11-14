@@ -43,6 +43,16 @@ fuente (CLAUDE.md §2).
 | Luna lisa a 2 m (pruebas): elevación y distancia de tangencia | −0,0869; 2.636 | °; m | `06_horizonte.md` §9; `08` §3.5 | `pipeline/tests/test_cube_engine.py` |
 | Shackleton, centro (pruebas) | −89,67; 129,78 | ° | Gazetteer of Planetary Nomenclature, ficha 5450 (`03` §4.4) | `pipeline/tests/test_dem_read.py`, `test_grids.py` |
 | SLIM, sitio y cota publicada (prueba) | −13,3160; 25,2510; −912 | °; °; m | LROC, «JAXA SLIM Landing» (`03` §5.4) | `pipeline/tests/test_dem_read.py` |
+| Tamaño de `ephemeris.bin` y tramos `main` / `apollo` (`t0_unix`, `n`, `byte_offset`) | 5.260.176; 1.704.063.600 / −31.539.600; 184.107 / 35.067; 0 / 4.418.568 | B; s; —; B | `05_efemerides.md` §4.2 | `contract/examples/make_examples.py`, `pipeline/cli/contract_check.py` |
+| Efemérides sintéticas: distancia y periodo del Sol, amplitud y periodo de su latitud | 1,496·10⁸; 29,53; 1,54; 346,6 | km; d; °; d | `09_contrato_datos.md` §13 | `contract/examples/make_examples.py` |
+| Efemérides sintéticas: distancia de la Tierra, amplitud y periodo de su longitud y de su latitud | 384.400; 7,9 y 27,55; 6,7 y 27,21 | km; ° y d | `09` §13 | Ídem |
+| Máscaras de ejemplo: `demo-a` 0,4 + 0,6·sin(3·az); `demo-b` 12 + 3·sin(2·az) | — | ° | `09` §13 | Ídem |
+| Comprobaciones de las efemérides: \|sol\| 1,45–1,53·10⁸ km, \|tierra\| 3,5–4,1·10⁵ km, Tierra a menos de 12° de +X | — | km, ° | `05` §8.7 | `pipeline/cli/contract_check.py` |
+| `PROFILE_BYTES` (perfil sin comprimir) y cabecera de 32 B `LLSNPRF1` | 737.312 | B | `09` §6 | `pipeline/horizon/profile.py` |
+| Capa sin comprimir (3 bandas) / validación y DEM de 500 m (2 bandas o `int16`) | 1.516.032 / 1.010.688 | B | `09` §8.3, §9.2 | `pipeline/cli/contract_check.py` |
+| Capas: máximo de un valor válido y valor sin dato | 250; 255 | — | `09` §9.2 | Ídem |
+| `map/hillshade_250m.png` | 1.504 × 1.344, gris de 8 bits | px | `09` §8.3 | Ídem, `make_examples.py` |
+| Máscaras compactas: cabecera `LLSNCMP1` de 32 B, 180 acimuts cada 200 centésimas de grado, 368 B por punto | — | — | `09` §11 | Ídem |
 
 ## Valores medidos
 

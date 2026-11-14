@@ -1,5 +1,5 @@
 # Data: never versioned (lives in $LLSN_DATA_DIR, e.g. C:\lunar_datos)
-data/
+/data/
 dist-offline/
 
 # Python
