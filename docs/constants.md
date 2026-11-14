@@ -53,6 +53,17 @@ fuente (CLAUDE.md §2).
 | Capas: máximo de un valor válido y valor sin dato | 250; 255 | — | `09` §9.2 | Ídem |
 | `map/hillshade_250m.png` | 1.504 × 1.344, gris de 8 bits | px | `09` §8.3 | Ídem, `make_examples.py` |
 | Máscaras compactas: cabecera `LLSNCMP1` de 32 B, 180 acimuts cada 200 centésimas de grado, 368 B por punto | — | — | `09` §11 | Ídem |
+| Versión mayor del contrato que lee la web | 1 | — | `contract/VERSION`, `09_contrato_datos.md` | `web/src/core/constants.ts` (`CONTRACT_MAJOR`) |
+| Acimuts por máscara y paso | 720 y 0,5 | — y ° | `09_contrato_datos.md` §5 | `web/src/core/constants.ts` (`N_AZ`, `AZ_STEP_DEG`) |
+| Tamaño de `ephemeris.bin` (comprobación en la web) | 5.260.176 | B | `09_contrato_datos.md` §3.2 | `web/src/core/constants.ts` (`EPHEMERIS_BYTES`) |
+| Tamaño de un perfil descomprimido | 737.312 | B | `09_contrato_datos.md` §6 | `web/src/core/constants.ts` (`PROFILE_BYTES`) |
+| Espera antes del reintento automático | 2.000 | ms | `10_interfaz.md` §9 | `web/src/core/constants.ts` (`NETWORK_RETRY_DELAY_MS`) |
+| Máximo de escenarios | 4 (A–D) | — | `10_interfaz.md` §5 | `web/src/core/constants.ts` (`MAX_SCENARIOS`) |
+| Velocidades de reproducción | 3.600, 21.600, 86.400 | s simulados por s | `10_interfaz.md` §4 (`1 h/s`, `6 h/s`, `1 d/s`) | `web/src/core/constants.ts` (`PLAY_SPEEDS`) |
+| Requisitos por defecto | Sol y Tierra al aterrizar; noche ≤ 24 h; 1,0° y 1,0 para `marginal` | h, °, — | `07_visibilidad.md` §8.1 | `web/src/state/store.ts` (`DEFAULT_REQUIREMENTS`) |
+| Radios de la Luna, el Sol y la Tierra (web) | 1.737,4; 695.700; 6.378,137 | km | `00_indice.md` §3; `ephemeris.meta.json` `constants` (`09` §3.2) | `web/src/core/constants.ts` (`R_MOON_KM`, `R_SUN_KM`, `R_EARTH_KM`) |
+| Registro y paso de la tabla de efemérides | 24 B (6 `float32`) y 3.600 s | B, s | `05_efemerides.md` §4.3 | `web/src/core/ephemeris.ts` |
+| Umbral del convenio del cénit | 10⁻¹² (fracción de la longitud del vector) | — | D-62 | `web/src/core/frames.ts` (`ZENITH_REL`) |
 | `DEFAULT_LAW` (ley del cubo cuando no se indica `LAW`) | `full` | — | D-59 | `pipeline/horizon/cube.py` |
 | `CF_MAX_FILES`, `CF_MAX_FILE_BYTES` (límites de Cloudflare Pages, plan gratuito; `deploy-heavy` se niega a publicar si se superan) | 20.000; 25 MiB (26.214.400) | ficheros; B | `02_arquitectura.md` §6.2 (documentación oficial de Cloudflare Pages, «Limits», en `SOURCES.md`) | `ops/tasks.mjs` |
 | `HEAVY_HEADERS` (fichero `_headers` del origen pesado) | `/*` → `Access-Control-Allow-Origin: *` | — | `02` §6.2; formato: documentación de Cloudflare Pages, «Headers» (`SOURCES.md`) | `ops/tasks.mjs` |
