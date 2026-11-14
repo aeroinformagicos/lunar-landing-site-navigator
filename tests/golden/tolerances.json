@@ -1,0 +1,18 @@
+{
+  "A1_deg": 0.02,
+  "A2_min": 5,
+  "A3_min": 30,
+  "A4_deg": 0.005,
+  "A5_deg": 0.1,
+  "A7_r_min": 0.9,
+  "A7_mae_pct_max": 10,
+  "A9_interp_deg": 0.001,
+  "B1_deg": 0.01,
+  "B1_min": 1,
+  "B3_min": 5,
+  "B5_deg": 0.05,
+  "B5_min": 2,
+  "B6_el_deg": 0.01,
+  "B6_pct": 0.4,
+  "B7_r_min": 0.9
+}

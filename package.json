@@ -18,6 +18,7 @@
     "cube": "node ops/tasks.mjs cube",
     "night": "node ops/tasks.mjs night",
     "deploy-heavy": "node ops/tasks.mjs deploy-heavy",
-    "examples": "node ops/tasks.mjs examples"
+    "examples": "node ops/tasks.mjs examples",
+    "golden": "node ops/tasks.mjs golden"
   }
 }
