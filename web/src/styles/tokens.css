@@ -20,6 +20,10 @@
   /* Derived, not in the colour table: muted text and borders on the dark surface. */
   --c-text-muted: #a9b0bb;
   --c-border: #2d333b;
+  /* Focus outline (10_interfaz.md §12): 2 px #F0E442. */
+  --c-focus: #f0e442;
+  /* Small warning text: --c-warn (#D55E00) gives 4.4:1 on --c-surface, below 4.5:1 (D-69). */
+  --c-warn-text: #ee7a3b;
 
   /* Layout of 10 §3.1. */
   --header-h: 56px;
