@@ -62,7 +62,7 @@ FIRST_BATCH = [
     "region-peak-near-cabeus-b", "region-slater-plain",
     "im-2", "change-7-candidate", "shackleton-floor", "blue-ghost-1", "apollo-11",
 ]
-SECOND_BATCH = ["val-899s", "im-2-planned"]  # demo-a and demo-b do not exist yet
+SECOND_BATCH = ["val-899s", "im-2-planned", "demo-a", "demo-b"]
 THIRD_BATCH = ["apollo-17", "slim", "chandrayaan-3", "change-4", "change-6", "im-1"]
 
 
@@ -125,11 +125,15 @@ def test_catalog_relief_follows_latitude(catalog):
     assert [s["id"] for s in catalog["sites"] if s["relief"] == "smooth"] == ["val-equator"]
 
 
-def test_catalog_default_demo_pair_is_the_reserve_pair(catalog):
-    # 04 §5.2: change-7-candidate and shackleton-floor until the main pair exists.
-    assert catalog["defaults"]["demo_pair"] == ["change-7-candidate", "shackleton-floor"]
-    ids = {s["id"] for s in catalog["sites"]}
-    assert set(catalog["defaults"]["demo_pair"]) <= ids
+def test_catalog_default_demo_pair_is_the_main_pair(catalog):
+    # 04 §5.1: the pair chosen by A1 (case A11, T-31) is demo-a and demo-b, type demo, not a replan candidate.
+    d = catalog["defaults"]
+    assert (d["demo_pair"], d["demo_mission_days"]) == (["demo-a", "demo-b"], 14)
+    by_id = sites_by_id(catalog)
+    for site_id in d["demo_pair"]:
+        assert (by_id[site_id]["type"], by_id[site_id]["replan_candidate"]) == ("demo", False)
+    # The reserve pair of 04 §5.2 stays in the catalog.
+    assert {"change-7-candidate", "shackleton-floor"} <= set(by_id)
 
 
 def test_catalog_spot_values(catalog):
