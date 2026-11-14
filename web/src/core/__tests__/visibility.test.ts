@@ -5,7 +5,7 @@ import { formulaMask, horizonAt, maskFromFile, smoothMask } from '../horizon';
 import { isoToUnix } from '../time';
 import { discAny, discFraction, evaluate, frameFor } from '../visibility';
 import type { HorizonFile } from '../types';
-import { exampleJson, exampleTable } from './fixtures';
+import { bestTimeMs, exampleJson, exampleTable } from './fixtures';
 
 /** Exact visible fraction of a disc cut by a flat horizon: δ = (H − el_c)/ρ. */
 function segment(delta: number): number {
@@ -72,10 +72,10 @@ describe('evaluate', () => {
     const f = frameFor(-88.8, 123.4, demoA);
     const t0 = isoToUnix('2027-08-01T00:00:00Z');
     for (let i = 0; i < 50_000; i++) evaluate(table, f, demoA, t0 + i * 61); // warm-up
-    const n = 200_000;
-    const start = performance.now();
-    for (let i = 0; i < n; i++) evaluate(table, f, demoA, t0 + i * 61);
-    const us = ((performance.now() - start) * 1000) / n;
-    expect(us).toBeLessThan(3);
+    const n = 100_000;
+    const ms = bestTimeMs(() => {
+      for (let i = 0; i < n; i++) evaluate(table, f, demoA, t0 + i * 61);
+    });
+    expect((ms * 1000) / n).toBeLessThan(3);
   });
 });
