@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { t, type TextKey } from '../../i18n/t';
 import { useAppStore, type Mode } from '../../state/store';
+import { flushUrl } from '../../state/url';
 import { LandingInput } from '../controls/LandingInput';
 import { MissionInput } from '../controls/MissionInput';
 import { TimeControls } from '../controls/TimeControls';
@@ -68,11 +69,12 @@ export function Header({ onReset }: { onReset: () => void }) {
   );
 }
 
-/** Copies the page URL (the state goes into the fragment with F16); without clipboard, shows it. */
+/** Copies the page URL, whose fragment carries the state (F16, 10 §10); without clipboard, shows it. */
 function ShareButton() {
   const [state, setState] = useState<'idle' | 'copied' | 'manual'>('idle');
 
   async function share() {
+    flushUrl(); // the last change may still be waiting for the 2-per-second limit
     try {
       await navigator.clipboard.writeText(location.href);
       setState('copied');

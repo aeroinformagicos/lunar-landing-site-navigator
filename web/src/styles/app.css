@@ -91,6 +91,18 @@ input[aria-invalid='true'] {
   padding: 4px 16px;
 }
 
+/* Link partly restored (F16, 10 §10): a message with its own button, not only a colour. */
+.banner--link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  border-bottom: 2px solid var(--c-warn);
+  padding: 4px 16px;
+}
+
 /* ---- Header (10 §3.1, §4) ---- */
 .app__header {
   display: flex;
