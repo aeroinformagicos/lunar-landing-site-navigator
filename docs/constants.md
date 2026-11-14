@@ -98,11 +98,11 @@ fuente (CLAUDE.md §2).
 
 | Vista 3D: función de fase lunar-Lambert de McEwen `L(α) = 1 + A1·α + A2·α² + A3·α³` (α en grados), recortada a [0, 1] | A1 = −0,019; A2 = 0,000242; A3 = −0,00000146 | 1/°, 1/°², 1/°³ | USGS ISIS, modelo fotométrico `LunarLambertMcEwen` (`LunarLambertMcEwen.cpp`, ISIS 8.1/9.0), a partir de McEwen (1991), *Icarus* 92, 298–311 (`16_vista_3d.md` §6.2) | `web/src/ui/stage3d/scene/shaders.ts` (`TERRAIN_FRAG`) |
 | Vista 3D: muestras de la sombra proyectada (primera distancia, razón, alcance, altura del ojo) | 250; 1,04; 300.000; 2 | m; —; m; m | `16_vista_3d.md` §6.3 (medio píxel de 500 m; la razón del código de distancia del cubo, `09` §10.2; el alcance del perfil, `06` §8; observador de CLAUDE.md §2) | `web/src/ui/stage3d/shadow.ts` |
-| Vista 3D: órbita (distancia mínima y máxima, inclinación, holgura, encuadre inicial) | 300 m – 800 km; 3°–89°; 50 m; 45 km a 22° | m; °; m | `16_vista_3d.md` §7.1, §7.6; encuadre de D-108 a | `web/src/ui/stage3d/camera.ts` (`ORBIT`) |
+| Vista 3D: órbita (distancia mínima y máxima, inclinación, holgura, encuadre inicial) | 300 m – 800 km; 3°–89°; 50 m; 45 km a 22° | m; °; m | `16_vista_3d.md` §7.1, §7.6; encuadre de D-110 a | `web/src/ui/stage3d/camera.ts` (`ORBIT`) |
 | Vista 3D: vuelo (holgura, altura máxima, velocidad = 0,8·AGL entre 20 m/s y 80 km/s, ×5 con Mayúsculas, paso máximo) y a ras de suelo (holgura, campo de visión 20°–90°, 60° al entrar) | 5 m; 2.000 km; 0,8 /s, 20 m/s, 80 km/s, 5; 0,1 s; 2 m; 20°–90°; 60° | m; m; 1/s, m/s; s; m; ° | `16_vista_3d.md` §7.2, §7.3, §7.6 | `web/src/ui/stage3d/navigation.ts` (`FLY`, `GROUND`) |
-| Vista 3D: vuelos «Go to» (duración = clamp(0,8 + 0,4·log10(km + 1), 0,8, 3) s; altura máxima = max(d0, d1, 0,6 × separación)) y suavizado de la órbita (τ) | 0,8–3 s; 0,6; 65 ms | s; —; ms | `16_vista_3d.md` §7.4; τ de D-108 f | `web/src/ui/stage3d/navigation.ts`, `scene/engine.ts` |
-| Vista 3D: señales (cúpula de las trayectorias, elevación de contornos y crestas, distancias de los rótulos, máximo de rótulos, refrescos) | 20 km; 15 m y 30 m; 250 km y 60 km; 14; 200 ms y 100 ms | m; m; m; —; ms | `16_vista_3d.md` §8; D-108 | `web/src/ui/stage3d/index.tsx`, `Labels.tsx`, `signals.ts` |
-| Vista 3D: barra de escala | 1, 2 o 5 × 10ⁿ m entre 60 y 150 px | px | `16_vista_3d.md` §8.6; D-108 e | `web/src/ui/stage3d/signals.ts` (`scaleBar`) |
+| Vista 3D: vuelos «Go to» (duración = clamp(0,8 + 0,4·log10(km + 1), 0,8, 3) s; altura máxima = max(d0, d1, 0,6 × separación)) y suavizado de la órbita (τ) | 0,8–3 s; 0,6; 65 ms | s; —; ms | `16_vista_3d.md` §7.4; τ de D-110 f | `web/src/ui/stage3d/navigation.ts`, `scene/engine.ts` |
+| Vista 3D: señales (cúpula de las trayectorias, elevación de contornos y crestas, distancias de los rótulos, máximo de rótulos, refrescos) | 20 km; 15 m y 30 m; 250 km y 60 km; 14; 200 ms y 100 ms | m; m; m; —; ms | `16_vista_3d.md` §8; D-110 | `web/src/ui/stage3d/index.tsx`, `Labels.tsx`, `signals.ts` |
+| Vista 3D: barra de escala | 1, 2 o 5 × 10ⁿ m entre 60 y 150 px | px | `16_vista_3d.md` §8.6; D-110 e | `web/src/ui/stage3d/signals.ts` (`scaleBar`) |
 | Vista 3D: niveles de calidad (malla, sombra, frecuencia, píxeles) y umbral adaptativo | `16` §12.2; 45 fps durante 2 s, una bajada cada 10 s | — | `16_vista_3d.md` §12.2 | `web/src/ui/stage3d/quality.ts` |
 | Vista 3D: parámetros visuales (intensidades, albedo, colores del Sol y la Tierra, estrellas) | `LOOK` | — | Solo visuales, sin significado físico ni efecto en ninguna cifra (D-97 h) | `web/src/ui/stage3d/look.ts` |
 ## Valores medidos
@@ -448,6 +448,52 @@ Valores medidos (portátil de I1, RTX 4060 Laptop, PyTorch 2.15.0+cu132; tabla r
 | N5: valores presentes | −20.000, +20.000 y **0 en 5 píxeles interiores** de 25.583.364 | Solo ±20.000 | `03` §6 (anotado en el traspaso) |
 | Centro de Shackleton en N1 / N5 | 0 / +20.000 | 0 / +20.000 | `03` §6 |
 | Celda de Shackleton (415, 380), media 3 × 3 de N1 | 0 % (± 1) | Sombra permanente | `03` §6 |
+
+### T-31 · Elección del par de la demo (2026-11-14)
+
+Constantes nuevas (`pipeline/vis/demo.py` y `pipeline/tests/test_pick_demo.py`):
+
+| Nombre | Valor | Fuente |
+| --- | --- | --- |
+| `FIRST_MONTH`, `LAST_MONTH` | 2027-01; 2028-12 | `04_catalogo_sitios.md` §5.1, paso 2 |
+| `MIN_BOTH_A_PCT`, `MAX_BOTH_B_PCT` | 60 %; 10 % | `04` §5.1, paso 2 |
+| `MAX_PAIR_DIST_M`, `RELAXED_PAIR_DIST_M` | 1.000 m (2 celdas); 2.000 m | `04` §5.1, paso 2 y relajaciones |
+| `N_PAIRS` | 5 | `04` §5.1, paso 3 |
+| `SEARCH_STEP_S`, `DELAY_DAYS`, `RELAXED_DELAY_DAYS` | 6 h; 12 d; 10–16 d (cada 6 h, la más cercana a 12 d primero) | `04` §5.1, paso 4 y relajaciones; D-108 |
+| `MISSION_DAYS`, `OBSERVER_HEIGHTS_M`, `LAW` | 14 d; 2 y 10 m; `full` | `04` §5.1, pasos 3 y 4 |
+| `PAIR_RELIEF` | `lola_polar` | El relieve de las regiones candidatas del catálogo (`04` §3) |
+| `LATLON_DECIMALS` (coordenadas de A y B) | 5 | Como `horizon/<site>.json` (`06` §5); D-108 |
+
+Cifras medidas con los datos reales (cubo completo, capas `computed`, 2026-11-14):
+
+| Medida | Valor |
+| --- | --- |
+| Parejas que cumplen el paso 2 a ≤ 1.000 m | 103 (57 con su mejor mes en 2028-10) |
+| Media de «ambos» en las celdas de regiones, 2027-01 … 2028-12 | 11,5 % (2027-05) … 33,7 % (2028-10) |
+| Parejas con fecha sin relajar / con relajación 1 / sin fecha | 3 / 1 / 1 |
+| Evaluaciones completas de `assess` | 484 |
+| Duración de `pick-demo` | 451 s |
+
+### T-34 · Máscaras compactas (2026-11-14)
+
+Constantes nuevas (`pipeline/horizon/compact.py` y `pipeline/tests/test_compact.py`):
+
+| Nombre | Valor | Fuente |
+| --- | --- | --- |
+| `MAGIC`, `HEADER` | `LLSNCMP1`; cabecera de 32 B | `09_contrato_datos.md` §11 |
+| `N_AZ_COMPACT`, `STEP_CDEG` | 180 acimuts; paso de 200 centésimas de grado (2°) | `09` §11 |
+| `WINDOW` | 2 acimuts completos a cada lado de `4·b` (± 1°) | `09` §11, `el_q[b] = max(q[(4b + m) mod 720], m = −2…2)` |
+| `OVERVIEW_STEP` | 4 (un punto de cada 4 en cada dirección; i, j = 0, 4, 8, …) | `09` §11; el origen en 0 es D-109 |
+| `REGION_NONE` | 255 | `09` §11 |
+| `REGION_POINTS`, `OVERVIEW_POINTS` (pruebas) | 10.252; 188 × 168 = 31.584 | `09` §11 |
+
+Cifras medidas:
+
+| Medida | Valor |
+| --- | --- |
+| Puntos por región con las cajas del catálogo | de Gerlache Rim 2 484, Haworth 1.156, Malapert Massif 576, Mons Mouton 324, Mons Mouton Plateau 5.776, Nobile Rim 1 484, Nobile Rim 2 484, Peak near Cabeus B 484, Slater Plain 484 (total 10.252, sin solapes) |
+| `regions` sin comprimir | 32 + 368 · 10.252 = 3.772.768 B |
+| Leer y compactar un trozo del cubo | ~6 ms → ~12 s para los 1.974 trozos (estimado con un trozo sintético) |
 
 ## T-05 · Valores de referencia de Horizons (A1, A2)
 

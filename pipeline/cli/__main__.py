@@ -110,10 +110,21 @@ def build_parser() -> argparse.ArgumentParser:
     layers.add_argument("--block-steps", type=int, default=None, help="hourly steps per block (default 512)")
     layers.add_argument("--force", action="store_true", help="recompute every chunk, not only the new ones")
     layers.add_argument("--web-dir", type=Path, default=None, help="ephemeris; default: web/public/data")
+    comp = sub.add_parser(
+        "compact", help="compact masks compact/regions.bin.gz from the cube into <out>/heavy (09 §11)"
+    )
+    comp.add_argument(
+        "--overview", action="store_true",
+        help="also compact/overview.bin.gz (1 point in 4 per direction; points not in the cube are left out)",
+    )
     sub.add_parser("hillshade", help="map/hillshade_250m.png and map/dem_500m.bin.gz from P2 (08 §6)")
     sub.add_parser(
         "compare-nasa", help="mean186_any vs the NASA AVGVISIB maps: case B7 and its two figures (08 §8)"
     )
+    demo = sub.add_parser(
+        "pick-demo", help="candidate demo pairs from the monthly layers into <out>/demo_candidates.json"
+    )
+    demo.add_argument("--web-dir", type=Path, default=None, help="ephemeris, masks; default: web/public/data")
     pub = sub.add_parser("publish", help="copy <out>/light to web/public/data and write manifest.json")
     pub.add_argument("--web-dir", type=Path, default=None, help="default: web/public/data")
     vec = sub.add_parser(
@@ -566,6 +577,30 @@ def cmd_layers(args: argparse.Namespace) -> int:
     return 1 if summary.bad else 0
 
 
+def cmd_compact(args: argparse.Namespace) -> int:
+    """Compact masks of the region boxes (and, with --overview, of the coarse mesh) from the cube."""
+    from pipeline.horizon import compact, cube
+
+    cube_dir = cube.cube_dir_of(out_dir(args))
+    if not (cube_dir / "done.bin").is_file():
+        print(f"compact: {cube_dir / 'done.bin'} does not exist: run make cube first")
+        return 1
+    out = compact.compact_dir_of(out_dir(args))
+    sources = ("regions", "overview") if args.overview else ("regions",)
+    for source in sources:
+        t0 = time.perf_counter()
+        try:
+            path, r = compact.run_compact(cube_dir, out, source)
+        except (OSError, EOFError, ValueError) as exc:
+            print(f"compact {source}: {exc}")
+            return 1
+        missing = f", {r.n_missing} left out (not in the cube)" if r.n_missing else ""
+        print(f"compact {source}: {r.n_points} points{missing}, law {r.law}, {r.chunks_read} chunks; "
+              f"{path} ({path.stat().st_size} B, {len(r.data)} B uncompressed) in "
+              f"{time.perf_counter() - t0:.1f} s")
+    return 0
+
+
 def cmd_hillshade(args: argparse.Namespace) -> int:
     """Hillshade and 500 m heights of the map background from P2 (08 §6), plus map/grid.json."""
     from pipeline.dem.grids import read_pds_image
@@ -614,6 +649,61 @@ def cmd_compare_nasa(args: argparse.Namespace) -> int:
     print(f"figures: {', '.join(f'{p.name} ({p.stat().st_size} B)' for p in figures)}; "
           f"{time.perf_counter() - t0:.1f} s. Then: make report")
     return 0
+
+
+def cmd_pick_demo(args: argparse.Namespace) -> int:
+    """Candidate demo pairs (04 §5.1, case A11) into <out>/demo_candidates.json; A1 picks one."""
+    from pipeline.common.catalog import default_catalog
+    from pipeline.dem.stack import DemDataMissing
+    from pipeline.ephem.interp import load_table
+    from pipeline.horizon import site_mask
+    from pipeline.layers.layers import layers_dir_of
+    from pipeline.vis import demo
+
+    out = out_dir(args)
+    web = args.web_dir if args.web_dir is not None else WEB_DATA_DIR
+    log = open_log(args, "pick-demo")
+    months = demo.month_ids()
+    t0 = time.perf_counter()
+    try:
+        both = demo.read_both_band(layers_dir_of(site_mask.heavy_dir_of(out)), months)
+        table = load_table(web)
+    except (OSError, ValueError) as exc:
+        log(f"pick-demo: {exc}")
+        return 1
+    catalog = default_catalog()
+    alternatives = demo.region_alternatives(catalog, [site_mask.light_dir_of(out), web], log)
+    factory = site_mask.default_stack_factory(args.data_dir)
+
+    def mask_fn(site: dict):
+        mask, reason = site_mask.compute_site(site, factory, demo.LAW)
+        if mask is None:
+            return None, reason
+        return site_mask.horizon_doc(site, mask), ""
+
+    csv_dir = out / "profile_csv"
+
+    def profile_fn(site: dict, az: float) -> str | None:
+        try:
+            text = site_mask.profile_csv_text(site, factory(site), az)
+        except (DemDataMissing, ValueError) as exc:
+            log(f"pick-demo: no profile CSV for {site['id']}: {exc}")
+            return None
+        csv_dir.mkdir(parents=True, exist_ok=True)
+        path = csv_dir / f"{site['id']}_az{site_mask.csv_az_label(az)}.csv"
+        path.write_text(text, encoding="utf-8", newline="")
+        return path.relative_to(out).as_posix()
+
+    doc = demo.pick_demo(both, months, catalog, table, mask_fn, alternatives, log, profile_fn)
+    doc["generated_utc"] = site_mask.utc_now()
+    doc["git_commit"] = site_mask.git_commit_short()
+    path = out / "demo_candidates.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    for line in demo.summary_lines(doc):
+        log(line)
+    log(f"pick-demo: {path} in {time.perf_counter() - t0:.1f} s")
+    return 0 if doc["relaxation_level"] is not None else 1
 
 
 def cmd_publish(args: argparse.Namespace) -> int:
@@ -697,8 +787,10 @@ def main(argv: list[str] | None = None) -> int:
         "sites": cmd_sites,
         "regions": cmd_regions,
         "layers": cmd_layers,
+        "compact": cmd_compact,
         "hillshade": cmd_hillshade,
         "compare-nasa": cmd_compare_nasa,
+        "pick-demo": cmd_pick_demo,
         "publish": cmd_publish,
         "core-vectors": cmd_core_vectors,
         "report": cmd_report,

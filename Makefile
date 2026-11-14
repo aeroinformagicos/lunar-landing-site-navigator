@@ -3,7 +3,7 @@
 # Targets from later cards (ephem, sites, cube, layers, night, ...) are added by those cards.
 TASKS := node ops/tasks.mjs
 
-.PHONY: setup setup-gpu test test-all check dev build deploy info ephem sites cube-bench cube-plan cube layers night deploy-heavy examples golden report
+.PHONY: setup setup-gpu test test-all check dev build deploy info ephem sites cube-bench cube-plan cube layers compact night deploy-heavy examples golden report
 
 setup:     ; $(TASKS) setup
 setup-gpu: ; $(TASKS) setup-gpu
@@ -20,6 +20,7 @@ cube-bench: ; $(TASKS) cube-bench
 cube-plan: ; $(TASKS) cube-plan
 cube:      ; $(TASKS) cube
 layers:    ; $(TASKS) layers
+compact:   ; $(TASKS) compact
 night:     ; $(TASKS) night
 deploy-heavy: ; $(TASKS) deploy-heavy
 examples:  ; $(TASKS) examples

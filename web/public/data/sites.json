@@ -1,11 +1,11 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "defaults": {
     "demo_pair": [
-      "change-7-candidate",
-      "shackleton-floor"
+      "demo-a",
+      "demo-b"
     ],
-    "demo_landing_utc": "2027-08-01T00:00:00Z",
+    "demo_landing_utc": "2028-10-19T00:00:00Z",
     "demo_mission_days": 14
   },
   "sites": [
@@ -1156,6 +1156,62 @@
         "url": "https://planetarynames.wr.usgs.gov/Feature/5450"
       },
       "note": ""
+    },
+    {
+      "id": "demo-a",
+      "name": "Demo site A (Malapert massif)",
+      "short_name": "Demo site A",
+      "type": "demo",
+      "lat_deg": -85.96708,
+      "lon_deg": -2.2251,
+      "height_m": 4984.7,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "Team Aeroinformágicos: pick-demo (T-31), pair chosen by A1 (case A11)",
+        "url": ""
+      },
+      "note": "Sunlit and in view of Earth on 2028-10-19; 707 m from demo site B."
+    },
+    {
+      "id": "demo-b",
+      "name": "Demo site B (Malapert massif)",
+      "short_name": "Demo site B",
+      "type": "demo",
+      "lat_deg": -85.98286,
+      "lon_deg": -2.46913,
+      "height_m": 4909.6,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "Team Aeroinformágicos: pick-demo (T-31), pair chosen by A1 (case A11)",
+        "url": ""
+      },
+      "note": "No Earth at 2028-10-19 landing: a slope a few tens of metres away raises its horizon; 707 m from demo site A."
     }
   ]
 }

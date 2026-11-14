@@ -199,6 +199,12 @@ const tasks = {
     if (envVar('FORCE') === '1') extra.push('--force');
     cli('layers', ...extra);
   },
+  // Compact masks for the optimal-site worker (09 §11; T-34) from the cube into
+  // $LLSN_DATA_DIR/out/heavy/compact: regions.bin.gz (every region point must be in the cube) and
+  // overview.bin.gz (1 point in 4 per direction; points not computed yet are left out). < 5 min.
+  compact() {
+    cli('compact', '--overview');
+  },
   // Unattended night chain (T-25): `make cube LEVELS=2,3,4`, then `make layers`. Stops at the first
   // failure. Each step's output goes to $LLSN_DATA_DIR/out/logs/night-<UTC>-<n>-<step>.log and the
   // start, end and exit code of each step to night-<UTC>.log.
