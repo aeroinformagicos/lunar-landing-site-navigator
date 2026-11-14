@@ -1,5 +1,6 @@
 /* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
-/* Skeleton layout (10_interfaz.md §3). T-14 refines it with ui/layout. */
+/* Layout and controls (10_interfaz.md §3, §4, §5, §12): single dark theme, base 16 px, nothing below
+   12 px, visible 2 px focus outline in #F0E442, 44 × 44 px touch targets. */
 *,
 *::before,
 *::after {
@@ -12,7 +13,7 @@ body {
   background: var(--c-bg);
   color: var(--c-text);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.45;
 }
 
@@ -20,24 +21,60 @@ a {
   color: inherit;
 }
 
-button {
+button,
+.button-link,
+input,
+select {
   font: inherit;
   color: var(--c-text);
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: var(--radius);
+  min-height: 36px;
+  min-width: 36px;
   padding: 4px 12px;
+}
+
+/* Touch screens: 44 × 44 px targets (10 §12). */
+@media (pointer: coarse) {
+  button,
+  .button-link,
+  input,
+  select,
+  .scenario-card__actions button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+button,
+.button-link {
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 button[aria-selected='true'],
 button[aria-pressed='true'] {
   border-color: var(--c-text);
+  font-weight: 600;
 }
 
-button:focus-visible {
-  outline: 2px solid var(--c-earth);
+:focus-visible {
+  outline: 2px solid var(--c-focus);
   outline-offset: 2px;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--c-nogo);
 }
 
 .app {
@@ -54,14 +91,20 @@ button:focus-visible {
   padding: 4px 16px;
 }
 
+/* ---- Header (10 §3.1, §4) ---- */
 .app__header {
-  min-height: var(--header-h);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.header__row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--gap);
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--c-border);
 }
 
 .app__title {
@@ -73,6 +116,10 @@ button:focus-visible {
   text-decoration: none;
 }
 
+.title--short {
+  display: none;
+}
+
 .segmented,
 .tabs {
   display: flex;
@@ -80,6 +127,73 @@ button:focus-visible {
   flex-wrap: wrap;
 }
 
+.field {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.field__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.field__check input {
+  min-height: 24px;
+  min-width: 24px;
+}
+
+.field--mission input {
+  width: 5.5em;
+}
+
+.field__error,
+.field__warn {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 13px;
+}
+
+.field__error {
+  color: var(--c-warn-text);
+}
+
+.field__warn {
+  color: var(--c-marginal);
+}
+
+.time-controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.time-controls__slider {
+  flex: 1;
+  min-width: 160px;
+  padding: 0;
+  accent-color: var(--c-sun);
+}
+
+.time-controls__readout {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---- Body: three columns (10 §3.1) ---- */
 .app__boot {
   flex: 1;
 }
@@ -114,7 +228,7 @@ button:focus-visible {
 }
 
 .scenario-card--active {
-  border-color: var(--c-text);
+  border: 2px solid var(--c-text);
 }
 
 .scenario-card p {
@@ -124,14 +238,43 @@ button:focus-visible {
 
 .scenario-card__select {
   width: 100%;
-  text-align: left;
+  justify-content: flex-start;
   border: none;
-  padding: 0;
+  padding: 0 4px;
   background: none;
 }
 
 .scenario-card__letter {
   font-weight: 700;
+}
+
+.scenario-card__name {
+  font-weight: 600;
+}
+
+.scenario-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.scenario-card__actions button {
+  font-size: 13px;
+  padding: 2px 8px;
+  min-height: 30px;
+}
+
+.scenario-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.scenario-actions p {
+  margin: 0;
+  font-size: 13px;
 }
 
 .view {
@@ -147,11 +290,11 @@ button:focus-visible {
 }
 
 .warn {
-  color: var(--c-warn);
+  color: var(--c-warn-text);
 }
 
 .data-state {
-  padding: 16px;
+  padding: 8px 0;
   color: var(--c-text-muted);
 }
 
@@ -173,10 +316,78 @@ button:focus-visible {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .skeleton {
-    animation: none;
-  }
+/* ---- Dialog and site picker (10 §5) ---- */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 60%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5vh 16px;
+  z-index: 10;
+}
+
+.dialog {
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  width: min(640px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 16px;
+}
+
+.dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dialog__header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.site-picker h3,
+.custom-coords h3 {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  margin: 16px 0 6px;
+}
+
+.site-picker ul,
+.shortcuts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.site-row {
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.site-row__meta {
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.custom-coords {
+  display: grid;
+  gap: 6px;
+  border-top: 1px solid var(--c-border);
+  margin-top: 16px;
+}
+
+.app__plan-mobile {
+  flex: 1;
+  padding: 24px 16px;
 }
 
 .app__footer {
@@ -190,7 +401,13 @@ button:focus-visible {
   margin: 2px 0;
 }
 
-/* 768–1023 px: right column below the main view; < 768 px: single column (10 §3.2). */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* 768–1023 px: right column below the main view (10 §3.2). */
 @media (max-width: 1023px) {
   .app__body {
     grid-template-columns: var(--col-left) minmax(0, 1fr);
@@ -200,8 +417,34 @@ button:focus-visible {
   }
 }
 
+/* < 768 px: one column, short title, scenario cards in a scrollable row (10 §3.2). */
 @media (max-width: 767px) {
   .app__body {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .title--long {
+    display: none;
+  }
+  .title--short {
+    display: inline;
+  }
+  .scenario-list {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(220px, 80%);
+    overflow-x: auto;
+  }
+  /* Time bar fixed at the bottom (slider, play). */
+  .time-controls {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    padding: 6px 16px;
+    background: var(--c-bg);
+    border-top: 1px solid var(--c-border);
+  }
+  .app {
+    padding-bottom: 120px;
   }
 }

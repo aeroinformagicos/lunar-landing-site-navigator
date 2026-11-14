@@ -84,6 +84,9 @@ fuente (CLAUDE.md §2).
 | Puesta del centro del Sol en Blue Ghost 1 con Luna lisa: 2025-03-16T20:10:39Z (± 1 s, redondeo al segundo) | 39 | s tras las 20:10 | `05` §8.3 | `pipeline/tests/test_ephem_frames.py` |
 | Tabla ENU a mano: tolerancias | 10⁻⁹; 10⁻⁶ | °; km | `05` §8.2 | `pipeline/tests/test_enu.py` |
 | Blue Ghost 1 en `MOON_ME`: (778,06; 1451,68; 553,01) km a mano y `Dxy` = 1647,03931 km, `Dz` = 553,01019 km de Horizons (tolerancia: media unidad de la última cifra impresa) | — | km | `03` §3.4 | `pipeline/tests/test_enu.py` |
+| Rangos de fecha de aterrizaje admitidos | 1969-01-01 – 1973-01-01 y 2024-01-01 – 2045-01-01 (UTC) | — | Validez de los tramos de `ephemeris.meta.json` (`09` §3.2, `05` §4.5) | `web/src/state/selectors.ts` (`SUPPORTED_RANGES`) |
+| Duración de la misión | 0,5 – 60, paso 0,5 | días | `10_interfaz.md` §4, `01_alcance.md` F2 | `web/src/state/selectors.ts` |
+| Paso del deslizador del cursor | 600 (flechas); 86.400 (PageUp/PageDown); 3.600 (botones y `[` `]`) | s | `10_interfaz.md` §4, §12 | `web/src/state/selectors.ts`, `ui/controls/TimeControls.tsx` |
 
 ## Valores medidos
 
