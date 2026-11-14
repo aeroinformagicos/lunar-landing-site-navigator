@@ -1,7 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Single-screen layout (10_interfaz.md §3): header, scenario column, tabs and main view, right panel.
 // Keyboard shortcuts of §12 and the mobile rule for Plan (§3.2).
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { t, type TextKey } from '../../i18n/t';
 import { activeScenario, shortcutFor } from '../../state/selectors';
 import { useAppStore, type Tab } from '../../state/store';
@@ -21,6 +21,9 @@ import { Dialog } from '../common/Dialog';
 import { togglePlay } from '../controls/TimeControls';
 import { ScenarioColumn } from '../scenario/ScenarioColumn';
 import { Header } from './Header';
+
+/** The map and its data load on demand, outside the main bundle (02_arquitectura.md §7). */
+const MapView = lazy(() => import('../map/MapView'));
 
 const BASE_TABS: Tab[] = ['panorama', 'timeline', 'map', 'section'];
 const MOBILE_QUERY = '(max-width: 767px)';
@@ -126,6 +129,10 @@ export function AppLayout() {
             <section id="main-view" className="view" role="tabpanel" aria-labelledby={`tab-${tab}`} tabIndex={-1}>
               {comparing ? (
                 <Compare onClose={() => setComparing(false)} />
+              ) : tab === 'map' ? (
+                <Suspense fallback={<p className="data-state data-state--loading">{t('map.loading')}</p>}>
+                  <MapView />
+                </Suspense>
               ) : tab === 'replan' ? (
                 <Replan story={replanViewForStep(storyStep)} />
               ) : (
