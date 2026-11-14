@@ -61,6 +61,9 @@ fuente (CLAUDE.md §2).
 | Máximo de escenarios | 4 (A–D) | — | `10_interfaz.md` §5 | `web/src/core/constants.ts` (`MAX_SCENARIOS`) |
 | Velocidades de reproducción | 3.600, 21.600, 86.400 | s simulados por s | `10_interfaz.md` §4 (`1 h/s`, `6 h/s`, `1 d/s`) | `web/src/core/constants.ts` (`PLAY_SPEEDS`) |
 | Requisitos por defecto | Sol y Tierra al aterrizar; noche ≤ 24 h; 1,0° y 1,0 para `marginal` | h, °, — | `07_visibilidad.md` §8.1 | `web/src/state/store.ts` (`DEFAULT_REQUIREMENTS`) |
+| Radios de la Luna, el Sol y la Tierra (web) | 1.737,4; 695.700; 6.378,137 | km | `00_indice.md` §3; `ephemeris.meta.json` `constants` (`09` §3.2) | `web/src/core/constants.ts` (`R_MOON_KM`, `R_SUN_KM`, `R_EARTH_KM`) |
+| Registro y paso de la tabla de efemérides | 24 B (6 `float32`) y 3.600 s | B, s | `05_efemerides.md` §4.3 | `web/src/core/ephemeris.ts` |
+| Umbral del convenio del cénit | 10⁻¹² (fracción de la longitud del vector) | — | D-62 | `web/src/core/frames.ts` (`ZENITH_REL`) |
 
 ## Valores medidos
 

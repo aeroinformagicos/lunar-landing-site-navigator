@@ -27,3 +27,8 @@ export const DEFAULT_OBSERVER_HEIGHT_M = 2;
 
 /** Playback speeds in simulated seconds per real second: `1 h/s`, `6 h/s`, `1 d/s` (10 §4). */
 export const PLAY_SPEEDS = [3600, 21_600, 86_400] as const;
+
+/** Radii (00_indice.md §3; ephemeris.meta.json `constants`, 09 §3.2). */
+export const R_MOON_KM = 1737.4;
+export const R_SUN_KM = 695_700;
+export const R_EARTH_KM = 6378.137;
