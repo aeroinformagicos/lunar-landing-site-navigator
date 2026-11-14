@@ -620,3 +620,159 @@ input[aria-invalid='true'] {
     min-height: 0;
   }
 }
+
+/* ---- Validation page (10 §6.7) ---- */
+.validation {
+  flex: 1;
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.validation h1 {
+  font-size: 24px;
+  margin: 8px 0 16px;
+}
+
+.headlines {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--gap);
+}
+
+.headline {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.headline--mismatch {
+  border-color: var(--c-nogo);
+}
+
+.headline__head h2 {
+  font-size: 17px;
+  margin: 0 0 6px;
+}
+
+.status-chip {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid currentColor;
+}
+
+.status-chip--match {
+  color: var(--c-go);
+}
+
+.status-chip--mismatch {
+  color: var(--c-warn-text);
+}
+
+.status-chip--pending {
+  color: var(--c-marginal);
+}
+
+.headline table,
+.checks-table,
+.case__details table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.headline th,
+.headline td,
+.checks-table th,
+.checks-table td,
+.case__details th,
+.case__details td {
+  text-align: left;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--c-border);
+  vertical-align: top;
+}
+
+.row--fail {
+  color: var(--c-warn-text);
+}
+
+.headline__figure {
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+  border-radius: var(--radius);
+}
+
+.headline__rule,
+.headline__note,
+.case__note {
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.headline__meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+  font-size: 14px;
+  margin: 8px 0 0;
+}
+
+.headline__meta dt {
+  color: var(--c-text-muted);
+}
+
+.headline__meta dd {
+  margin: 0;
+}
+
+.validation__summary {
+  margin: 16px 0 8px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.case__toggle {
+  min-height: 28px;
+  padding: 0 6px;
+  border: none;
+  background: none;
+  font-weight: 600;
+}
+
+.case__status--pass {
+  color: var(--c-go);
+}
+
+.case__status--fail {
+  color: var(--c-warn-text);
+}
+
+.case__status--manual,
+.case__status--skipped {
+  color: var(--c-marginal);
+}
+
+.case__details td {
+  background: var(--c-bg);
+}
+
+.validation__footer {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.case__toggle,
+.case__status {
+  white-space: nowrap;
+}

@@ -1,13 +1,15 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // App shell: loads config, manifest and sites (T-11), builds the initial state from
-// `sites.json.defaults` and renders the layout (T-14). Each view arrives with its task.
-import { useEffect } from 'react';
+// `sites.json.defaults` and renders the layout (T-14) or, on `#/validation`, the validation page (T-23).
+import { useEffect, useState } from 'react';
 import { DataError, loader } from './core/loaders';
 import { t } from './i18n/t';
 import { useAppStore } from './state/store';
 import { BootContext } from './ui/common/data';
 import { DataState, useResource } from './ui/common/DataState';
 import { AppLayout } from './ui/layout/AppLayout';
+import { routeOf } from './ui/validation/report';
+import { ValidationPage } from './ui/validation/ValidationPage';
 
 function bootError(error: Error): string {
   return error instanceof DataError && (error.kind === 'contract' || error.kind === 'format')
@@ -15,7 +17,21 @@ function bootError(error: Error): string {
     : t('error.boot');
 }
 
+function useRoute(): 'validation' | 'main' {
+  const [route, setRoute] = useState(() => routeOf(location.hash));
+  useEffect(() => {
+    const on = () => {
+      setRoute(routeOf(location.hash));
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('hashchange', on);
+    return () => window.removeEventListener('hashchange', on);
+  }, []);
+  return route;
+}
+
 export function App() {
+  const route = useRoute();
   const [boot, retry] = useResource('boot', () => loader.loadBoot());
   const init = useAppStore((s) => s.init);
   const initialised = useAppStore((s) => s.initialised);
@@ -37,7 +53,7 @@ export function App() {
         {(data) =>
           initialised ? (
             <BootContext.Provider value={data}>
-              <AppLayout />
+              {route === 'validation' ? <ValidationPage /> : <AppLayout />}
             </BootContext.Provider>
           ) : null
         }
