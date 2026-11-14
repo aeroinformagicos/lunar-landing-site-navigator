@@ -109,7 +109,8 @@ en memoria) la mide T-09 con `time python -m pipeline.cli site-mask --site <id>`
 
 Medido en el portátil de I1 (RTX 4060 Laptop de 8 GB, PyTorch 2.15.0+cu132, 10 hilos de CPU) con
 **relieve sintético en memoria**, sin ficheros de `$LLSN_DATA_DIR`. La velocidad con los DEM reales es
-la de `make cube-bench` (`$LLSN_DATA_DIR/out/cube/bench.json`), que lanza I3: **PENDIENTE**.
+la de `make cube-bench` (`$LLSN_DATA_DIR/out/cube/bench.json`), que lanzó I3 el 2026-11-14: está en la
+tabla «Con los DEM reales», al final de este apartado (D-59).
 
 | Qué | Valor medido | Esperado | Fuente del esperado |
 | --- | --- | --- | --- |
@@ -127,3 +128,20 @@ La rejilla sintética de la medida de velocidad (40 m, 6.000 px; 120 m, 2.200 px
 ocupan 578 MB, así que con los DEM reales la lectura de vecinos tendrá más fallos de caché y la cifra
 puede ser menor. Extrapolación **provisional** con 5,6·10⁸ muestras/s: cubo completo con la ley `full`
 en unos 40 min; no sustituye a la medida.
+
+**Con los DEM reales** (`make cube-bench`, `bench.json` generado el 2026-11-14T10:01:42Z): P1
+`LDEM_80S_40M` + P2 `LDEM_75S_120M` en la GPU (RTX 4060 Laptop, PyTorch 2.15.0+cu132), los 4 trozos de
+`08_mapa_polar.md` §4 (1.024 puntos por ley), `ring` 32, `pts_batch` 64, observador a 2 m.
+
+| Qué | Valor medido | Esperado | Fuente del esperado |
+| --- | --- | --- | --- |
+| Velocidad con la ley `full` (2,73·10⁹ muestras en 5,51 s): con la codificación; solo el cálculo | 4,96·10⁸; 5,17·10⁸ muestras/s (5,38 ms por punto) | 2·10⁸–5·10⁸ (supuesto) | `08` §4 |
+| Velocidad con la ley `fast` (1,37·10⁹ muestras en 2,96 s): con la codificación; solo el cálculo | 4,62·10⁸; 4,97·10⁸ muestras/s (2,89 ms por punto) | 2·10⁸–5·10⁸ (supuesto) | `08` §4 |
+| Barrido de `ring`: 128; 64; 32; 16 | 2,87·10⁸; 3,98·10⁸; 5,26·10⁸; 2,65·10⁸ muestras/s | — | D-53 |
+| Extrapolación con `full`: niveles 1; 2; 3; 4; cubo completo | 156 s; 275 s; 1.282 s; 1.005 s; **2.718 s = 45 min 18 s** | 45 min (optimista) a 1 h 53 min (prudente); límite de la regla, 6 h | `08` §4 |
+| Extrapolación con `fast`: niveles 1; 2; 3; 4; cubo completo | 84 s; 148 s; 688 s; 540 s; 1.460 s = 24 min 20 s | 23 min a 56 min | `08` §4 |
+| Pico de memoria de la GPU durante la medida | 1.087 MB | Cabe en 8 GB | `08` §3.1 |
+| Tamaño medio del trozo comprimido: `full`; `fast` | 146.594 B; 142.608 B (unos 289 MB los 1.974 trozos con `full`) | 0,3–0,6 GB el cubo | `08` §4 |
+| Lectura de P1 y P2 y copia a la GPU | 1,2 s | — | — |
+
+Regla de decisión de `08` §4 aplicada en D-59: ley `full`, niveles 1 a 4.
