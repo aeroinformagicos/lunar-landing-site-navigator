@@ -1177,3 +1177,62 @@ input[aria-invalid='true'] {
     min-height: 44px;
   }
 }
+
+/* ---- Guided story (10 §11, F15) ---- */
+.story {
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  width: min(900px, calc(100% - 24px));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-text-muted);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 50%);
+}
+
+.story__text {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+}
+
+.story__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.story__count {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--c-text-muted);
+}
+
+.story__next {
+  border-color: var(--c-text);
+  font-weight: 600;
+}
+
+.replan__active {
+  outline: 3px solid var(--c-marginal);
+  outline-offset: -2px;
+}
+
+.replan__highlight {
+  outline: 2px solid var(--c-marginal);
+}
+
+@media (max-width: 767px) {
+  .story {
+    flex-direction: column;
+    align-items: stretch;
+    bottom: 120px;
+  }
+}

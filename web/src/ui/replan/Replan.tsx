@@ -29,15 +29,27 @@ function asScenario(siteRef: string, base: Scenario): Scenario {
   return { ...base, siteRef };
 }
 
+/** Base column and, in the guided story, the active column (10 §11, step 4). */
+function colClass(c: number, active: number | null): string | undefined {
+  const cls = [c === 0 ? 'replan__base' : '', c === active ? 'replan__active' : ''].filter(Boolean).join(' ');
+  return cls || undefined;
+}
+
+/** The story's reduced matrix (§6.5: 2 rows, 13 columns). */
+const COMPACT_ROWS = 2;
+const COMPACT_COLUMNS = 13;
+
 function MatrixRow(props: {
   r: number;
   spec: RowSpec;
   base: Scenario;
   deltaS: number;
   focus: { r: number; c: number };
+  columns: number;
+  activeColumn: number | null;
   onPick: (r: number, c: number, cell: Cell, spec: RowSpec) => void;
 }) {
-  const { r, spec, base, deltaS, focus, onPick } = props;
+  const { r, spec, base, deltaS, focus, columns, activeColumn, onPick } = props;
   const req = useAppStore((s) => s.requirements);
   const [model] = useScenarioModel(asScenario(spec.siteRef, base));
   const result = useMemo(() => {
@@ -55,8 +67,8 @@ function MatrixRow(props: {
         {spec.name}
       </th>
       {result
-        ? result.cells.map((cell, c) => (
-            <td key={c} className={c === 0 ? 'replan__base' : undefined}>
+        ? result.cells.slice(0, columns).map((cell, c) => (
+            <td key={c} className={colClass(c, activeColumn)}>
               <button
                 type="button"
                 className={`replan__cell replan__cell--${cell.status ?? 'none'}`}
@@ -69,7 +81,7 @@ function MatrixRow(props: {
               </button>
             </td>
           ))
-        : Array.from({ length: MATRIX_COLUMNS }, (_, c) => (
+        : Array.from({ length: columns }, (_, c) => (
             <td key={c} className="replan__cell--loading" aria-hidden="true" />
           ))}
       <td className="replan__window" data-testid="next-window">
@@ -103,7 +115,41 @@ function CandidateRank({ site, base, onRow }: { site: Site; base: Scenario; onRo
   return null;
 }
 
-export function Replan() {
+export interface ReplanStoryProps {
+  compact: true;
+  columnFrom: number;
+  columnTo: number;
+  highlightRank: boolean;
+}
+
+/** Steps `columnFrom` → `columnTo` over 1 s; immediately with reduced motion (10 §11). */
+function useAnimatedColumn(story: ReplanStoryProps | undefined): number | null {
+  const [col, setCol] = useState<number | null>(story ? story.columnFrom : null);
+  useEffect(() => {
+    if (!story) {
+      setCol(null);
+      return;
+    }
+    const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const steps = story.columnTo - story.columnFrom;
+    if (reduced || steps === 0) {
+      setCol(story.columnTo);
+      return;
+    }
+    setCol(story.columnFrom);
+    let k = 0;
+    const id = setInterval(() => {
+      k++;
+      setCol(story.columnFrom + k);
+      if (k >= steps) clearInterval(id);
+    }, 1000 / steps);
+    return () => clearInterval(id);
+    // Primitive dependencies only: the story object is rebuilt on every render.
+  }, [story?.columnFrom, story?.columnTo, story !== undefined]);
+  return col;
+}
+
+export function Replan({ story }: { story?: ReplanStoryProps } = {}) {
   const { sites } = useBoot();
   const base = useAppStore(activeScenario);
   const scenarios = useAppStore((s) => s.scenarios);
@@ -121,14 +167,18 @@ export function Replan() {
   const onRow = useCallback((id: string, row: RankRow | null) => setRanked((p) => (p[id] === row ? p : { ...p, [id]: row })), []);
 
   const candidates = sites.sites.filter((s) => s.replan_candidate);
+  const columns = story ? COMPACT_COLUMNS : MATRIX_COLUMNS;
+  const activeColumn = useAnimatedColumn(story);
   const nameOf = (ref: string) => {
     const p = parseSiteRef(ref);
     return p.kind === 'catalogue' ? (sites.sites.find((s) => s.id === p.id)?.short_name ?? p.id) : t('scenario.custom');
   };
-  const rows: RowSpec[] = [
+  const allRows: RowSpec[] = [
     ...scenarios.map((sc) => ({ key: `s-${sc.id}`, name: `${sc.id} · ${nameOf(sc.siteRef)}`, siteRef: sc.siteRef, scenarioId: sc.id })),
-    ...(withCandidates ? candidates.map((s) => ({ key: `c-${s.id}`, name: s.short_name, siteRef: s.id, scenarioId: null })) : []),
+    ...(withCandidates && !story ? candidates.map((s) => ({ key: `c-${s.id}`, name: s.short_name, siteRef: s.id, scenarioId: null })) : []),
   ];
+
+  const rows = story ? allRows.slice(0, COMPACT_ROWS) : allRows;
 
   function onPick(r: number, c: number, cell: Cell, spec: RowSpec) {
     setFocus({ r, c });
@@ -144,7 +194,7 @@ export function Replan() {
     if (!d) return;
     e.preventDefault();
     const r = Math.min(Math.max(focus.r + d[0], 0), rows.length - 1);
-    const c = Math.min(Math.max(focus.c + d[1], 0), MATRIX_COLUMNS - 1);
+    const c = Math.min(Math.max(focus.c + d[1], 0), columns - 1);
     setFocus({ r, c });
     document.querySelector<HTMLElement>(`[data-cell="${r}-${c}"]`)?.focus();
   }
@@ -158,6 +208,7 @@ export function Replan() {
       {candidates.map((s) => (
         <CandidateRank key={s.id} site={s} base={base} onRow={onRow} />
       ))}
+      {!story && (
       <div className="replan__controls">
         <div className="segmented" role="group" aria-label={t('replan.delay')}>
           <span className="replan__label">{t('replan.delay')}</span>
@@ -191,6 +242,7 @@ export function Replan() {
           {t('replan.reset')}
         </button>
       </div>
+      )}
 
       <div className="table-scroll">
         <table className="replan__matrix" onKeyDown={onKeyDown} aria-label={t('replan.matrix', { date: formatUtc(base.landingUnix) })}>
@@ -199,8 +251,8 @@ export function Replan() {
               <th scope="col">
                 <span className="visually-hidden">{t('compare.site')}</span>
               </th>
-              {Array.from({ length: MATRIX_COLUMNS }, (_, k) => (
-                <th key={k} scope="col" className={k === 0 ? 'replan__base' : undefined}>
+              {Array.from({ length: columns }, (_, k) => (
+                <th key={k} scope="col" className={colClass(k, activeColumn)}>
                   {offsetLabel(k * deltaS)}
                 </th>
               ))}
@@ -209,7 +261,7 @@ export function Replan() {
           </thead>
           <tbody>
             {rows.map((spec, r) => (
-              <MatrixRow key={spec.key} r={r} spec={spec} base={base} deltaS={deltaS} focus={focus} onPick={onPick} />
+              <MatrixRow key={spec.key} r={r} spec={spec} base={base} deltaS={deltaS} focus={focus} columns={columns} activeColumn={activeColumn} onPick={onPick} />
             ))}
           </tbody>
         </table>
@@ -239,7 +291,7 @@ export function Replan() {
               </thead>
               <tbody>
                 {rankRows.map((row, i) => (
-                  <tr key={row.siteId}>
+                  <tr key={row.siteId} className={story?.highlightRank && i === 0 ? 'replan__highlight' : undefined}>
                     <td>{i + 1}</td>
                     <td>{row.name}</td>
                     <td className={`compare__status--${row.assessment.status}`}>
