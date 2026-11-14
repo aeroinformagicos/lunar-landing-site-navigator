@@ -1,0 +1,155 @@
+{
+  "contract_version": "1.0.0",
+  "generated_utc": "2026-11-14T00:00:00Z",
+  "git_commit": "example",
+  "summary": {
+    "total": 4,
+    "passed": 2,
+    "failed": 0,
+    "manual": 1,
+    "skipped": 1,
+    "horizons_comparisons": 256,
+    "horizons_max_abs_err_deg": 4e-05
+  },
+  "headline": [
+    {
+      "id": "B3",
+      "title": "Total solar eclipse seen by Blue Ghost 1 (14 March 2025)",
+      "rows": [
+        {
+          "label": "Eclipse starts",
+          "predicted": "05:01 UTC",
+          "observed": "05:00 UTC",
+          "ok": true
+        },
+        {
+          "label": "Totality starts",
+          "predicted": "06:17 UTC",
+          "observed": "06:18 UTC",
+          "ok": true
+        },
+        {
+          "label": "Totality ends",
+          "predicted": "08:34 UTC",
+          "observed": "08:34 UTC",
+          "ok": true
+        },
+        {
+          "label": "Eclipse ends",
+          "predicted": "09:51 UTC",
+          "observed": "09:52 UTC",
+          "ok": true
+        }
+      ],
+      "tolerance": "5 min",
+      "source": {
+        "label": "Firefly Aerospace, Blue Ghost Mission 1 updates",
+        "url": "https://fireflyspace.com/?p=3379"
+      },
+      "note": "Firefly gives the times as CST; they match UTC-5 (CDT). Example report (synthetic values).",
+      "status": "pass"
+    },
+    {
+      "id": "A3",
+      "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
+      "rows": [
+        {
+          "label": "Sunset",
+          "predicted": "\u2014",
+          "observed": "18:00\u201318:15 UTC",
+          "ok": null
+        }
+      ],
+      "tolerance": "30 min",
+      "source": {
+        "label": "Firefly Aerospace, Blue Ghost Mission 1 updates",
+        "url": "https://fireflyspace.com/?p=3379"
+      },
+      "note": "Example report (synthetic values).",
+      "status": "skipped"
+    },
+    {
+      "id": "A7B7",
+      "title": "Our south pole maps vs NASA illumination and Earth visibility maps",
+      "rows": [],
+      "tolerance": "\u2014",
+      "source": {
+        "label": "NASA PGDA, south pole illumination products",
+        "url": ""
+      },
+      "note": "Example report (synthetic values).",
+      "status": "skipped"
+    }
+  ],
+  "cases": [
+    {
+      "id": "A1",
+      "group": "A",
+      "title": "Sun and Earth azimuth and elevation vs JPL Horizons",
+      "status": "pass",
+      "expected": "JPL Horizons, observer on the lunar surface",
+      "obtained": "max |error| 0.00004 deg over 256 comparisons",
+      "tolerance": "0.02 deg",
+      "source": {
+        "label": "JPL Horizons",
+        "url": "https://ssd.jpl.nasa.gov/horizons/"
+      },
+      "details": [
+        {
+          "label": "apollo-11 sun el 2025-03-14T06:00Z",
+          "expected": 12.345678,
+          "obtained": 12.345671,
+          "abs_err": 7e-06,
+          "unit": "deg",
+          "ok": true
+        }
+      ],
+      "note": "Example report (synthetic values)."
+    },
+    {
+      "id": "A4",
+      "group": "A",
+      "title": "Smooth sphere and synthetic hill",
+      "status": "pass",
+      "expected": "-0.087, -0.615, -1.943 and 2.606 deg",
+      "obtained": "all within 0.001 deg",
+      "tolerance": "0.005 deg",
+      "source": {
+        "label": "Hand calculation, R = 1737.4 km",
+        "url": ""
+      },
+      "details": [],
+      "note": "Example report (synthetic values)."
+    },
+    {
+      "id": "A5",
+      "group": "A",
+      "title": "Terrain section vs QGIS profile",
+      "status": "manual",
+      "expected": "Same blocking point",
+      "obtained": "Signed off by A1",
+      "tolerance": "\u2014",
+      "source": {
+        "label": "QGIS",
+        "url": ""
+      },
+      "details": [],
+      "note": "Example report (synthetic values)."
+    },
+    {
+      "id": "B1",
+      "group": "B",
+      "title": "Sunrise and sunset in the web vs Python",
+      "status": "skipped",
+      "expected": "\u2014",
+      "obtained": "\u2014",
+      "tolerance": "1 min",
+      "source": {
+        "label": "Python reference",
+        "url": ""
+      },
+      "details": [],
+      "note": "Not run in the example data. Example report (synthetic values)."
+    }
+  ]
+}

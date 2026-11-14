@@ -1,0 +1,121 @@
+{
+  "contract_version": "1.0.0",
+  "defaults": {
+    "demo_pair": [
+      "demo-a",
+      "demo-b"
+    ],
+    "demo_landing_utc": "2027-08-01T00:00:00Z",
+    "demo_mission_days": 14
+  },
+  "sites": [
+    {
+      "id": "demo-a",
+      "name": "Demo site A (example data)",
+      "short_name": "Demo A",
+      "type": "demo",
+      "lat_deg": -88.8,
+      "lon_deg": 123.4,
+      "height_m": 0.0,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": true,
+      "observer_heights_m": [
+        2
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "Synthetic example data (task T-02)",
+        "url": ""
+      },
+      "note": "Example data: formula horizon, not real terrain."
+    },
+    {
+      "id": "demo-b",
+      "name": "Demo site B (example data)",
+      "short_name": "Demo B",
+      "type": "demo",
+      "lat_deg": -89.67,
+      "lon_deg": 129.78,
+      "height_m": 0.0,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "relief_label": "LOLA polar 40 m + 120 m",
+      "has_mask": true,
+      "has_profile": false,
+      "observer_heights_m": [
+        2
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "Synthetic example data (task T-02)",
+        "url": ""
+      },
+      "note": "Example data: formula horizon, not real terrain."
+    },
+    {
+      "id": "blue-ghost-1",
+      "name": "Blue Ghost Mission 1",
+      "short_name": "Blue Ghost 1",
+      "type": "landing",
+      "lat_deg": 18.562,
+      "lon_deg": 61.81,
+      "height_m": null,
+      "mission": "Blue Ghost Mission 1",
+      "operator": "Firefly Aerospace (NASA CLPS)",
+      "landing_utc": "2025-03-02T08:34:00Z",
+      "landing_date": "2025-03-02",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    },
+    {
+      "id": "apollo-11",
+      "name": "Apollo 11",
+      "short_name": "Apollo 11",
+      "type": "landing",
+      "lat_deg": 0.67416,
+      "lon_deg": 23.47314,
+      "height_m": null,
+      "mission": "Apollo 11",
+      "operator": "NASA",
+      "landing_utc": null,
+      "landing_date": "1969-07-20",
+      "relief": "smooth",
+      "relief_label": "Smooth Moon (no terrain)",
+      "has_mask": false,
+      "has_profile": false,
+      "observer_heights_m": [
+        2
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NSSDCA, Table of Anthropogenic Impacts and Spacecraft on the Moon",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+      },
+      "note": ""
+    }
+  ]
+}

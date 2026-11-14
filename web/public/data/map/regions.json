@@ -1,0 +1,194 @@
+{
+  "contract_version": "1.0.0",
+  "regions": [
+    {
+      "id": "de-gerlache-rim-2",
+      "name": "de Gerlache Rim 2",
+      "lat_deg": -88.2,
+      "lon_deg": -64.6,
+      "x_m": -49309.9,
+      "y_m": 23414.1,
+      "size_km": 11.0,
+      "box_m": [
+        -54809.9,
+        17914.1,
+        -43809.9,
+        28914.1
+      ],
+      "site_id": "region-de-gerlache-rim-2",
+      "status": "candidate_2024",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      }
+    },
+    {
+      "id": "haworth",
+      "name": "Haworth",
+      "lat_deg": -86.8,
+      "lon_deg": -22.8,
+      "x_m": -37612.2,
+      "y_m": 89476.0,
+      "size_km": 17.0,
+      "box_m": [
+        -46112.2,
+        80976.0,
+        -29112.2,
+        97976.0
+      ],
+      "site_id": "region-haworth",
+      "status": "candidate_2024",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      }
+    },
+    {
+      "id": "malapert-massif",
+      "name": "Malapert Massif",
+      "lat_deg": -86.0,
+      "lon_deg": -0.2,
+      "x_m": -423.6,
+      "y_m": 121342.0,
+      "size_km": 12.0,
+      "box_m": [
+        -6423.6,
+        115342.0,
+        5576.4,
+        127342.0
+      ],
+      "site_id": "region-malapert-massif",
+      "status": "candidate_2024",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      }
+    },
+    {
+      "id": "mons-mouton",
+      "name": "Mons Mouton",
+      "lat_deg": -85.4,
+      "lon_deg": 31.7,
+      "x_m": 73336.1,
+      "y_m": 118741.2,
+      "size_km": 9.0,
+      "box_m": [
+        68836.1,
+        114241.2,
+        77836.1,
+        123241.2
+      ],
+      "site_id": "region-mons-mouton",
+      "status": "candidate_2024",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      }
+    },
+    {
+      "id": "mons-mouton-plateau",
+      "name": "Mons Mouton Plateau",
+      "lat_deg": -84.3,
+      "lon_deg": 30.6,
+      "x_m": 88056.9,
+      "y_m": 148896.1,
+      "size_km": 38.0,
+      "box_m": [
+        69056.9,
+        129896.1,
+        107056.9,
+        167896.1
+      ],
+      "site_id": "region-mons-mouton-plateau",
+      "status": "candidate_2024",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      }
+    },
+    {
+      "id": "nobile-rim-1",
+      "name": "Nobile Rim 1",
+      "lat_deg": -85.4,
+      "lon_deg": 37.3,
+      "x_m": 84573.2,
+      "y_m": 111018.2,
+      "size_km": 11.0,
+      "box_m": [
+        79073.2,
+        105518.2,
+        90073.2,
+        116518.2
+      ],
+      "site_id": "region-nobile-rim-1",
+      "status": "candidate_2024",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      }
+    },
+    {
+      "id": "nobile-rim-2",
+      "name": "Nobile Rim 2",
+      "lat_deg": -84.0,
+      "lon_deg": 58.8,
+      "x_m": 155767.4,
+      "y_m": 94336.1,
+      "size_km": 11.0,
+      "box_m": [
+        150267.4,
+        88836.1,
+        161267.4,
+        99836.1
+      ],
+      "site_id": "region-nobile-rim-2",
+      "status": "candidate_2024",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      }
+    },
+    {
+      "id": "peak-near-cabeus-b",
+      "name": "Peak near Cabeus B",
+      "lat_deg": -83.6,
+      "lon_deg": -68.7,
+      "x_m": -181001.0,
+      "y_m": 70569.4,
+      "size_km": 11.0,
+      "box_m": [
+        -186501.0,
+        65069.4,
+        -175501.0,
+        76069.4
+      ],
+      "site_id": "region-peak-near-cabeus-b",
+      "status": "candidate_2024",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      }
+    },
+    {
+      "id": "slater-plain",
+      "name": "Slater Plain",
+      "lat_deg": -87.2,
+      "lon_deg": 125.5,
+      "x_m": 69136.5,
+      "y_m": -49314.6,
+      "size_km": 11.0,
+      "box_m": [
+        63636.5,
+        -54814.6,
+        74636.5,
+        -43814.6
+      ],
+      "site_id": "region-slater-plain",
+      "status": "candidate_2024",
+      "source": {
+        "label": "NASA (2024); centre via USGS record 671a6fa8d34efed5620f89f8",
+        "url": "https://www.nasanow.org/artemis"
+      }
+    }
+  ]
+}

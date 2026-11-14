@@ -1,0 +1,17 @@
+{
+  "contract_version": "1.0.0",
+  "grid": "map/grid.json",
+  "law": "full",
+  "observer_height_m": 2,
+  "dem_stack": [
+    "synthetic"
+  ],
+  "el_scale_deg": 0.01,
+  "dist_code": {
+    "base_m": 20,
+    "ratio": 1.04
+  },
+  "chunks_done": 4,
+  "chunks_total": 1974,
+  "done": "cube/done.bin"
+}
