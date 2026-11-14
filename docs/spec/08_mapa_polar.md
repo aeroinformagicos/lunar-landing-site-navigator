@@ -259,7 +259,7 @@ for cada celda (i, j) calculada:
 métricas, para Sol y para Tierra, sobre el conjunto «85S» (celdas comparadas con N1/N2) y sobre el total:
     n, r de Pearson, sesgo = media(ours − nasa), mae = media(|ours − nasa|), rmse
     fracción de celdas con |ours − nasa| ≤ 10 puntos
-salida: data/out/test_results/A7B7.json, a7b7_scatter.png y a7b7_diff_map.png (formato en 09 §7.1) para la página de validación
+salida: data/out/test_results/A7.json (los 20 puntos, T-36, D-113 c) y B7.json (todas las celdas, D-106 f), a7b7_scatter.png y a7b7_diff_map.png (formato en 09 §7.1) para la página de validación
 ```
 
 ### 8.3 Umbrales
