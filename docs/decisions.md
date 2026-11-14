@@ -35,3 +35,5 @@ fijaba: `@types/react` 19.3.0, `@types/react-dom` 19.3.0, `@types/d3-array` 3.2.
 | Etiqueta | Fecha | URL |
 | --- | --- | --- |
 | — | — | — |
+| D-59 | 2026-11-14 | Si `config.json` no existe (404), la web usa `data` en `data_base_url` y en `heavy_base_url`; una clave que falta o está vacía toma ese mismo valor | Es el valor de la copia local sin conexión (`09_contrato_datos.md` §1). Así `vite dev` y una copia sin despliegue arrancan igual; un error de red o un 5xx en `config.json` sí se muestra como error | I2 (T-11) |
+| D-60 | 2026-11-14 | Los cargadores de binarios `.gz` aceptan también los datos ya descomprimidos (sin el número mágico de gzip), y después comprueban igualmente el tamaño exacto y la cabecera | Algunos alojamientos sirven `.gz` con `Content-Encoding: gzip` y el navegador los descomprime antes de entregarlos; la comprobación de tamaño y cabecera de `09` §14 sigue detectando un fichero erróneo | I2 (T-11) |
