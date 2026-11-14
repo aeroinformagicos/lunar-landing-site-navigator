@@ -16,7 +16,8 @@
 //                         need_earth_at_landing, max_night_hours, marginal_earth_margin_deg, marginal_sun_fraction},
 //                         status, reasons }],
 //     "replan_row":    [{ site_id, observer_height_m, t0, delta_s, mission_days, statuses: [31 × status | null] }],
-//     "rank":          [{ landing_unix, mission_days, site_ids: [ordered, replan_candidate sites] }] }
+//     "rank":          [{ landing_unix, mission_days, site_ids: [ordered, replan_candidate sites] }],
+//     "eclipse":       [{ site_id, observer_height_m, t_unix, kind, covered, sep_deg }] }
 //
 // `mask` is a formula id (`flat:0`, `tilt:0.3`, `sine:1,3`…) or a published site id.
 import { describe, expect, it } from 'vitest';
@@ -25,6 +26,7 @@ import { siteFrame, skyAt } from '../frames';
 import { formulaMask, horizonAt, maskFromFile, smoothMask, type Mask } from '../horizon';
 import { missionMetrics } from '../metrics';
 import { rankCandidates } from '../ranking';
+import { eclipseState } from '../eclipse';
 import { assess, replanRow, type Requirements } from '../requirements';
 import type { HorizonFile, SitesFile } from '../types';
 import { discFraction, evaluate, frameFor } from '../visibility';
@@ -179,5 +181,15 @@ describe('core_vectors.json (07 §12)', () => {
         return { siteId: s.id, name: s.short_name, assessment: a, sunPct: m.sunPct, earthPct: m.earthPct };
       });
     expect(rankCandidates(rows).map((r) => r.siteId), `#${i}`).toEqual(c.site_ids);
+  });
+
+  block('eclipse', true, (c, i) => {
+    const site = siteOf(c.site_id as string);
+    const mask = maskOf(site.id, (c.observer_height_m as number) ?? 2);
+    const sky = skyAt(table!, frameFor(site.lat_deg, site.lon_deg, mask), c.t_unix as number);
+    const e = eclipseState(sky.sun, sky.earth);
+    expect(e.kind, `#${i}`).toBe(c.kind);
+    close(e.covered, c.covered as number, TOL_FRAC, `#${i} covered`);
+    close(e.sepDeg, c.sep_deg as number, TOL_DEG, `#${i} sep`);
   });
 });
