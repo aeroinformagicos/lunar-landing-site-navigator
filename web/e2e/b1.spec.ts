@@ -133,55 +133,77 @@ function linkOf(site: string, landing: number, days: number, cursor: number): st
 
 async function text(page: Page, locator: ReturnType<Page['locator']>): Promise<string> {
   await expect(locator).toBeVisible({ timeout: 30_000 });
-  return (await locator.innerText()).trim();
+  // One line: the v2 keeps the share of a figure in a visually hidden span, which innerText puts on its own line.
+  return (await locator.innerText()).replace(/\s+/g, ' ').trim();
 }
 
 test.describe('B1: panel figures equal the Python reference', () => {
   test.skip(metricsBlock === null, `no "metrics" block in ${VECTORS} yet (T-26 writes it)`);
 
   for (const sc of SCENARIOS) {
-    test(`B1 ${sc.name}, cursor at landing + 1 d`, async ({ page, request }) => {
-      const manifest = await (await request.get('/data/manifest.json')).json();
-      test.skip(manifest.ephemeris.synthetic, 'B1 needs the real ephemeris table');
-      const sites = await (await request.get('/data/sites.json')).json();
-      const site = sc.site ?? (sites.defaults.demo_pair[0] as string);
-      const landing = Date.parse(sc.landing ?? sites.defaults.demo_landing_utc) / 1000;
-      const days = sc.days ?? (sites.defaults.demo_mission_days as number);
-      const cursor = landing + DAY;
-      const info = sites.sites.find((s: { id: string }) => s.id === site);
-      expect(info, `${site} in sites.json`).toBeTruthy();
+    for (const ui of ['v1', 'v2'] as const) {
+      test(`B1 ${sc.name}, cursor at landing + 1 d (${ui})`, async ({ page, request }) => {
+        const manifest = await (await request.get('/data/manifest.json')).json();
+        test.skip(manifest.ephemeris.synthetic, 'B1 needs the real ephemeris table');
+        const sites = await (await request.get('/data/sites.json')).json();
+        const site = sc.site ?? (sites.defaults.demo_pair[0] as string);
+        const landing = Date.parse(sc.landing ?? sites.defaults.demo_landing_utc) / 1000;
+        const days = sc.days ?? (sites.defaults.demo_mission_days as number);
+        const cursor = landing + DAY;
+        const info = sites.sites.find((s: { id: string }) => s.id === site);
+        expect(info, `${site} in sites.json`).toBeTruthy();
 
-      const ref = metricsBlock!.find(
-        (c) => c.site_id === site && c.landing_unix === landing && c.mission_days === days && c.cursor_unix === cursor && (c.observer_height_m ?? 2) === 2,
-      );
-      expect(ref, `metrics block has no case for ${site}, landing ${landing}, ${days} d, cursor ${cursor}, 2 m`).toBeTruthy();
-      const missing = FIELDS.filter((f) => ref![f] === undefined);
-      expect(missing, `fields missing in the metrics case of ${site}`).toEqual([]);
+        const ref = metricsBlock!.find(
+          (c) => c.site_id === site && c.landing_unix === landing && c.mission_days === days && c.cursor_unix === cursor && (c.observer_height_m ?? 2) === 2,
+        );
+        expect(ref, `metrics block has no case for ${site}, landing ${landing}, ${days} d, cursor ${cursor}, 2 m`).toBeTruthy();
+        const missing = FIELDS.filter((f) => ref![f] === undefined);
+        expect(missing, `fields missing in the metrics case of ${site}`).toEqual([]);
+        const where = `${sc.name} (${ui})`;
 
-      await page.goto(linkOf(site, landing, days, cursor));
-      await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText(info.short_name);
-      const now = page.getByRole('region', { name: 'Now' });
-      const where = `${sc.name}`;
+        const link = linkOf(site, landing, days, cursor);
+        if (ui === 'v1') {
+          await page.goto(link.replace('/#', '/?ui=v1#'));
+          // The first read waits as long as the others: the real heavy origin can be slow under load.
+          await expect(page.getByRole('article', { name: 'Scenario A' })).toContainText(info.short_name, { timeout: 30_000 });
+          const now = page.getByRole('region', { name: 'Now' });
+          expectDeg(await text(page, now.getByText(/^Sun elevation /)), /^Sun elevation ([−-]?\d+\.\d\d)°$/, ref!.sun_el_deg, `${where} Sun elevation`);
+          expectPct(match(await text(page, now.getByText(/^Solar disc visible /)), /^Solar disc visible (.+)$/)[1], ref!.sun_disc_pct, TOL_DISC_PCT, `${where} disc`);
+          const earth = await text(page, now.getByText(/^Earth elevation /));
+          expectDeg(earth, /^Earth elevation ([−-]?\d+\.\d\d)° /, ref!.earth_el_deg, `${where} Earth elevation`);
+          expectDeg(earth, /\(margin ([+−-]\d+\.\d\d)°\)$/, ref!.earth_margin_deg, `${where} Earth margin`);
+          // The Sun's margin is in the panorama readout, with the focus on the Sun.
+          expectDeg(await text(page, page.getByTestId('margin')), /^Margin: ([+−-]\d+\.\d\d)°$/, ref!.sun_margin_deg, `${where} Sun margin`);
+        } else {
+          // v2 (15_interfaz_v2.md): the 2D stage, the pills and the Now at site panel.
+          await page.goto(link.replace('/#', '/?ui=v2&vm=2d#'));
+          await expect(page.getByRole('group', { name: 'Scenarios' })).toContainText(`A · ${info.short_name}`, { timeout: 30_000 });
+          const row = (label: string) => page.locator('.v2-dl__row', { has: page.locator('dt', { hasText: new RegExp(`^${label}$`) }) }).locator('dd');
+          expectDeg(await text(page, row('Sun elevation')), /^([−-]?\d+\.\d\d)°$/, ref!.sun_el_deg, `${where} Sun elevation`);
+          expectPct(await text(page, row('Solar disc visible')), ref!.sun_disc_pct, TOL_DISC_PCT, `${where} disc`);
+          const earth = (await text(page, row('Earth elevation'))).replace(/\s+/g, ' ');
+          expectDeg(earth, /^([−-]?\d+\.\d\d)°/, ref!.earth_el_deg, `${where} Earth elevation`);
+          expectDeg(earth, /margin ([+−-]\d+\.\d\d)°$/, ref!.earth_margin_deg, `${where} Earth margin`);
+        }
 
-      expectDeg(await text(page, now.getByText(/^Sun elevation /)), /^Sun elevation ([−-]?\d+\.\d\d)°$/, ref!.sun_el_deg, `${where} Sun elevation`);
-      expectPct(match(await text(page, now.getByText(/^Solar disc visible /)), /^Solar disc visible (.+)$/)[1], ref!.sun_disc_pct, TOL_DISC_PCT, `${where} disc`);
-      const earth = await text(page, now.getByText(/^Earth elevation /));
-      expectDeg(earth, /^Earth elevation ([−-]?\d+\.\d\d)° /, ref!.earth_el_deg, `${where} Earth elevation`);
-      expectDeg(earth, /\(margin ([+−-]\d+\.\d\d)°\)$/, ref!.earth_margin_deg, `${where} Earth margin`);
-      // The Sun's margin is in the panorama readout, with the focus on the Sun.
-      expectDeg(await text(page, page.getByTestId('margin')), /^Margin: ([+−-]\d+\.\d\d)°$/, ref!.sun_margin_deg, `${where} Sun margin`);
+        const tolPct = (TOL_S / 3600 / (days * 24)) * 100;
+        const [sunH, sunP] = (await text(page, page.locator('.figure--sunlight .figure__value'))).split(' · ');
+        expectHours(sunH, ref!.sun_hours, `${where} sun hours`);
+        expectPct(sunP, ref!.sun_pct, tolPct, `${where} sun %`);
+        const [earthH, earthP] = (await text(page, page.locator('.figure--earth_link .figure__value'))).split(' · ');
+        expectHours(earthH, ref!.earth_hours, `${where} Earth hours`);
+        expectPct(earthP, ref!.earth_pct, tolPct, `${where} Earth %`);
+        expectHours(await text(page, page.locator('.figure--longest_night .figure__value')), ref!.longest_night_h, `${where} longest night`);
 
-      const tolPct = (TOL_S / 3600 / (days * 24)) * 100;
-      const [sunH, sunP] = (await text(page, page.locator('.figure--sunlight .figure__value'))).split(' · ');
-      expectHours(sunH, ref!.sun_hours, `${where} sun hours`);
-      expectPct(sunP, ref!.sun_pct, tolPct, `${where} sun %`);
-      const [earthH, earthP] = (await text(page, page.locator('.figure--earth_link .figure__value'))).split(' · ');
-      expectHours(earthH, ref!.earth_hours, `${where} Earth hours`);
-      expectPct(earthP, ref!.earth_pct, tolPct, `${where} Earth %`);
-      expectHours(await text(page, page.locator('.figure--longest_night .figure__value')), ref!.longest_night_h, `${where} longest night`);
+        expectCountdown(await text(page, page.getByTestId('sun-countdown')), ref!.next_sun_event, cursor, `${where} next Sun event`);
+        expectCountdown(await text(page, page.getByTestId('earth-countdown')), ref!.next_earth_event, cursor, `${where} next Earth event`);
 
-      expectCountdown(await text(page, page.getByTestId('sun-countdown')), ref!.next_sun_event, cursor, `${where} next Sun event`);
-      expectCountdown(await text(page, page.getByTestId('earth-countdown')), ref!.next_earth_event, cursor, `${where} next Earth event`);
-    });
+        if (ui === 'v2') {
+          // The Sun's margin is in Horizon detail (focus on the Sun); opening it folds the telemetry.
+          await page.getByRole('button', { name: 'Horizon detail' }).click();
+          expectDeg((await text(page, page.getByTestId('margin'))).replace(/\s+/g, ' '), /([+−-]\d+\.\d\d)°$/, ref!.sun_margin_deg, `${where} Sun margin`);
+        }
+      });
+    }
   }
 });

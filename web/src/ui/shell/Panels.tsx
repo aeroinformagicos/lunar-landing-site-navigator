@@ -207,13 +207,24 @@ export function NowPanel() {
 
 /** `Sunrise in 0d 17h 22m` → label `Sunrise in`, value `0d 17h 22m` (the full text is the name). */
 function countdownRow(text: string, testId: string) {
-  const m = /^(.*? in) (.*)$/.exec(text);
+  // `Sunrise in 0d 17h 22m` → label and value; `No earthset in the next 60 days` stays one sentence.
+  const m = /^(\w+ in) (\d.*)$/.exec(text);
+  if (!m) {
+    return (
+      <div className="v2-dl__row v2-dl__row--full">
+        <dt className="visually-hidden">{testId === 'sun-countdown' ? t('compare.next_sun') : t('compare.next_earth')}</dt>
+        <dd className="v2-dl__v v2-dl__v--note countdown" data-testid={testId}>
+          {text}
+        </dd>
+      </div>
+    );
+  }
   return (
     <div className="v2-dl__row">
-      <dt>{m ? m[1] : text}</dt>
+      <dt>{m[1]}</dt>
       <dd className="v2-dl__v v2-dl__v--plain countdown" data-testid={testId}>
-        <span className="visually-hidden">{m ? `${m[1]} ` : ''}</span>
-        {m ? m[2] : ''}
+        <span className="visually-hidden">{`${m[1]} `}</span>
+        {m[2]}
       </dd>
     </div>
   );

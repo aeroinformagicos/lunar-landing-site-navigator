@@ -2,7 +2,7 @@
 // T-19 end to end (F8, 10_interfaz.md §5): the comparison table with 2, 3 and 4 scenarios, the best
 // figure marked with ▲, `Close comparison` back to the previous tab, the one-scenario message, and
 // add / duplicate / remove still working with never more than 4.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './v1';
 
 const table = (page: Page) => page.locator('.compare__table');
 

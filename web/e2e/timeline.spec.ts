@@ -2,7 +2,7 @@
 // T-16 end to end (F5, F6, F7) on the example data: a click on the timeline moves the cursor to the
 // same value as the slider; the countdown matches the event marker to the minute; the panel shows
 // the figures with unit, help and source.
-import { expect, test } from '@playwright/test';
+import { expect, test } from './v1';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');

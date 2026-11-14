@@ -3,7 +3,7 @@
 // cards (JPL Horizons, the Blue Ghost 1 eclipse and the NASA maps; decision D-95) with prediction,
 // fact, tolerance, linked source and state; the retired A3 stays in the full table; the full table
 // unfolds and each row expands; a mismatch is shown; without a report, the message.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './v1';
 
 async function openValidation(page: Page) {
   await page.goto('/');
@@ -27,8 +27,10 @@ test('three headline cards with prediction, fact, tolerance, source and state', 
   // A3 is retired (decision D-95): no card.
   await expect(page.getByRole('article', { name: /Sunset seen by Blue Ghost 1/ })).toHaveCount(0);
   const a7 = page.getByRole('article', { name: /south pole maps vs NASA/ });
-  await expect(a7).toContainText('Pending');
-  await expect(a7).toContainText(/Computed tonight/);
+  // Pending until the night run publishes the comparison (T-39); then Match or Mismatch with its values.
+  await expect(a7).toContainText(/Pending|Match|Mismatch/);
+  if ((await a7.innerText()).includes('Pending')) await expect(a7).toContainText(/Computed tonight/);
+  else await expect(a7).toContainText(/Pearson r/);
   await expect(a7).toContainText("NASA counts a point as lit when any part of the Sun's or Earth's disc is visible");
   await expect(page.getByText(/^[\d,]+ values checked against JPL Horizons · largest difference 0\.\d+°$/)).toBeVisible();
   await expect(page.getByText(/^Rise and set times are only as accurate as the terrain map\./)).toBeVisible();

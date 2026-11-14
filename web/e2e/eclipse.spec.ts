@@ -2,7 +2,7 @@
 // T-32 end to end (F13, case B3): Blue Ghost 1 on 14 March 2025 — the timeline marks the eclipse and
 // the totality, the panel warns during it and the panorama draws the Earth in front of the Sun.
 // Needs the real ephemeris table (T-06); with the example one there is no such eclipse.
-import { expect, test } from '@playwright/test';
+import { expect, test } from './v1';
 
 test('Blue Ghost 1, 14 March 2025: band, events, notice and Earth in front', async ({ page, request }) => {
   const manifest = await (await request.get('/data/manifest.json')).json();

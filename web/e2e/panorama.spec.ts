@@ -2,7 +2,7 @@
 // T-15 end to end (F3, F4, 10_interfaz.md §6.1) on the example data: drag and keys pan the 40° view,
 // the 360° strip jumps to another direction, `Centre on …` follows the body again, the smooth-Moon
 // line and the `Terrain effect` box, loading and error states.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './v1';
 
 const strip = (page: Page) => page.getByRole('slider', { name: /360° horizon strip/ });
 const azimuth = async (page: Page) => Number(await strip(page).getAttribute('aria-valuenow'));

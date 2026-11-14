@@ -17,6 +17,7 @@ import {
   meshPointLabel,
   NotComputed,
   rampColour,
+  BAND_COLOUR_V2,
   rampStep,
   zoomAt,
 } from './mapData';
@@ -37,8 +38,11 @@ describe('layers: ramp of 11 steps from #161B22 to the concept colour', () => {
     expect(rampStep(250)).toBe(10);
     expect(rampStep(125)).toBe(5); // 50 %
     expect(rampStep(255)).toBeNull();
-    expect(rampColour(0, 'sun')).toEqual([0x16, 0x1b, 0x22]);
-    expect(rampColour(10, 'earth')).toEqual(BAND_COLOUR.earth);
+    // v1 ramp (10 §6.4) and, the default since T-63, the v2 OKLab ramp (15 §7.5).
+    expect(rampColour(0, 'sun', 'v1')).toEqual([0x16, 0x1b, 0x22]);
+    expect(rampColour(10, 'earth', 'v1')).toEqual(BAND_COLOUR.earth);
+    expect(rampColour(0, 'sun', 'v2')).toEqual([0x16, 0x20, 0x32]);
+    expect(rampColour(10, 'earth', 'v2')).toEqual(BAND_COLOUR_V2.earth);
   });
 
   it('pixels: no data is transparent', () => {
@@ -46,7 +50,7 @@ describe('layers: ramp of 11 steps from #161B22 to the concept colour', () => {
     const bands = new Uint8Array(3 * n).fill(250);
     bands[n + 5] = 255;
     const px = layerPixels(bands, 'earth', 1);
-    expect([...px.subarray(0, 4)]).toEqual([...BAND_COLOUR.earth, 255]);
+    expect([...px.subarray(0, 4)]).toEqual([...rampColour(10, 'earth'), 255]); // full step in the active palette
     expect(px[4 * 5 + 3]).toBe(0);
     expect(cellPct(bands, 1, 5, 0)).toBeNull();
     expect(cellPct(bands, 0, 5, 0)).toBe(100);

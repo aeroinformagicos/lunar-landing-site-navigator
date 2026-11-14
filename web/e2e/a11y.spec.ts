@@ -2,13 +2,13 @@
 // T-20 end to end (10_interfaz.md §3.2, §12, §14; case B9, automatic part): mobile profile
 // 390 × 844 without horizontal scroll, 44 × 44 px targets, keyboard-only walk through the five
 // regions, chart descriptions, hidden data tables, text sizes and 200 % zoom.
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './v1';
 
 const VIEW_TABS = ['Panorama', 'Timeline', 'Map', 'Terrain profile'];
 
 async function open(page: Page) {
   await page.goto('/');
-  await expect(page.getByRole('article', { name: 'Scenario A' })).toBeVisible();
+  await expect(page.getByRole('article', { name: 'Scenario A' })).toBeVisible({ timeout: 30_000 }); // real heavy origin under load
   await expect(page.getByTestId('status-chip')).toBeVisible({ timeout: 20_000 });
 }
 

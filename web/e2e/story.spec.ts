@@ -1,7 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // T-30 end to end (F15, 10_interfaz.md §11): Learn walks the seven steps with `Next`, each showing its
 // view; keys ← → work; the last step offers `Try it yourself` and `Restart`; `Exit tour` on every step.
-import { expect, test } from '@playwright/test';
+import { expect, test } from './v1';
 import { DAY, sitesInfo, utc } from './data';
 
 test('the seven steps with Next, then Try it yourself', async ({ page, request }) => {
