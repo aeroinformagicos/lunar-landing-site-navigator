@@ -23,6 +23,7 @@ petición automática (la página existe; se leyó con WebFetch o con el navegad
 | LROC image 1407: Blue Ghost lander seen from above | https://lroc.im-ldi.com/images/1407 | OK |
 | NASA, candidate landing regions (2022 list) | https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/ | OK |
 | NASA, update on the candidate landing regions (2024 list) | https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/ | OK |
+| NASA, Artemis III becomes an Earth-orbit test; Artemis IV landing in 2028 (27 February 2026) | https://www.nasa.gov/news-release/nasa-adds-mission-to-artemis-lunar-program-updates-architecture/ | OK |
 
 Nota: el catálogo toma las coordenadas de los Apolo de la tabla NSSDCA de impactos y naves
 (`lunar_artifact_impacts.html`), no de `lunar_sites.html`, y la de IM-2 también de NSSDCA, no de LROC 1408;
@@ -70,12 +71,12 @@ at 18:54 UTC, about 40 minutes later. The horizon there is an 11 m rise 800 m aw
 terrain map can resolve; moving the site by one pixel moves our sunset by up to 51 minutes. We show it as
 an open discrepancy, not as a pass.
 
-**Artemis.** The app shows NASA's candidate landing regions near the lunar south pole (2024 list). Since
-27 February 2026 NASA plans the first crewed landing for Artemis IV (2028); the regions keep their 2024
-names.
+**Artemis.** The app shows NASA's candidate landing regions near the lunar south pole (2024 list). On
+27 February 2026 NASA made Artemis III (2027) a test of systems and operations in low Earth orbit and now
+targets the Artemis IV landing for 2028; the regions keep their 2024 names.
 
-*(Comprobar antes de pegar: la fecha del 27/02/2026 y «Artemis IV (2028)» vienen del encargo; no se han
-contrastado con una fuente en esta sesión y no están en `SOURCES.md`.)*
+*(Fuente comprobada el 15/11/2026: NASA, «NASA Adds Mission to Artemis Lunar Program, Updates Architecture»,
+27/02/2026. La nota no dice literalmente «first landing», por eso la frase dice «the Artemis IV landing».)*
 
 **Real terrain and smooth Moon.** Sites with terrain data are computed on the real horizon: Blue Ghost 1
 and SLIM on SLDEM2015 (59 m), IM-2 on the LOLA polar model, Chandrayaan-3 on the LOLA 60° S model.
