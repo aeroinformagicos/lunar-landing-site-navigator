@@ -13,7 +13,7 @@ async function openV2(page: Page, query = '?ui=v2') {
 test('brand, motto, scenario pills, stage and figures of the demo pair', async ({ page, request }) => {
   const { pair } = await sitesInfo(request);
   await openV2(page);
-  await expect(page.getByRole('link', { name: 'Lunar Landing Site Navigator' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Lunar Sightline' })).toBeVisible();
   await expect(page.getByText('Lunar Sightline', { exact: true })).toBeVisible();
   await expect(page.getByText('When will your landing site see the Sun and Earth?')).toBeVisible();
   const pills = page.getByRole('group', { name: 'Scenarios' });
@@ -90,7 +90,7 @@ test('the view mode travels in the shared link (vm)', async ({ page }) => {
 
 test('the v2 is the default since T-63; ?ui=v1 keeps the previous interface', async ({ page }) => {
   await page.goto('/?ui=v1');
-  await expect(page.getByRole('link', { name: 'Lunar Landing Site Navigator' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Lunar Sightline' })).toBeVisible();
   await expect(page.locator('.v2')).toHaveCount(0);
   await expect(page.getByRole('tab', { name: 'Panorama' })).toBeVisible();
   await page.goto('/');

@@ -59,8 +59,8 @@ test('keyboard: skip link first, then brand, pills, mode, switch, panels, stage,
     if (!r.visible) hidden.push(r.name);
   }
   const at = (re: RegExp) => seen.findIndex((s) => re.test(s));
-  expect(at(/Lunar Landing Site Navigator$/)).toBeGreaterThanOrEqual(0);
-  expect(at(/^A · /)).toBeGreaterThan(at(/Lunar Landing Site Navigator$/));
+  expect(at(/^Lunar Sightline/)).toBeGreaterThanOrEqual(0);
+  expect(at(/^A · /)).toBeGreaterThan(at(/^Lunar Sightline/));
   expect(at(/^Explore$/)).toBeGreaterThan(at(/^A · /));
   expect(at(/^Play$/)).toBeGreaterThan(at(/^Explore$/));
   expect(hidden).toEqual([]);

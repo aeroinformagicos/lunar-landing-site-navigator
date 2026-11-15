@@ -63,13 +63,13 @@ Reglas: ningún estado se comunica solo con color (siempre icono o texto); contr
 
 ### 3.2 Móvil (< 768 px), solo modo Explore y Learn
 
-Vertical, con desplazamiento: cabecera compacta (título corto `Moon Site Navigator`, selector de modo); fila de fichas de escenario desplazable (A, B); pestañas; vista principal a ancho completo (alto 55 % de la pantalla); panel de cifras debajo en tres columnas; resumen llano; barra de tiempo fija abajo (deslizador, reproducir). El modo Plan muestra en móvil `Plan mode needs a wider screen.` con un botón `Back to Explore`. Entre 768 y 1023 px: como escritorio, con la columna derecha debajo de la vista principal.
+Vertical, con desplazamiento: cabecera compacta (título corto `Lunar Sightline` (D-182), selector de modo); fila de fichas de escenario desplazable (A, B); pestañas; vista principal a ancho completo (alto 55 % de la pantalla); panel de cifras debajo en tres columnas; resumen llano; barra de tiempo fija abajo (deslizador, reproducir). El modo Plan muestra en móvil `Plan mode needs a wider screen.` con un botón `Back to Explore`. Entre 768 y 1023 px: como escritorio, con la columna derecha debajo de la vista principal.
 
 ## 4. Cabecera y controles de tiempo (F2)
 
 | Elemento | Comportamiento | Texto o etiqueta |
 | --- | --- | --- |
-| Título | Enlace al estado inicial | `Lunar Landing Site Navigator` |
+| Título | Enlace al estado inicial | `Lunar Sightline` (D-182) |
 | Selector de modo | Grupo de 3 botones (`role="tablist"`) | `Explore`, `Plan`, `Learn` |
 | Fecha de aterrizaje | Campo `datetime-local` interpretado como UTC, paso de 1 min; afecta al escenario activo (o a todos si `Link dates` está marcado, por defecto sí) | Etiqueta `Landing (UTC)` |
 | Duración | Numérico, 0,5–60, paso 0,5 | Etiqueta `Mission`, sufijo `days` |
@@ -177,7 +177,7 @@ Las claves siguen el patrón `area.elemento`. Todos los textos citados en este d
 
 | Clave | Texto |
 | --- | --- |
-| `app.title` | `Lunar Landing Site Navigator` |
+| `app.title` | `Lunar Sightline` (D-182) |
 | `app.tagline` | `Compare Moon landing sites and dates by when the Sun (power) and Earth (radio contact) are above the real horizon.` |
 | `mode.explore` / `mode.plan` / `mode.learn` | `Explore` / `Plan` / `Learn` |
 | `tab.panorama` / `tab.timeline` / `tab.map` / `tab.section` / `tab.replan` | `Panorama` / `Timeline` / `Map` / `Terrain profile` / `Replan` |

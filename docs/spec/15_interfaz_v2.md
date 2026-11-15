@@ -80,7 +80,7 @@ Zonas de la v2 (figura del §3):
 
 | Elemento v1 | Texto o comportamiento que se conserva | Zona v2 |
 | --- | --- | --- |
-| Título enlazado al estado inicial | `Lunar Landing Site Navigator` sigue en `app.title`, en `<title>` y como nombre accesible del enlace del emblema (§6.1); el rótulo visible es `Lunar Sightline` | H |
+| Título enlazado al estado inicial | `Lunar Sightline` en `app.title`, en `<title>` y en el rótulo visible; el nombre accesible del enlace del emblema es el texto visible (marca y lema, §6.1; D-182) | H |
 | Línea de propósito (`14` §1) | `app.tagline`: la v2 enseña el lema del emblema `When will your landing site see the Sun and Earth?` (`app.motto`), y `app.tagline` va como descripción accesible del enlace (D-99) | H |
 | Selector de modo | `Explore`, `Plan`, `Learn`; `role="tablist"`, flechas | M |
 | Validación | `Validation` (enlace a `#/validation`) | M |
@@ -343,7 +343,7 @@ SVG propio que reproduce el isotipo de `ref-2-emblema.jpg`: **retícula orbital 
 - órbita: elipse `rx=19 ry=7`, girada −18°, 1,4 px `--c-earth`;
 - nodo solar: círculo `r=3` en `(30, 24)`, relleno `--c-sun`.
 
-`aria-hidden="true"`: el nombre accesible lo lleva el enlace que lo envuelve (`Lunar Landing Site Navigator — home`). Se usa a 48 px en la cabecera, a 64 px en la bienvenida y a 32 px en móvil. El mismo SVG es el `favicon.svg` (D-104).
+`aria-hidden="true"`: el nombre accesible lo lleva el enlace que lo envuelve (`Lunar Sightline` y el lema, D-182). Se usa a 48 px en la cabecera, a 64 px en la bienvenida y a 32 px en móvil. El mismo SVG es el `favicon.svg` (D-104).
 
 ### 6.2 Botones
 

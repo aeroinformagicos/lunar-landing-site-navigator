@@ -1,6 +1,6 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Constants of the web skeleton (T-11). T-12/T-13 add the physical constants from docs/spec/00_indice.md §3.
-export const APP_TITLE = 'Lunar Landing Site Navigator';
+export const APP_TITLE = 'Lunar Sightline';
 
 /** Major version of the data contract this build reads (contract/VERSION, 09_contrato_datos.md). */
 export const CONTRACT_MAJOR = 1;

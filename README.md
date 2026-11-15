@@ -1,5 +1,5 @@
 <!-- AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos -->
-# Lunar Landing Site Navigator
+# Lunar Sightline
 
 **Will this landing site have power and a line to Earth?** A static web app that shows, for any lunar
 site and date, the Sun and the Earth above the **real** lunar horizon: how long sunlight and the direct
