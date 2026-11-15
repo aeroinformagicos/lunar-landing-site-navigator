@@ -214,6 +214,8 @@ export function Controls(p: ControlsProps) {
         </span>
         <span ref={p.live.readout} className="stage3d__readout stage3d__mono" />
       </div>
+      {/* T-90 (proposal 9): picking a terrain point already works in the polar scene (§10.2); say so. */}
+      {p.polar && p.mode !== 'ground' && <p className="stage3d__note">{t('stage3d.click_hint')}</p>}
       {p.message && (
         <p className="stage3d__status" role="status">
           {p.message}

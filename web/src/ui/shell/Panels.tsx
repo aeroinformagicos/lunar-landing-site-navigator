@@ -15,6 +15,7 @@ import { ScenarioCard } from '../scenario/ScenarioColumn';
 import { FloatingPanel } from './FloatingPanel';
 import { HorizonDetail } from './HorizonDetail';
 import { openLeftPanel, REQUIREMENTS_FOCUS } from './openPanel';
+import { requestBestSite } from '../optimal/request';
 import { useActive } from './useActive';
 
 const SitesIcon = (
@@ -65,6 +66,10 @@ export function SitesPanel({ onPick, open, onOpenChange }: LeftProps & { onPick:
             {t('scenario.compare')}
           </Button>
         )}
+        {/* T-90 (proposal 9): the best-site search, reachable from the main view. */}
+        <Button variant="secondary" onClick={requestBestSite}>
+          {t('best.find_best')}
+        </Button>
       </div>
       {full && (
         <p id="v2-max-scenarios" className="v2-note">

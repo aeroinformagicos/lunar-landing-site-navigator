@@ -84,3 +84,20 @@ test('(6) each open scenario says, in the Sites panel, whether its mission works
   await page.getByRole('button', { name: /^Open Sites/ }).click();
   await expect(card('A').getByRole('button', { name: /· Works$/ })).toBeVisible();
 });
+
+test('(9) Find the best site from the Sites panel opens the tool on the map; the 3D view says a terrain point can be picked', async ({ page }) => {
+  await openV2(page);
+  await page.getByRole('button', { name: /^Open Sites/ }).click();
+  await page.getByRole('button', { name: 'Find the best site' }).click();
+  await expect(page.getByRole('tab', { name: 'Map' })).toHaveAttribute('aria-selected', 'true');
+  const toggle = page.getByRole('region', { name: 'Best site' }).getByRole('button', { name: 'Find the best site' });
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true', { timeout: 20_000 });
+  await expect(toggle).toBeFocused();
+});
+
+test('(9) the 3D polar scene says that a click on the terrain computes that point', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/?ui=v2&test3d=1');
+  await expect(page.locator('.stage3d[data-state="ready"][data-scene="polar"]')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText('Click the terrain (or press Enter on the centre cross) to compute that point as the site.')).toBeVisible();
+});

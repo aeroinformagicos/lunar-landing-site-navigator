@@ -266,6 +266,7 @@
   "stage3d.keys.fov_action": "Narrower or wider view",
   "stage3d.keys.enter": "Enter",
   "stage3d.keys.enter_action": "Use the point under the centre as the site",
+  "stage3d.click_hint": "Click the terrain (or press Enter on the centre cross) to compute that point as the site.",
   "stage3d.relief_profile": "3D terrain: reconstructed from the horizon profile · Figures: {relief}",
   "stage3d.relief_ring": "3D terrain: horizon ring only · Figures: {relief}",
   "stage3d.beyond": "Beyond the mapped area: smooth Moon",
