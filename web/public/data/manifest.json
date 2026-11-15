@@ -1,8 +1,8 @@
 {
   "contract_version": "1.1.0",
-  "generated_utc": "2026-11-14T20:43:59Z",
-  "git_commit": "1a83643",
-  "sites": 43,
+  "generated_utc": "2026-11-15T02:29:36Z",
+  "git_commit": "9211c5f",
+  "sites": 51,
   "ephemeris": {
     "file": "ephemeris.bin",
     "bytes": 5260176,
