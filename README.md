@@ -10,13 +10,14 @@ Navigator" challenge). In the app the interface is branded **Lunar Sightline**.
 All heavy computation runs offline in Python (SPICE ephemerides and LOLA / SLDEM2015 terrain); the
 web app only reads static files, so there is no server to go down.
 
-- **Live app:** <https://aeroinformagicos-llsn.pages.dev>
+- **Live app:** <https://lunarsightline.pages.dev> (the first address,
+  <https://aeroinformagicos-llsn.pages.dev>, still serves the same app)
 - **Heavy map data** (horizon cube, map layers, terrain for the 3D view):
   <https://aeroinformagicos-llsn-data.pages.dev> (read-only static files, CORS open). The app reads the
   real map from there (`heavy_base_url` in `web/public/config.json`); the small files in
   `web/public/data/layers` and `web/public/data/cube` are synthetic sample data for the automated tests.
-- **Previous interface**, kept as a safety net: <https://aeroinformagicos-llsn.pages.dev/?ui=v1>
-- **How we check the numbers:** <https://aeroinformagicos-llsn.pages.dev/#/validation>
+- **Previous interface**, kept as a safety net: <https://lunarsightline.pages.dev/?ui=v1>
+- **How we check the numbers:** <https://lunarsightline.pages.dev/#/validation>
 
 ## How to use it
 
@@ -100,7 +101,7 @@ CUDA) on 14 November 2026; "not timed" means nobody measured that step yet. On L
 | 11. Slow validation tests | `make test-all` | `out/test_results/*.json` (A6, A7, B4, B6 and the rest) | Python part 3 min 12 s |
 | 12. Validation report | `make report` | `web/public/data/validation_report.json` | seconds |
 | 13. Publish heavy data | `make deploy-heavy` | Cloudflare Pages project `aeroinformagicos-llsn-data` (339 MB, 2,045 files) and `heavy_base_url` in `web/public/config.json` | not timed |
-| 14. Publish the app | `make deploy` (CI does it on every merge to `main`) | Cloudflare Pages project `aeroinformagicos-llsn` | not timed |
+| 14. Publish the app | `make deploy` (CI does it on every merge to `main`) | Cloudflare Pages projects `lunarsightline` and `aeroinformagicos-llsn` | not timed |
 
 Every long step can be resumed: running the same command again skips what is already done.
 `ops/cloud/README.md` explains how to split the cube with a cloud machine. Check any data folder
