@@ -2411,3 +2411,18 @@
     max-height: max(260px, calc(100vh - 150px - 24px));
   }
 }
+
+/* P-12 (D-162), phones: the scenario pills wrap to a second row instead of cutting the site name
+   («A · Ma…»); each pill shows its full short name. */
+@media (max-width: 767px) {
+  .ui-v2 .v2-pills {
+    flex-wrap: wrap;
+    overflow: visible;
+    row-gap: 8px;
+  }
+  .ui-v2 .v2-pills .pill,
+  .ui-v2 .v2-pills .pill--scenario span {
+    max-width: none;
+    flex-shrink: 0;
+  }
+}
