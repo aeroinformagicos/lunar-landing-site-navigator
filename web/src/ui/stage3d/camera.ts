@@ -40,6 +40,15 @@ export function wrapDeg(a: number): number {
   return ((a % 360) + 360) % 360;
 }
 
+/**
+ * Turn that keeps following a body while the mission plays (D-183): the shortest signed step, in
+ * degrees, from its previous azimuth to the new one (−180, 180]; across north it stays small.
+ */
+export function followTurn(prevAzDeg: number, azDeg: number): number {
+  const d = wrapDeg(azDeg - prevAzDeg);
+  return d > 180 ? d - 360 : d;
+}
+
 export function limitOrbit(s: OrbitState): OrbitState {
   return {
     target: s.target,
