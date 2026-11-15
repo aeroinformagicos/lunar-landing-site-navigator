@@ -2354,3 +2354,60 @@
     padding-bottom: calc(var(--time-h, 150px) + var(--story-h, 0px) + 16px);
   }
 }
+
+/* ---- D-161: small laptop windows with a mouse (e.g. 811 × 599, 1024 × 640, 1280 × 720 at 1×) ----
+   Below ~760 px of height the bottom strip (figures, summary, view tabs, time bar) took most of the window
+   and, below ~680 px, ran over the Sites / Setup tabs, and the open Setup panel got a negative height. With a
+   fine pointer the strip is compacted (figures with clamp(), summary clamped with «More», smaller play
+   button) and the side panels keep a usable height. Touch devices keep the tablet / phone layout. */
+@media (pointer: fine) and (max-height: 760px) {
+  .ui-v2 .v2-fig__value {
+    font-size: clamp(28px, 6.2vh, 48px);
+  }
+  .ui-v2 .v2-fig__unit {
+    font-size: 15px;
+  }
+  .ui-v2 .v2-summary {
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .ui-v2 .v2-summary:not(.v2-summary--all) .summary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+  .ui-v2 .v2-summary .summary p {
+    font-size: 13px;
+  }
+  .ui-v2 .v2-play {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (pointer: fine) and (max-height: 680px) {
+  .ui-v2 .v2-summary:not(.v2-summary--all) .summary {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+  /* The figures start right of the Sites / Setup tabs, so «Works» and the first figure stay visible. */
+  .ui-v2 .v2-mission {
+    margin-left: 200px;
+  }
+  /* The folded «3D controls» button goes under «Now at site», away from the view tabs. */
+  .ui-v2 .stage3d__controls--closed {
+    top: 214px;
+    right: 16px;
+    bottom: auto;
+  }
+  /* Open side panels keep a usable height and are drawn above the strip. */
+  .ui-v2 .v2-left,
+  .ui-v2 .v2-right {
+    z-index: 16;
+    max-height: max(260px, calc(100vh - 150px - 24px));
+  }
+}
