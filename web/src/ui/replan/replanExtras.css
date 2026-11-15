@@ -24,3 +24,13 @@
   margin: 6px 0 0;
   font-size: 13px;
 }
+
+/* Mentor feedback (D-173): every day column has the same width, like a date picker, so "+1 d" and
+   "+10 d" columns are spaced evenly; labels use tabular figures. */
+.replan__matrix th.replan__day,
+.replan__matrix td.replan__day {
+  width: 44px;
+  min-width: 44px;
+  max-width: 44px;
+  font-variant-numeric: tabular-nums;
+}

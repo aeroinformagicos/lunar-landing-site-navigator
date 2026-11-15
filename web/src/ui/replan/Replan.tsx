@@ -31,9 +31,9 @@ function asScenario(siteRef: string, base: Scenario): Scenario {
 }
 
 /** Base column and, in the guided story, the active column (10 §11, step 4). */
-function colClass(c: number, active: number | null): string | undefined {
-  const cls = [c === 0 ? 'replan__base' : '', c === active ? 'replan__active' : ''].filter(Boolean).join(' ');
-  return cls || undefined;
+function colClass(c: number, active: number | null): string {
+  // Every day column gets `replan__day` so all columns share one width (mentor feedback, D-173).
+  return ['replan__day', c === 0 ? 'replan__base' : '', c === active ? 'replan__active' : ''].filter(Boolean).join(' ');
 }
 
 /** The story's reduced matrix (§6.5: 2 rows, 13 columns). */
@@ -83,7 +83,7 @@ function MatrixRow(props: {
             </td>
           ))
         : Array.from({ length: columns }, (_, c) => (
-            <td key={c} className="replan__cell--loading" aria-hidden="true" />
+            <td key={c} className="replan__day replan__cell--loading" aria-hidden="true" />
           ))}
       {/* T-90 (proposal 5): the answer column stays visible (sticky) while the matrix scrolls. */}
       <td className="replan__window" data-testid="next-window">
