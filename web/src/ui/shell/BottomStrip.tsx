@@ -56,6 +56,8 @@ export function Verdict() {
 
 function Figure({ id, value, share, tone }: { id: 'sunlight' | 'earth_link' | 'longest_night'; value: string; share?: string; tone: 'sun' | 'earth' | 'plain' }) {
   const [help, setHelp] = useState(false);
+  // Mentor feedback (D-176): the explanation also shows on hover and keyboard focus, not only on click.
+  const [peek, setPeek] = useState(false);
   const name = t(`metrics.${id}` as TextKey);
   const number = value.replace(/ h$/, '');
   return (
@@ -76,15 +78,23 @@ function Figure({ id, value, share, tone }: { id: 'sunlight' | 'earth_link' | 'l
         <button
           type="button"
           className="v2-help"
-          aria-expanded={help}
+          aria-expanded={help || peek}
           aria-controls={`v2-help-${id}`}
           aria-label={t('metrics.help_button', { name })}
-          onClick={() => setHelp(!help)}
+          onClick={() => {
+            // Hover or focus shows it; a click pins it, a second click closes it.
+            if (help) setPeek(false);
+            setHelp(!help);
+          }}
+          onMouseEnter={() => setPeek(true)}
+          onMouseLeave={() => setPeek(false)}
+          onFocus={() => setPeek(true)}
+          onBlur={() => setPeek(false)}
         >
           ⓘ
         </button>
       </p>
-      {help && (
+      {(help || peek) && (
         <p id={`v2-help-${id}`} className="v2-fig__help" role="note">
           {t(`metrics.help.${id}` as TextKey)}
         </p>
