@@ -1,0 +1,9 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* Explanation under `Link dates` in the v2 Setup panel (T-90, proposal 7). */
+.field__hint {
+  margin: 4px 0 0;
+  max-width: 34em;
+  color: var(--c-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}

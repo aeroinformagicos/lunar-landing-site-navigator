@@ -45,6 +45,8 @@
   "header.mission": "Mission",
   "header.days": "days",
   "header.link_dates": "Link dates",
+  "header.link_dates_on": "On: a new landing date applies to every scenario (A, B…), so they are compared on the same date. Turn it off to give each scenario its own date.",
+  "header.link_dates_off": "Off: a new landing date applies only to the active scenario. Turn it on to give every scenario the same date.",
   "header.validation": "Validation",
   "header.share": "Share",
   "header.copied": "Link copied",
