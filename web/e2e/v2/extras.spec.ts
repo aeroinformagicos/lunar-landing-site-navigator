@@ -10,7 +10,7 @@ async function openV2(page: Page, query = '?ui=v2&vm=2d') {
 test('(3) Now at site says what the elevations and the margin are measured from', async ({ page }) => {
   await openV2(page);
   const now = page.getByRole('region', { name: 'Now at site A' });
-  await expect(now.getByText('Elevation: angle above the flat horizon of a smooth Moon. Margin: angle above the real horizon, with the terrain.')).toBeVisible({ timeout: 20_000 });
+  await expect(now.getByText('Elevation: above the flat horizon (smooth Moon). Margin: above the real horizon.')).toBeVisible({ timeout: 20_000 });
   await expect(now.locator('.v2-dl__sub')).toHaveText(/^margin [+−-]\d+\.\d\d°$/);
 });
 
@@ -19,9 +19,9 @@ test('(7) Link dates explains that it moves every scenario to the same date', as
   await page.getByRole('button', { name: /^Open Setup · / }).click();
   const box = page.getByRole('checkbox', { name: 'Link dates' });
   await expect(box).toBeChecked();
-  await expect(box).toHaveAccessibleDescription(/applies to every scenario \(A, B…\)/);
+  await expect(box).toHaveAccessibleDescription(/every scenario \(A, B…\) gets the same landing date/);
   await box.uncheck();
-  await expect(box).toHaveAccessibleDescription(/applies only to the active scenario/);
+  await expect(box).toHaveAccessibleDescription(/only the active scenario changes its date/);
   await expect(page.locator('#link-dates-help')).toBeVisible();
 });
 
@@ -32,4 +32,16 @@ test('(8) one line says what the active mode is for, and each mode tab carries i
   await page.getByRole('tab', { name: 'Plan' }).click();
   await expect(page.locator('.v2-modes__help')).toHaveText(/^Plan: /);
   await expect(page.getByRole('tab', { name: 'Learn' })).toHaveAccessibleDescription(/^Learn: a 60-second guided tour/);
+});
+
+test('(4) requirements: explained as editable team defaults, and reachable from the Now panel', async ({ page }) => {
+  await openV2(page);
+  const now = page.getByRole('region', { name: 'Now at site A' });
+  await now.getByRole('button', { name: 'Change requirements' }).click();
+  await expect(page.getByRole('heading', { name: 'Requirements' })).toBeVisible();
+  await expect(page.getByText(/Team defaults, not mission rules: change them here or in Replan/)).toBeVisible();
+  await expect(page.getByRole('checkbox', { name: 'Sun at landing' })).toBeFocused();
+  const night = page.getByRole('spinbutton', { name: 'Longest night allowed (h)' });
+  await night.fill('48');
+  await expect(now.getByText('No night over 48 h')).toBeVisible();
 });

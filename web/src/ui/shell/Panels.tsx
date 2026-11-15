@@ -14,6 +14,7 @@ import { countdownText, requirementChecks } from '../metrics/derive';
 import { ScenarioCard } from '../scenario/ScenarioColumn';
 import { FloatingPanel } from './FloatingPanel';
 import { HorizonDetail } from './HorizonDetail';
+import { openLeftPanel, REQUIREMENTS_FOCUS } from './openPanel';
 import { useActive } from './useActive';
 
 const SitesIcon = (
@@ -89,6 +90,7 @@ export function SetupPanel({ open, onOpenChange }: LeftProps) {
         <h3 id="v2-req-title" className="v2-section__title">
           {t('panel.requirements')}
         </h3>
+        <p className="v2-note">{t('panel.requirements_help')}</p>
         <label className="field__check">
           <input type="checkbox" checked={req.needSunAtLanding} onChange={(e) => setRequirements({ needSunAtLanding: e.target.checked })} />
           {t('req.sun')}
@@ -179,6 +181,11 @@ export function NowPanel() {
             </li>
           ))}
         </ul>
+      )}
+      {!detail && checks.length > 0 && (
+        <Button variant="ghost" onClick={() => openLeftPanel({ which: 'setup', focus: REQUIREMENTS_FOCUS })}>
+          {t('panel.requirements_change')}
+        </Button>
       )}
 
       {now && now.sky.eclipse.kind !== 'none' && (

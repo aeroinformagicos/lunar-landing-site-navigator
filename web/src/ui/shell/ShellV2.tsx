@@ -15,6 +15,7 @@ import { Figures, Provenance, SummaryBlock, TimeBar, Verdict, ViewTabs } from '.
 import { NowPanel, SetupPanel, SitesPanel } from './Panels';
 import { can3d } from '../../state/viewMode';
 import { Minimap } from './Minimap';
+import { onOpenLeftPanel } from './openPanel';
 import { Stage } from './Stage';
 import { Brand, ModeNav, ScenarioPills, ViewToggle } from './TopBar';
 import { ActiveContext, BottomStripContext, useActiveData } from './useActive';
@@ -57,6 +58,16 @@ export default function ShellV2() {
     writePanelOpen('setup', which === 'setup');
   };
   const [welcome, setWelcome] = useState(welcomePending);
+  // T-90 (proposal 4): another panel can open Setup (or Sites) and focus a control in it.
+  useEffect(
+    () =>
+      onOpenLeftPanel(({ which, focus }) => {
+        setLeft(which);
+        if (focus) window.setTimeout(() => document.querySelector<HTMLElement>(focus)?.focus(), 50);
+      }),
+    // `setLeft` only writes state and storage; subscribing once is enough.
+    [],
+  );
 
   const onHelp = useCallback(() => setHelp(true), []);
   // The stage views end where the bottom strip starts: its height is measured, not assumed.
