@@ -186,16 +186,28 @@ export function NowPanel() {
       {!detail && now && <p className="v2-note">{t('now.reference')}</p>}
 
       {!detail && checks.length > 0 && (
-        <ul className="v2-checks" aria-label={t('metrics.status')}>
-          {checks.map((c) => (
-            <li key={c.key} className={c.ok ? 'v2-check v2-check--ok' : 'v2-check v2-check--fail'}>
-              <span className="v2-check__mark" aria-label={c.ok ? 'met' : 'not met'}>
-                {c.ok ? '✓' : '⊗'}
-              </span>
-              {c.ok ? checkLabel(c.key) : t('req.not_met', { req: checkLabel(c.key) })}
-            </li>
+        // Mentor feedback (D-171): requirements split into Met / Not met columns instead of repeating
+        // "not met" on every row.
+        <div className="v2-checks v2-checks--cols" role="group" aria-label={t('metrics.status')}>
+          {([true, false] as const).map((ok) => (
+            <div key={String(ok)} className="v2-checks__col">
+              <p className={ok ? 'v2-checks__head v2-check--ok' : 'v2-checks__head v2-check--fail'}>
+                {t(ok ? 'req.col_met' : 'req.col_not_met')}
+              </p>
+              <ul>
+                {checks.filter((c) => c.ok === ok).map((c) => (
+                  <li key={c.key} className={c.ok ? 'v2-check v2-check--ok' : 'v2-check v2-check--fail'}>
+                    <span className="v2-check__mark" aria-label={c.ok ? 'met' : 'not met'}>
+                      {c.ok ? '✓' : '⊗'}
+                    </span>
+                    {checkLabel(c.key)}
+                  </li>
+                ))}
+                {!checks.some((c) => c.ok === ok) && <li className="v2-check v2-check--none">—</li>}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
       {!detail && checks.length > 0 && (
         <Button variant="ghost" onClick={() => openLeftPanel({ which: 'setup', focus: REQUIREMENTS_FOCUS })}>

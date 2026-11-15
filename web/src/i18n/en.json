@@ -422,6 +422,8 @@
   "now.margin": "margin {margin}",
   "now.reference": "Elevation: above the flat horizon (smooth Moon). Margin: above the real horizon.",
   "req.not_met": "{req} — not met",
+  "req.col_met": "Met",
+  "req.col_not_met": "Not met",
   "summary.more": "More",
   "summary.less": "Less",
   "view.mode": "View mode",

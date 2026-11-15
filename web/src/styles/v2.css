@@ -683,6 +683,32 @@
   font-size: 13px;
 }
 
+.ui-v2 .v2-checks--cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+}
+
+.ui-v2 .v2-checks__col ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ui-v2 .v2-checks__head {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ui-v2 .v2-check--none {
+  color: var(--c-muted);
+}
+
 .ui-v2 .v2-check {
   display: flex;
   align-items: center;
