@@ -2081,6 +2081,13 @@
   .ui-v2 .v2-brand__motto {
     max-width: 230px;
   }
+  /* P-04 (D-160): the central sheet (Compare, Map, Timeline, Replan…) uses the full width under the pills
+     and the Sites / Setup tabs, so Compare shows both columns. */
+  .ui-v2 .v2-sheet {
+    left: var(--gutter);
+    right: var(--gutter);
+    top: calc(var(--top-pills) + 236px);
+  }
 }
 
 /* ---- T-64 (D-120 f): phones (< 768 px) ----
