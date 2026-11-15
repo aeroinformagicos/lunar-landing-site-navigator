@@ -12,6 +12,7 @@ import {
   advanceCursor,
   cursorBounds,
   groupSites,
+  SITE_GROUPS,
   missionTruncated,
   normaliseMissionDays,
   parseCustomCoords,
@@ -104,6 +105,18 @@ describe('site picker (F1): grouped by type, searchable by name', () => {
     expect(g.landed.map((s) => s.id)).toEqual(['blue-ghost-1', 'apollo-11']);
     expect(g.other.map((s) => s.id)).toEqual(['demo-a', 'demo-b']);
     expect(g.candidates).toEqual([]);
+    expect(g.candidates2022).toEqual([]);
+  });
+
+  it('T-91: candidate regions without a box (2022 list) get their own group, in the agreed order', () => {
+    const base = sitesFile.sites[0];
+    const r2024 = { ...base, id: 'region-x', type: 'candidate_region' as const, region_id: 'x' };
+    const r2022 = { ...base, id: 'region2022-y', type: 'candidate_region' as const, region_id: null };
+    const g = groupSites([r2022, r2024, ...sitesFile.sites], '');
+    expect(g.candidates.map((s) => s.id)).toEqual(['region-x']);
+    expect(g.candidates2022.map((s) => s.id)).toEqual(['region2022-y']);
+    expect(SITE_GROUPS).toEqual(['candidates', 'candidates2022', 'landed', 'other']);
+    expect(t('picker.group.candidates2022')).toBe('NASA candidate landing regions near the lunar south pole (2022 list, not kept in 2024)');
   });
 
   it('searches without case or accents', () => {

@@ -75,6 +75,7 @@
   "picker.search": "Search sites",
   "picker.group.landed": "Landed missions",
   "picker.group.candidates": "NASA candidate landing regions near the lunar south pole (2024 list)",
+  "picker.group.candidates2022": "NASA candidate landing regions near the lunar south pole (2022 list, not kept in 2024)",
   "picker.group.other": "Other points",
   "picker.none": "No sites match \"{q}\".",
   "picker.custom": "Custom coordinates",

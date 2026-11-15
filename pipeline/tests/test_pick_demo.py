@@ -266,3 +266,16 @@ def test_cli_without_layers(tmp_path):
 
     assert main(["--data-dir", str(tmp_path), "pick-demo"]) == 1
     assert "pick-demo" in (tmp_path / "out" / "logs" / "pick-demo.log").read_text(encoding="utf-8")
+
+
+def test_region_alternatives_leave_out_the_2022_points(tmp_path):
+    # T-91 (D-122): candidate regions without a box (region_id null) are never demo alternatives, not
+    # even looked up on disk.
+    site = {"id": "region2022-x", "type": "candidate_region", "relief": "lola_polar", "region_id": None}
+    logs: list[str] = []
+    assert demo.region_alternatives({"sites": [site]}, [tmp_path], logs.append) == []
+    assert logs == []
+    # A 2024 region without its file is looked up and reported.
+    site24 = {**site, "id": "region-x", "region_id": "x"}
+    assert demo.region_alternatives({"sites": [site24]}, [tmp_path], logs.append) == []
+    assert len(logs) == 1 and "region-x" in logs[0]
