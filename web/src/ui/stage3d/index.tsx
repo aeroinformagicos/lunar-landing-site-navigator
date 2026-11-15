@@ -49,7 +49,7 @@ import { GROUND, raycastGround, segmentBlocked, type CameraMode, type FlyInput, 
 import { bandBytes, overlayChoices, overlayLutLinear, overlayRamp, shownLayer } from './overlay';
 import { pickTier, TIER_SETTINGS, type Tier } from './quality';
 import { RADIAL_MAX_M, buildRingPanels, ringGroundAt } from './radial';
-import { bodyStatus, describeView, inPolarMesh, pickScene, reliefLine, siteLatLon, type DemStatus, type SceneKind, type Source } from './scenePlan';
+import { bodyStatus, catalogueMarker, describeView, inPolarMesh, pickScene, reliefLine, siteLatLon, type DemStatus, type SceneKind, type Source } from './scenePlan';
 import { Engine, type Ground, type LineItem } from './scene/engine';
 import { litFraction, radialLitFraction } from './shadow';
 import { crestIndices, crestLine, pathOnDome, regionOutline, scaleBar } from './signals';
@@ -829,7 +829,7 @@ export default function Stage3D() {
     if (frame.polar) {
       const used = new Set(scenarios.map((s) => s.siteRef));
       for (const site of sites.sites) {
-        if (used.has(site.id) || site.type === 'candidate_region' || !inPolarMesh(site.lat_deg, site.lon_deg)) continue;
+        if (used.has(site.id) || !catalogueMarker(site) || !inPolarMesh(site.lat_deg, site.lon_deg)) continue;
         const p = pointAt(site.lat_deg, site.lon_deg, groundAt(site.lat_deg, site.lon_deg) + 50);
         if (!p) continue;
         out.push({
