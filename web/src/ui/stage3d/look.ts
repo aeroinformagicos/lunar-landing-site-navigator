@@ -35,6 +35,9 @@ export const LOOK = Object.freeze({
   earthIntensity: 2.2,
   /** Sky objects live on a sphere of this radius around the sky camera. */
   skyRadius: 1000,
+  /** Profile scene: near-site smoothing across azimuth (D-134): arc of the window (m) and its cap (azimuths each side). */
+  profileSmoothArcM: 150,
+  profileSmoothMaxHalf: 24,
   /** Scenario pin mast (m). */
   mastM: 300,
   exposure: 1.0,
