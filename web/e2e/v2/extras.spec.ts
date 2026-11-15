@@ -69,3 +69,18 @@ test('(2) map: the opacity shows its value up to 100 % and is off with the None 
   await page.getByRole('button', { name: 'None', exact: true }).click();
   await expect(slider).toBeDisabled();
 });
+
+test('(6) each open scenario says, in the Sites panel, whether its mission works with its date and the requirements', async ({ page }) => {
+  await openV2(page);
+  await page.getByRole('button', { name: /^Open Sites/ }).click();
+  const card = (id: string) => page.getByRole('article', { name: `Scenario ${id}` });
+  await expect(card('A').getByRole('button', { name: /· (Works|Tight|Doesn't work)$/ })).toBeVisible({ timeout: 30_000 });
+  await expect(card('B').getByRole('button', { name: /· (Works|Tight|Doesn't work)$/ })).toBeVisible({ timeout: 30_000 });
+  // It follows the requirements: with every requirement off and a 400 h night, A works.
+  await page.getByRole('button', { name: /^Open Setup · / }).click();
+  await page.getByRole('checkbox', { name: 'Sun at landing' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Earth contact at landing' }).uncheck();
+  await page.getByRole('spinbutton', { name: 'Longest night allowed (h)' }).fill('400');
+  await page.getByRole('button', { name: /^Open Sites/ }).click();
+  await expect(card('A').getByRole('button', { name: /· Works$/ })).toBeVisible();
+});
