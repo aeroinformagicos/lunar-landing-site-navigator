@@ -96,7 +96,7 @@ export function parseSiteRef(ref: string): SiteRef {
 
 // ---- Site picker (10 §5) -------------------------------------------------------------------
 
-export type SiteGroup = 'landed' | 'candidates' | 'other';
+export type SiteGroup = 'candidates' | 'candidates2022' | 'landed' | 'other';
 
 const GROUP_OF: Record<SiteType, SiteGroup> = {
   landing: 'landed',
@@ -105,16 +105,23 @@ const GROUP_OF: Record<SiteType, SiteGroup> = {
   demo: 'other',
 };
 
-export const SITE_GROUPS: readonly SiteGroup[] = ['landed', 'candidates', 'other'];
+/** Group of a site: candidate regions without a box (`region_id` null) are the 2022 list (T-91, D-122). */
+export function siteGroup(site: Pick<Site, 'type' | 'region_id'>): SiteGroup {
+  if (site.type === 'candidate_region' && site.region_id === null) return 'candidates2022';
+  return GROUP_OF[site.type];
+}
+
+/** Order of the picker groups (T-91): 2024 candidates, 2022 candidates, landed missions, other points. */
+export const SITE_GROUPS: readonly SiteGroup[] = ['candidates', 'candidates2022', 'landed', 'other'];
 
 /** Sites matching `query` (case- and accent-insensitive, on name, short name and mission), by group. */
 export function groupSites(sites: readonly Site[], query: string): Record<SiteGroup, Site[]> {
   const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const q = fold(query.trim());
-  const out: Record<SiteGroup, Site[]> = { landed: [], candidates: [], other: [] };
+  const out: Record<SiteGroup, Site[]> = { candidates: [], candidates2022: [], landed: [], other: [] };
   for (const site of sites) {
     const text = fold(`${site.name} ${site.short_name} ${site.mission ?? ''} ${site.id}`);
-    if (q === '' || text.includes(q)) out[GROUP_OF[site.type]].push(site);
+    if (q === '' || text.includes(q)) out[siteGroup(site)].push(site);
   }
   return out;
 }

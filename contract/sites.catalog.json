@@ -874,6 +874,198 @@
       "note": "One of the NASA candidate landing regions near the lunar south pole (2024 list)."
     },
     {
+      "id": "region2022-faustini-rim-a",
+      "name": "Faustini Rim A",
+      "short_name": "Faustini Rim A",
+      "type": "candidate_region",
+      "lat_deg": -87.88965,
+      "lon_deg": 90.0,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NASA (19 Aug 2022, release 22-089, 13 regions); centre of the region box in LROC QuickMap",
+        "url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole in the August 2022 list, not kept in the 2024 list. The point is the centre of the region."
+    },
+    {
+      "id": "region2022-peak-near-shackleton",
+      "name": "Peak Near Shackleton",
+      "short_name": "Peak nr Shackleton",
+      "type": "candidate_region",
+      "lat_deg": -88.81101,
+      "lon_deg": 123.69009,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NASA (19 Aug 2022, release 22-089, 13 regions); centre of the region box in LROC QuickMap",
+        "url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole in the August 2022 list, not kept in the 2024 list. The point is the centre of the region."
+    },
+    {
+      "id": "region2022-connecting-ridge",
+      "name": "Connecting Ridge",
+      "short_name": "Connecting Ridge",
+      "type": "candidate_region",
+      "lat_deg": -89.46316,
+      "lon_deg": -137.48953,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NASA (19 Aug 2022, release 22-089, 13 regions); centre of the region box in LROC QuickMap",
+        "url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole in the August 2022 list, not kept in the 2024 list. The point is the centre of the region."
+    },
+    {
+      "id": "region2022-connecting-ridge-extension",
+      "name": "Connecting Ridge Extension",
+      "short_name": "Conn. Ridge Ext.",
+      "type": "candidate_region",
+      "lat_deg": -89.03242,
+      "lon_deg": -101.99932,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NASA (19 Aug 2022, release 22-089, 13 regions); centre of the region box in LROC QuickMap",
+        "url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole in the August 2022 list, not kept in the 2024 list. The point is the centre of the region."
+    },
+    {
+      "id": "region2022-de-gerlache-rim-1",
+      "name": "de Gerlache Rim 1",
+      "short_name": "de Gerlache Rim 1",
+      "type": "candidate_region",
+      "lat_deg": -88.68342,
+      "lon_deg": -67.93212,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NASA (19 Aug 2022, release 22-089, 13 regions); centre of the region box in LROC QuickMap",
+        "url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole in the August 2022 list, not kept in the 2024 list. The point is the centre of the region."
+    },
+    {
+      "id": "region2022-de-gerlache-kocher-massif",
+      "name": "de Gerlache-Kocher Massif",
+      "short_name": "Gerlache-Kocher",
+      "type": "candidate_region",
+      "lat_deg": -85.82955,
+      "lon_deg": -116.32203,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NASA (19 Aug 2022, release 22-089, 13 regions); centre of the region box in LROC QuickMap",
+        "url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole in the August 2022 list, not kept in the 2024 list. The point is the centre of the region."
+    },
+    {
+      "id": "region2022-leibnitz-beta-plateau",
+      "name": "Leibnitz Beta Plateau",
+      "short_name": "Leibnitz Beta",
+      "type": "candidate_region",
+      "lat_deg": -85.42658,
+      "lon_deg": 31.74276,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NASA (19 Aug 2022, release 22-089, 13 regions); centre of the region box in LROC QuickMap",
+        "url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole in the August 2022 list, not kept in the 2024 list. The point is the centre of the region."
+    },
+    {
+      "id": "region2022-amundsen-rim",
+      "name": "Amundsen Rim",
+      "short_name": "Amundsen Rim",
+      "type": "candidate_region",
+      "lat_deg": -84.22874,
+      "lon_deg": 69.44395,
+      "mission": null,
+      "operator": null,
+      "landing_utc": null,
+      "landing_date": null,
+      "relief": "lola_polar",
+      "observer_heights_m": [
+        2,
+        10
+      ],
+      "replan_candidate": false,
+      "region_id": null,
+      "source": {
+        "label": "NASA (19 Aug 2022, release 22-089, 13 regions); centre of the region box in LROC QuickMap",
+        "url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+      },
+      "note": "One of the NASA candidate landing regions near the lunar south pole in the August 2022 list, not kept in the 2024 list. The point is the centre of the region."
+    },
+    {
       "id": "val-899s",
       "name": "89.9° S test point",
       "short_name": "89.9° S test point",

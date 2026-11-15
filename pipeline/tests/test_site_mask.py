@@ -31,7 +31,7 @@ from pipeline.common.catalog import (
     sites_by_id,
 )
 from pipeline.dem.grids import SyntheticGrid
-from pipeline.dem.stack import P1_NAME, DemDataMissing, DemStack
+from pipeline.dem.stack import P1_NAME, DemDataMissing, DemStack, polar_xy_m
 from pipeline.horizon import cube, site_mask
 from pipeline.horizon.engine_ref import horizon_mask
 from pipeline.horizon.profile import decode_profile
@@ -42,6 +42,20 @@ R = 1_737_400.0
 
 # --- 04 §2-§4: what the catalog must hold -------------------------------------------------------
 N_LANDINGS, N_REGIONS, N_VALIDATION = 27, 9, 5
+# T-91 (D-122): the 8 regions of NASA's 2022 list not kept in 2024, as points (no region box).
+N_REGIONS_2022 = 8
+# Centre of each 2022 region box drawn in LROC QuickMap (south polar stereographic, R = 1737.4 km):
+# the boxes are squares whose centres fall on these round map coordinates (metres).
+REGION_2022_XY_M = {
+    "region2022-faustini-rim-a": (64_000, 0),
+    "region2022-peak-near-shackleton": (30_000, -20_000),
+    "region2022-connecting-ridge": (-11_000, -12_000),
+    "region2022-connecting-ridge-extension": (-28_700, -6_100),
+    "region2022-de-gerlache-rim-1": (-37_000, 15_000),
+    "region2022-de-gerlache-kocher-massif": (-113_400, -56_100),
+    "region2022-leibnitz-beta-plateau": (73_000, 118_000),
+    "region2022-amundsen-rim": (164_000, 61_500),
+}
 SLDEM_LAT_MAX_DEG = 50.1  # 04 §7: the 300 km circle fits in SLDEM2015
 # 04 §3: x and y of each region (metres, rounded to 10 m in the table).
 REGION_XY_M = {
@@ -60,6 +74,7 @@ FIRST_BATCH = [
     "region-de-gerlache-rim-2", "region-haworth", "region-malapert-massif", "region-mons-mouton",
     "region-mons-mouton-plateau", "region-nobile-rim-1", "region-nobile-rim-2",
     "region-peak-near-cabeus-b", "region-slater-plain",
+    *REGION_2022_XY_M,
     "im-2", "change-7-candidate", "shackleton-floor", "blue-ghost-1", "apollo-11",
 ]
 SECOND_BATCH = ["val-899s", "im-2-planned", "demo-a", "demo-b"]
@@ -92,7 +107,7 @@ def catalog() -> dict:
 def test_catalog_counts_and_unique_ids(catalog):
     types = [s["type"] for s in catalog["sites"]]
     assert types.count("landing") == N_LANDINGS
-    assert types.count("candidate_region") == N_REGIONS
+    assert types.count("candidate_region") == N_REGIONS + N_REGIONS_2022
     assert types.count("validation") == N_VALIDATION
     ids = [s["id"] for s in catalog["sites"]]
     assert len(ids) == len(set(ids))
@@ -146,8 +161,22 @@ def test_catalog_spot_values(catalog):
     assert by_id["chandrayaan-3"]["relief"] == "lola_60s"
     for s in catalog["sites"]:
         if s["type"] == "candidate_region":
-            assert s["replan_candidate"] and s["region_id"] == s["id"].removeprefix("region-")
+            if s["region_id"] is not None:  # 2024 regions: a box, and replanning candidates
+                assert s["replan_candidate"] and s["region_id"] == s["id"].removeprefix("region-")
+            else:  # 2022 points (T-91): no box, never a replanning candidate
+                assert s["id"].startswith("region2022-") and not s["replan_candidate"]
             assert "Artemis" not in s["name"] + s["note"]  # 04 §1, §3
+
+
+def test_catalog_2022_points_sit_at_the_centre_of_their_quickmap_box(catalog):
+    by_id = sites_by_id(catalog)
+    assert [s["id"] for s in catalog["sites"] if s["id"].startswith("region2022-")] == list(REGION_2022_XY_M)
+    for site_id, (x_box, y_box) in REGION_2022_XY_M.items():
+        s = by_id[site_id]
+        assert (s["type"], s["relief"], s["region_id"]) == ("candidate_region", "lola_polar", None)
+        x, y = polar_xy_m(s["lat_deg"], s["lon_deg"])
+        assert abs(x - x_box) <= 1.0 and abs(y - y_box) <= 1.0, site_id  # 5 decimals ≈ 0.3 m at the pole
+        assert s["source"]["url"].startswith("https://www.nasa.gov/")
 
 
 def test_regions_match_the_table_and_fit_in_the_mesh(catalog):
