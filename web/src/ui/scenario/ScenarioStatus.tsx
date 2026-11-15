@@ -13,7 +13,7 @@ import { useAppStore, type Scenario } from '../../state/store';
 import { useScenarioModel } from '../common/model';
 import './scenarioStatus.css';
 
-const ICON: Record<Status, string> = { go: '✓', marginal: '!', no_go: '✕' };
+const ICON: Record<Status, string> = { go: '✓', marginal: '!', no_go: '⊗' };
 
 /** Status of the scenario's mission with the current requirements; null while loading or outside the table. */
 export function useScenarioStatus(sc: Scenario): Status | null {
@@ -32,7 +32,7 @@ export function useScenarioStatus(sc: Scenario): Status | null {
   }, [model, sc.landingUnix, sc.missionDays, req]);
 }
 
-/** `✓` / `!` / `✕` next to a scenario, with the status word for screen readers. */
+/** `✓` / `!` / `⊗` next to a scenario, with the status word for screen readers. */
 export function ScenarioStatus({ scenario }: { scenario: Scenario }) {
   const status = useScenarioStatus(scenario);
   if (!status) return null;

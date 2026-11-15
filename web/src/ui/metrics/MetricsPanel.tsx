@@ -108,7 +108,7 @@ export function MetricsPanel({ model, mission, scenario }: { model: ScenarioMode
           {checks.map((c) => (
             <li key={c.key} className={c.ok ? 'check check--ok' : 'check check--fail'}>
               <span className="check__mark" aria-label={c.ok ? 'met' : 'not met'}>
-                {c.ok ? '✓' : '✕'}
+                {c.ok ? '✓' : '⊗'}
               </span>{' '}
               {checkLabel(c.key)}
             </li>

@@ -22,8 +22,8 @@ for (const [name, query] of [
   test(`T-92 · step 2 contrast in the ${name}`, async ({ page }) => {
     const table = await step2(page, query);
     const cells = (row: string) => table.getByRole('row', { name: new RegExp(`^${row}`) }).locator('td');
-    await expect(cells('Status')).toHaveText([/Works/, /Doesn't work/], { timeout: 20_000 });
-    await expect(cells('Sun now')).toHaveText([/^✓ In view · [\d.]+° above the real horizon$/, /^(✓ In view|✕ Hidden) · /]);
-    await expect(cells('Earth now')).toHaveText([/^✓ In view · [\d.]+° above the real horizon$/, /^✕ Hidden · [\d.]+° below the real horizon$/]);
+    await expect(cells('Status')).toHaveText([/Works/, /Not suitable/], { timeout: 20_000 });
+    await expect(cells('Sun now')).toHaveText([/^✓ In view · [\d.]+° above the real horizon$/, /^(✓ In view|⊗ Hidden) · /]);
+    await expect(cells('Earth now')).toHaveText([/^✓ In view · [\d.]+° above the real horizon$/, /^⊗ Hidden · [\d.]+° below the real horizon$/]);
   });
 }

@@ -51,7 +51,7 @@ test('(5) Replan says what to set, what the columns and icons mean, and answers 
   await page.getByRole('tab', { name: 'Plan' }).click();
   await page.getByRole('tab', { name: 'Replan' }).click();
   await expect(page.getByText(/Each column is a later landing: \+0 is the planned date \(.* UTC\), \+1 d one day later/)).toBeVisible();
-  await expect(page.locator('.replan__legend')).toContainText("✓ Works · ! Tight · ✕ Doesn't work · – no data");
+  await expect(page.locator('.replan__legend')).toContainText("✓ Works · ! Tight · ⊗ Not suitable · – no data");
   await expect(page.getByRole('columnheader', { name: /^When can I land here\?/ })).toBeVisible();
   await expect(page.getByTestId('next-window').first()).toHaveText(/^(Next valid landing window: .* UTC \(.*\)|No valid landing window in the next 90 days\.)$/, { timeout: 30_000 });
 });
@@ -74,8 +74,8 @@ test('(6) each open scenario says, in the Sites panel, whether its mission works
   await openV2(page);
   await page.getByRole('button', { name: /^Open Sites/ }).click();
   const card = (id: string) => page.getByRole('article', { name: `Scenario ${id}` });
-  await expect(card('A').getByRole('button', { name: /· (Works|Tight|Doesn't work)$/ })).toBeVisible({ timeout: 30_000 });
-  await expect(card('B').getByRole('button', { name: /· (Works|Tight|Doesn't work)$/ })).toBeVisible({ timeout: 30_000 });
+  await expect(card('A').getByRole('button', { name: /· (Works|Tight|Not suitable)$/ })).toBeVisible({ timeout: 30_000 });
+  await expect(card('B').getByRole('button', { name: /· (Works|Tight|Not suitable)$/ })).toBeVisible({ timeout: 30_000 });
   // It follows the requirements: with every requirement off and a 400 h night, A works.
   await page.getByRole('button', { name: /^Open Setup · / }).click();
   await page.getByRole('checkbox', { name: 'Sun at landing' }).uncheck();

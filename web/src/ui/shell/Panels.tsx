@@ -169,7 +169,7 @@ export function NowPanel() {
         <p className="v2-now-line">
           <span className="v2-dl__v--sun">☀ {formatDeg(now.sky.sun.elDeg)}</span>
           <span className="v2-dl__v--earth">◐ {formatDeg(now.sky.earth.elDeg)}</span>
-          {checks.some((c) => !c.ok) ? <span className="v2-check--fail">✕ {checks.filter((c) => !c.ok).length}</span> : <span>✓</span>}
+          {checks.some((c) => !c.ok) ? <span className="v2-check--fail">⊗ {checks.filter((c) => !c.ok).length}</span> : <span>✓</span>}
         </p>
       ) : now ? (
         <dl className="v2-dl">
@@ -190,7 +190,7 @@ export function NowPanel() {
           {checks.map((c) => (
             <li key={c.key} className={c.ok ? 'v2-check v2-check--ok' : 'v2-check v2-check--fail'}>
               <span className="v2-check__mark" aria-label={c.ok ? 'met' : 'not met'}>
-                {c.ok ? '✓' : '✕'}
+                {c.ok ? '✓' : '⊗'}
               </span>
               {c.ok ? checkLabel(c.key) : t('req.not_met', { req: checkLabel(c.key) })}
             </li>

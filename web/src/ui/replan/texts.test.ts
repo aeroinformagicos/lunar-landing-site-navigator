@@ -31,8 +31,8 @@ describe('replan texts', () => {
   });
 
   it('cell detail and accessible name', () => {
-    expect(cellDetail(cell(), 24)).toBe('Landing 2027-08-13 06:00 UTC · Sun ✓ · Earth ✓ · Longest night 31 h ✕');
-    expect(cellDetail(cell({ earthAtLanding: false, longestNightH: 7.46 }), 24)).toBe('Landing 2027-08-13 06:00 UTC · Sun ✓ · Earth ✕ · Longest night 7.5 h ✓');
+    expect(cellDetail(cell(), 24)).toBe('Landing 2027-08-13 06:00 UTC · Sun ✓ · Earth ✓ · Longest night 31 h ⊗');
+    expect(cellDetail(cell({ earthAtLanding: false, longestNightH: 7.46 }), 24)).toBe('Landing 2027-08-13 06:00 UTC · Sun ✓ · Earth ⊗ · Longest night 7.5 h ✓');
     expect(cellLabel('Demo A', cell({ status: 'go' }))).toBe('Demo A, landing 2027-08-13 06:00 UTC: Works');
     expect(cellLabel('Demo A', cell({ status: null }))).toBe('Demo A, landing 2027-08-13 06:00 UTC: no data');
   });

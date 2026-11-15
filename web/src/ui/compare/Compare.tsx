@@ -15,7 +15,7 @@ import { bestColumns, commonRange, computeColumn, landingText, NUMERIC_ROWS, typ
 
 type SlotState = { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: ColumnResult };
 
-const STATUS_ICON = { go: '✓', marginal: '!', no_go: '✕' } as const;
+const STATUS_ICON = { go: '✓', marginal: '!', no_go: '⊗' } as const;
 const STATUS_KEY = { go: 'status.go', marginal: 'status.marginal', no_go: 'status.no_go' } as const;
 
 /** Loads one scenario and reports its column (hooks need a fixed component per scenario). */
@@ -62,13 +62,13 @@ function MiniTimeline({ c, t0, t1 }: { c: ColumnResult; t0: number; t1: number }
   );
 }
 
-/** `✓ In view · 1.31° above the real horizon` or `✕ Hidden · 2.10° below the real horizon`. */
+/** `✓ In view · 1.31° above the real horizon` or `⊗ Hidden · 2.10° below the real horizon`. */
 function NowCell({ now }: { now: ColumnResult['sunNow'] }) {
   if (!now) return <td>—</td>;
   const margin = formatDeg(Math.abs(now.marginDeg));
   return (
     <td className={now.visible ? 'compare__now compare__now--in' : 'compare__now compare__now--out'}>
-      <span aria-hidden="true">{now.visible ? '✓' : '✕'}</span> {t(now.visible ? 'compare.in_view' : 'compare.hidden', { margin })}
+      <span aria-hidden="true">{now.visible ? '✓' : '⊗'}</span> {t(now.visible ? 'compare.in_view' : 'compare.hidden', { margin })}
     </td>
   );
 }
