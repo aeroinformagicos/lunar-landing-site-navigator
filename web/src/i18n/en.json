@@ -135,7 +135,7 @@
   "metrics.sun_elevation": "Sun elevation {el}",
   "metrics.disc_visible": "Solar disc visible {pct}",
   "metrics.earth_elevation": "Earth elevation {el} (margin {margin})",
-  "metrics.provenance": "Terrain: {terrain} · Ephemeris: JPL DE440 · Frame: MOON_ME",
+  "metrics.provenance": "Terrain: {terrain} · Ephemeris: JPL DE440",
   "metrics.status": "Requirements",
   "metrics.loading": "Loading…",
   "metrics.outside": "The cursor is outside the ephemeris table.",
