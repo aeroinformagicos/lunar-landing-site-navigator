@@ -726,7 +726,16 @@
 }
 
 .ui-v2 .v2-check--fail {
-  color: var(--c-sun-2);
+  color: var(--c-nogo);
+}
+
+/* Mentor feedback (D-174): one colour code for alerts everywhere — green works / met, yellow tight,
+   red not suitable / not met — always with its icon (✓ ! ⊗) and word, never colour alone. Before,
+   "not suitable" was orange in the ranking and Compare and red in the Replan matrix, and "not met"
+   was amber like "tight". */
+.ui-v2 .compare__status--no_go,
+.ui-v2 .status-chip--no_go {
+  color: var(--c-nogo);
 }
 
 .ui-v2 .v2-eclipse {
