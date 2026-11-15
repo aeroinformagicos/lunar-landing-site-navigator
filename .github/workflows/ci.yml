@@ -1,6 +1,6 @@
 # AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 # CI (docs/spec/02_arquitectura.md §6.1). Runs on every PR and on every push to main;
-# on main it also deploys web/dist to Cloudflare Pages (project aeroinformagicos-llsn).
+# on main it also deploys web/dist to Cloudflare Pages (projects lunarsightline and aeroinformagicos-llsn).
 name: ci
 
 on:
@@ -96,4 +96,6 @@ jobs:
             echo "::warning::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets not set: deploy skipped"
             exit 0
           fi
+          npx wrangler pages deploy dist --project-name lunarsightline --branch main
+          # The first address stays live so earlier links keep working.
           npx wrangler pages deploy dist --project-name aeroinformagicos-llsn --branch main
