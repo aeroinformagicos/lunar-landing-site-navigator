@@ -12,7 +12,9 @@ web app only reads static files, so there is no server to go down.
 
 - **Live app:** <https://aeroinformagicos-llsn.pages.dev>
 - **Heavy map data** (horizon cube, map layers, terrain for the 3D view):
-  <https://aeroinformagicos-llsn-data.pages.dev> (read-only static files, CORS open)
+  <https://aeroinformagicos-llsn-data.pages.dev> (read-only static files, CORS open). The app reads the
+  real map from there (`heavy_base_url` in `web/public/config.json`); the small files in
+  `web/public/data/layers` and `web/public/data/cube` are synthetic sample data for the automated tests.
 - **Previous interface**, kept as a safety net: <https://aeroinformagicos-llsn.pages.dev/?ui=v1>
 - **How we check the numbers:** <https://aeroinformagicos-llsn.pages.dev/#/validation>
 
@@ -51,7 +53,7 @@ checks three requirements, all **editable in the Replan tab**:
 - **no night lasts more than 24 h** during the mission (editable from 0 to 400 h).
 
 The 24 h limit is a team default chosen to make differences between nearby sites visible, not a
-rule of any mission. For reference, NASA chose the Artemis III candidate regions for access to
+rule of any mission. For reference, in 2022 NASA chose the candidate regions then planned for Artemis III for access to
 continuous sunlight over a 6.5-day period (NASA, 19 August 2022), a figure later refined to about
 5.75–6.25 days depending on the mission epoch (NASA Technical Reports Server, 20250011660). Set the
 limit that matches your own mission.
@@ -150,8 +152,8 @@ ground; "Sun" and "Earth contact" mean the **centre** of the disc above the real
 ## Validation
 
 The validation page of the app (`#/validation`) is generated from the automated test report
-(`web/public/data/validation_report.json`: 21 checks; 11 pass, 1 needs a person's judgement and 9 are
-not automated). It opens with three checks against independent sources:
+(`web/public/data/validation_report.json`: 21 checks; 11 pass, 2 need a person's judgement, one of them
+an open discrepancy, and 8 are not automated). It opens with three checks against independent sources:
 
 - **Sun and Earth positions vs JPL Horizons:** 256 azimuth and elevation values (8 sites × 8 dates);
   largest difference 0.000025° (tolerance 0.02°).
@@ -177,9 +179,12 @@ interface figures against the Python reference, run with `make test-all`.
   240 days, same order) but a longest night of 11.25 days against about 1.5 days published. The check
   is shown as "Manual", not as a pass. Our maps use one horizon per 500 m cell at 2 m height; the
   published figure is for the best points at the scale of the LOLA grid.
-- **Terrain away from the poles is not checked against an observed event.** Firefly published no
-  sunset time for Blue Ghost 1, only when the last data arrived, and the result there depends on
-  relief smaller than the 59 m terrain map can resolve. That check was retired.
+- **The only observed event away from the poles, the Blue Ghost 1 sunset (16 March 2025), differs from
+  our prediction by about 40 minutes.** Firefly gives no exact time, only that the last data arrived
+  around 23:15 UTC, "just over 5 hours into the lunar night", which puts sunset around 18:00–18:15 UTC;
+  our model has the centre of the Sun on the horizon at 18:54 UTC. The horizon there is an 11 m rise
+  800 m away, smaller than the 59 m terrain map can resolve: moving the site by one pixel moves our
+  sunset by up to 51 minutes. The validation page shows it as an open discrepancy, not as a pass.
 - **The 3D view is illustrative:** the terrain is the 500 m polar grid (or, away from the pole, a
   reconstruction from the site's horizon profile); every figure comes from the horizon calculation,
   not from the 3D scene. Beyond the mapped area the 3D view shows a smooth Moon and says so.
