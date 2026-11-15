@@ -63,7 +63,7 @@ test('(2) map: the opacity shows its value up to 100 % and is off with the None 
   await expect(slider).toBeEnabled({ timeout: 20_000 });
   await slider.focus();
   await page.keyboard.press('End');
-  await expect(slider).toHaveValue('1');
+  await expect(slider).toHaveValue('100'); // D-152: 0–100 scale
   await expect(slider).toHaveAttribute('aria-valuetext', '100 %');
   await expect(page.locator('.map__opacity-value')).toHaveText('100 %');
   await page.getByRole('button', { name: 'None', exact: true }).click();
