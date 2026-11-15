@@ -1731,6 +1731,16 @@
   bottom: calc(var(--bottom-h, 200px) + 8px);
 }
 
+/* P-11 (D-153): in Learn the central sheet and the right panel end above the story card (its height is
+   measured into --story-h) and scroll inside, so the card never hides what the step explains. */
+.ui-v2 .v2--learn .v2-sheet {
+  bottom: calc(var(--bottom-h, 200px) + var(--story-h, 0px) + 16px);
+}
+
+.ui-v2 .v2--learn .v2-right {
+  max-height: calc(100vh - 130px - var(--bottom-h, 200px) - var(--story-h, 0px) - 16px);
+}
+
 /* ---- Phones (< 768 px): one column, 2D, panels inline (15 §9, simplified, D-112) ---- */
 @media (max-width: 767px) {
   .ui-v2 {
@@ -2263,5 +2273,25 @@
   .ui-v2 .v2-power .v2-fig__unit {
     display: block;
     font-size: 12px;
+  }
+}
+
+/* P-11 (D-153), phones: the story card is pinned to the bottom of the screen at full width and the page
+   keeps room for it below its last line, so everything the step explains can be scrolled above the card. */
+@media (max-width: 767px) {
+  .ui-v2 .story {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--time-h, 150px);
+    z-index: 31;
+    width: auto;
+    transform: none;
+    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+    max-height: 40svh;
+    overflow: auto;
+  }
+  .ui-v2 .v2--learn {
+    padding-bottom: calc(var(--time-h, 150px) + var(--story-h, 0px) + 16px);
   }
 }

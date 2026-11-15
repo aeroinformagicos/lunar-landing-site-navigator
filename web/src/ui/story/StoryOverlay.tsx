@@ -114,6 +114,31 @@ export function StoryOverlay() {
     return () => window.removeEventListener('keydown', onKey);
   }, [mode, next, back]);
 
+  // P-11 (D-153): the card's height goes to `--story-h`, so the view above it ends where the card starts
+  // and scrolls inside instead of hiding its last rows (styles in v2.css).
+  const storyObs = useRef<ResizeObserver | null>(null);
+  const cardRef = useCallback((el: HTMLDivElement | null) => {
+    storyObs.current?.disconnect();
+    storyObs.current = null;
+    const root = document.documentElement;
+    if (!el) {
+      root.style.removeProperty('--story-h');
+      root.style.removeProperty('--time-h');
+      return;
+    }
+    const set = () => {
+      root.style.setProperty('--story-h', `${Math.ceil(el.getBoundingClientRect().height)}px`);
+      // Phones: the time bar is fixed at the bottom; the card sits right above it (v2.css).
+      const bar = document.querySelector('.v2-time');
+      root.style.setProperty('--time-h', `${bar ? Math.ceil(bar.getBoundingClientRect().height) : 0}px`);
+    };
+    set();
+    if (typeof ResizeObserver !== 'undefined') {
+      storyObs.current = new ResizeObserver(set);
+      storyObs.current.observe(el);
+    }
+  }, []);
+
   if (mode !== 'learn' || step === null) return null;
 
   function explore() {
@@ -132,7 +157,7 @@ export function StoryOverlay() {
   const last = step === STORY_LENGTH - 1;
 
   return (
-    <div className="story" role="region" aria-label={t('story.label')}>
+    <div ref={cardRef} className="story" role="region" aria-label={t('story.label')}>
       <p className="story__text" aria-live="polite" data-testid="story-text">
         {storySteps[step].text(ctx)}
       </p>
