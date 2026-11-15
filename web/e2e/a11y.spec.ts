@@ -43,7 +43,7 @@ test.describe('mobile profile 390 × 844 (10 §3.2)', () => {
 
   test('Explore: every tab without horizontal scroll and with 44 px targets', async ({ page }) => {
     await open(page);
-    await expect(page.getByRole('link', { name: 'Moon Site Navigator' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Lunar Sightline' })).toBeVisible();
     for (const name of VIEW_TABS) {
       await openTab(page, name);
       expect(await horizontalScroll(page), name).toBe(0);

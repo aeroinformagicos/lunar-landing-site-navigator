@@ -23,7 +23,7 @@ test('opens with the demo pair; the example banner follows the manifest', async 
 
 test('keyboard: Tab reaches the header, the cards and the tabs; shortcuts work', async ({ page, request }) => {
   const { landingUnix } = await sitesInfo(request);
-  await page.getByRole('link', { name: 'Lunar Landing Site Navigator' }).focus();
+  await page.getByRole('link', { name: 'Lunar Sightline' }).focus();
   const seen: string[] = [];
   for (let i = 0; i < 40; i++) {
     await page.keyboard.press('Tab');

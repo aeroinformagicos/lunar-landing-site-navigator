@@ -1,6 +1,6 @@
 {
-  "app.title": "Lunar Landing Site Navigator",
-  "app.title_short": "Moon Site Navigator",
+  "app.title": "Lunar Sightline",
+  "app.title_short": "Lunar Sightline",
   "app.tagline": "Compare Moon landing sites and dates by when the Sun (power) and Earth (radio contact) are above the real horizon.",
   "mode.label": "Mode",
   "mode.explore": "Explore",

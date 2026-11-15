@@ -155,7 +155,7 @@ test('the URL follows the state and the title link brings back the clean URL', a
   await page.goBack();
   await ready(page);
   await expect(page.getByRole('tab', { name: 'Timeline' })).toHaveAttribute('aria-selected', 'true');
-  await page.getByRole('link', { name: 'Lunar Landing Site Navigator' }).click();
+  await page.getByRole('link', { name: 'Lunar Sightline' }).click();
   await expect(page.getByRole('tab', { name: 'Panorama' })).toHaveAttribute('aria-selected', 'true');
   await expect.poll(() => new URL(page.url()).hash).toBe('');
 });

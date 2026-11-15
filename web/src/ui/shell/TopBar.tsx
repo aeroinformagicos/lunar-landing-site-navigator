@@ -29,12 +29,11 @@ export function Brand({ onReset }: { onReset: () => void }) {
         }}
       >
         <Emblem size={48} />
-        {/* The accessible name is the visible text plus the full title (label in name, B9). */}
+        {/* The accessible name is the visible text: brand and motto (label in name, B9; D-182). */}
         <span className="v2-brand__text">
           <span className="v2-brand__name">{t('app.brand')}</span>
           <span className="v2-brand__motto">{t('app.motto')}</span>
         </span>
-        <span className="visually-hidden"> — {t('app.title')}</span>
       </a>
       <span id="v2-tagline" className="visually-hidden">
         {t('app.tagline')}
