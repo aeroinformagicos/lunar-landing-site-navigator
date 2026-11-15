@@ -103,7 +103,7 @@ export const MAX_LABELS = 14;
 /** Rough box of a label for the overlap test (no layout reads per frame). */
 function boxOf(l: LabelView, x: number, y: number): [number, number, number, number] {
   if (l.kind === 'bead') return [x, y, x, y];
-  const w = l.kind === 'pin' ? 56 + 8 * l.text.length : 24 + 7.5 * Math.max(l.text.length, (l.sub ?? '').length);
+  const w = l.kind === 'pin' ? 56 + Math.min(200, 8 * l.text.length) : 24 + 7.5 * Math.max(l.text.length, (l.sub ?? '').length);
   const h = l.kind === 'pin' ? 56 : l.sub ? 40 : 28;
   return [x - 22, y - h / 2, x - 22 + w, y + h / 2];
 }

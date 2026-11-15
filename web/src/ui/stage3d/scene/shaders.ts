@@ -233,7 +233,9 @@ void main() {
   float fade = 1.0 - smoothstep(0.85 * halfAngle, halfAngle, r);
   c += haloColour * haloStrength * exp(-r / haloScale) * fade;
   // White core glow just outside the disc, and four thin glare spikes (lens-like, decorative).
-  c += discColour * 1.6 * exp(-max(r - rho, 0.0) / (rho * 0.9)) * (1.0 - disc);
+  // D-154: the glow also fades out before the edge of the quad, or the low tier (no halo, small quad)
+  // shows the quad itself as a white square.
+  c += discColour * 1.6 * exp(-max(r - rho, 0.0) / (rho * 0.9)) * (1.0 - disc) * fade;
   vec2 q = abs(vUv * 2.0 - 1.0) * halfAngle;
   float spike = exp(-min(q.x, q.y) / (rho * 0.08)) * exp(-max(q.x, q.y) / (halfAngle * 0.35));
   c += discColour * spikes * spike * fade;
