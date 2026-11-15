@@ -22,6 +22,7 @@ import { useScenarioModel } from '../common/model';
 import { loadCellMask, loadLayer, meshPointLabel, NotComputed, type Band, type LayersInfo, type LayerPeriod } from '../map/mapData';
 import { bodyTrace, pointerReadout, ridgeLabel } from '../panorama/texts';
 import { startOrbit, wrapDeg } from './camera';
+import { LOOK } from './look';
 import { Controls, type GoToItem, type LiveRefs, type OverlayControl } from './Controls';
 import {
   POLAR_FRAME,
@@ -54,6 +55,7 @@ import { Engine, type Ground, type LineItem } from './scene/engine';
 import { litFraction, radialLitFraction } from './shadow';
 import { crestIndices, crestLine, pathOnDome, regionOutline, scaleBar } from './signals';
 import {
+  exaggeratedGround,
   loadPolarDem,
   meshJob,
   polarGround,
@@ -62,6 +64,8 @@ import {
   profileHeightFn,
   radialGround,
   radialHeights,
+  realHeight,
+  shownHeight,
   sphereGround,
   type TerrainHeights,
 } from './terrain';
@@ -111,6 +115,19 @@ function urlParam(name: string): string | null {
  * another tab opens, and the store keeps no 3D state (§10.2).
  */
 const overlaySession = { on: false };
+
+/** Vertical exaggeration choices of the drawn relief (T-74, D-131); the first one after ×1 is the default. */
+export const EXAGGERATIONS = [1, 2, 3] as const;
+const EXAG_KEY = 'llsn.stage3d.exag';
+const DEFAULT_EXAG = 2;
+function readExag(): number {
+  try {
+    const v = Number(localStorage.getItem(EXAG_KEY));
+    return (EXAGGERATIONS as readonly number[]).includes(v) ? v : DEFAULT_EXAG;
+  } catch {
+    return DEFAULT_EXAG;
+  }
+}
 
 const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -192,6 +209,21 @@ export default function Stage3D() {
     setOverlayOnState(on);
   }, []);
   const [camMode, setCamMode] = useState<CameraMode>('orbit');
+  /** Exaggeration chosen in the controls; Ground always draws the true scale (D-131). */
+  const [exagPick, setExagPickState] = useState(readExag);
+  const setExagPick = useCallback((k: number) => {
+    setExagPickState(k);
+    try {
+      localStorage.setItem(EXAG_KEY, String(k));
+    } catch {
+      /* private mode: the choice is not remembered */
+    }
+  }, []);
+  const exag = camMode === 'ground' ? 1 : exagPick;
+  const exagRef = useRef(exag);
+  exagRef.current = exag;
+  /** The scene's ground at true scale; `groundRef` holds it as drawn (exaggerated). */
+  const baseGroundRef = useRef<Ground | null>(null);
   const [fpsText, setFpsText] = useState<string | null>(null);
   const [desc, setDesc] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -357,9 +389,11 @@ export default function Stage3D() {
     if (shownGroup !== sceneGroup) return;
     let alive = true;
     const setGround = (g: Ground, h: TerrainHeights | null) => {
-      groundRef.current = g;
+      baseGroundRef.current = g;
       terrRef.current = h;
-      engine.setGround(g);
+      const shown = exaggeratedGround(engine.sceneFrame(), g, exagRef.current);
+      groundRef.current = shown;
+      engine.setGround(shown);
     };
     /** A bare sphere around `f` while the scene's data loads: never an empty view (§13). */
     const placeholder = (f: SceneFrame) => {
@@ -428,6 +462,21 @@ export default function Stage3D() {
     // `built` is read to skip a rebuild of the same scene; listing it would loop.
   }, [engineReady, engineKey, kind, sceneKey, sceneGroup, shownGroup, pick?.pending, demRes, profileRes, mask, lod]);
 
+  // Vertical exaggeration (D-131): the drawn mesh, the ground of the cameras and the orbit target follow it.
+  useEffect(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    engine.setExaggeration(exag);
+    const base = baseGroundRef.current;
+    if (!base) return;
+    const shown = exaggeratedGround(engine.sceneFrame(), base, exag);
+    groundRef.current = shown;
+    engine.setGround(shown);
+    const goal = engine.getOrbit();
+    if (goal && engine.getMode() === 'orbit') engine.setOrbit({ ...goal, target: shown.surface(goal.target) }, false);
+    occludedAt.current = 0;
+  }, [exag, built, engineReady]);
+
   // A lower tier after slow frames (§12.2): new level of detail and shadow resolution.
   const lastTier = useRef(tier);
   useEffect(() => {
@@ -487,16 +536,22 @@ export default function Stage3D() {
   );
   /** Terrain height (m) under a latitude and longitude in the current scene. */
   const groundAt = useCallback(
-    (latDeg: number, lonDeg: number): number => (frame && terrRef.current ? terrRef.current.heightAt(latDeg, lonDeg) : 0),
+    (latDeg: number, lonDeg: number): number => (frame && terrRef.current ? shownHeight(frame, exag, terrRef.current.heightAt(latDeg, lonDeg)) : 0),
     // `built` changes when the scene's heights arrive.
-    [frame, built],
+    [frame, built, exag],
   );
   /** The observer's eye at the active site (§7.3): terrain or mask height + observer height. */
   const eye = useMemo((): V3 | null => {
     if (!loc || !frame) return null;
-    const siteH = mask ? mask.siteHeightM : 0;
+    const siteH = mask ? shownHeight(frame, exag, mask.siteHeightM) : 0;
     return pointAt(loc.latDeg, loc.lonDeg, Math.max(groundAt(loc.latDeg, loc.lonDeg), siteH) + active.observerHeightM);
-  }, [loc, frame, mask, pointAt, groundAt, active.observerHeightM]);
+  }, [loc, frame, mask, pointAt, groundAt, active.observerHeightM, exag]);
+  /** Drawn height of the polar terrain at a map point (exaggerated like the mesh). */
+  const polarH = useCallback(
+    (x: number, y: number): number => (heightsRef.current ? shownHeight(POLAR_FRAME, exag, polarHeightAt(heightsRef.current, x, y)) : 0),
+    // `built` changes when the polar heights arrive.
+    [exag, built],
+  );
   const dirOf = useCallback(
     (azDeg: number, elDeg: number): V3 => (frame && loc ? dirToScene(frame, azDeg, elDeg, loc.latDeg, loc.lonDeg) : [0, 1, 0]),
     [frame, loc],
@@ -553,8 +608,11 @@ export default function Stage3D() {
     const other = scenarios.find((x) => x.id !== active.id);
     const ol = other ? siteLatLon(other.siteRef, sites.sites) : null;
     const sep = ol ? surfaceDistanceM(loc.latDeg, loc.lonDeg, ol.latDeg, ol.lonDeg) : null;
-    return startOrbit(target, focusAz(), sep);
-  }, [frame, loc, scenarios, active.id, sites.sites, focusAz, pointAt, groundAt]);
+    // Side light (T-74, D-132): with the Sun in focus the first framing and Recenter look 65° away
+    // from it, so the grazing light rakes across the relief instead of silhouetting it. Centre on Sun
+    // and the guided story still look straight at the Sun.
+    return startOrbit(target, focusAz() + (focusBody === 'sun' ? LOOK.crossLightDeg : 0), sep);
+  }, [frame, loc, scenarios, active.id, sites.sites, focusAz, pointAt, groundAt, focusBody]);
 
   const changeMode = useCallback(
     (m: CameraMode) => {
@@ -645,9 +703,10 @@ export default function Stage3D() {
   const blockerPoint = useCallback(
     (lat: number, lon: number, h: number, liftM: number): V3 | null => {
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
-      return pointAt(lat, lon, (Number.isFinite(h) ? Math.max(h, groundAt(lat, lon)) : groundAt(lat, lon)) + liftM);
+      const shown = frame && Number.isFinite(h) ? shownHeight(frame, exag, h) : Number.NaN;
+      return pointAt(lat, lon, (Number.isFinite(shown) ? Math.max(shown, groundAt(lat, lon)) : groundAt(lat, lon)) + liftM);
     },
-    [pointAt, groundAt],
+    [pointAt, groundAt, frame, exag],
   );
 
   /**
@@ -679,14 +738,14 @@ export default function Stage3D() {
     if (!engine || !frame) return;
     const c = colours;
     const regionLines: LineItem[] = regions.map((r) => ({
-      points: regionOutline(r.box_m, (x, y, lift) => mapToScene(x, y, (heightsRef.current ? polarHeightAt(heightsRef.current, x, y) : 0) + lift)),
+      points: regionOutline(r.box_m, (x, y, lift) => mapToScene(x, y, polarH(x, y) + lift)),
       colour: c.text,
       widthPx: 1.5,
       opacity: 0.55,
       dash: r.status && r.status !== 'candidate_2024' ? ([400, 250] as [number, number]) : undefined,
     }));
     engine.setLines('regions', regionLines);
-  }, [regions, frame, built, colours, engineReady]);
+  }, [regions, frame, built, colours, engineReady, polarH]);
 
   useEffect(() => {
     const engine = engineRef.current;
@@ -813,7 +872,7 @@ export default function Stage3D() {
     for (const r of regions) {
       const cx = (r.box_m[0] + r.box_m[2]) / 2;
       const cy = (r.box_m[1] + r.box_m[3]) / 2;
-      const h = heightsRef.current ? polarHeightAt(heightsRef.current, cx, cy) : 0;
+      const h = polarH(cx, cy);
       out.push({
         key: `region:${r.id}`,
         kind: 'region',
@@ -856,7 +915,7 @@ export default function Stage3D() {
       }
     }
     return out;
-  }, [frame, pinBases, active.id, camMode, sites.sites, sky, mask, focusBody, crestPointAt, regions, scenarios, pointAt, groundAt, paths, eye, dirOf, setActiveScenario, updateScenario]);
+  }, [frame, pinBases, active.id, camMode, sites.sites, sky, mask, focusBody, crestPointAt, regions, scenarios, pointAt, groundAt, paths, eye, dirOf, setActiveScenario, updateScenario, polarH]);
   labelsRef.current = labels;
   useEffect(() => {
     occludedAt.current = 0;
@@ -877,7 +936,7 @@ export default function Stage3D() {
     const cy = (r.box_m[1] + r.box_m[3]) / 2;
     const size = Math.max(r.box_m[2] - r.box_m[0], r.box_m[3] - r.box_m[1]);
     const goal = engine.getOrbit();
-    const target = mapToScene(cx, cy, heightsRef.current ? polarHeightAt(heightsRef.current, cx, cy) : 0);
+    const target = mapToScene(cx, cy, polarH(cx, cy));
     if (engine.getMode() === 'ground') changeMode('orbit');
     engine.goTo({ target, headingDeg: goal?.headingDeg ?? focusAz(), pitchDeg: 35, distM: Math.max(8000, size * 1.6) });
   };
@@ -896,12 +955,12 @@ export default function Stage3D() {
           const engine = engineRef.current;
           if (!engine) return;
           if (engine.getMode() === 'ground') changeMode('orbit');
-          engine.goTo({ target: mapToScene(0, 0, heightsRef.current ? polarHeightAt(heightsRef.current, 0, 0) : 0), headingDeg: 0, pitchDeg: 40, distM: 60_000 });
+          engine.goTo({ target: mapToScene(0, 0, polarH(0, 0)), headingDeg: 0, pitchDeg: 40, distM: 60_000 });
         },
       });
     }
     return items;
-  }, [scenarios, sites.sites, active.id, regions, frame, recenter, setActiveScenario, changeMode]);
+  }, [scenarios, sites.sites, active.id, regions, frame, recenter, setActiveScenario, changeMode, polarH]);
 
   const northUp = useCallback(() => {
     const engine = engineRef.current;
@@ -988,7 +1047,8 @@ export default function Stage3D() {
             const hit = raycastGround(o, d, (p) => g.clearance(p));
             if (hit && ctx.frame) {
               const ll = meToLatLonH(fromScene(ctx.frame, hit));
-              const hm = Math.round(ll.hM);
+              // The ray hits the drawn (exaggerated) relief: the readout gives the real height (D-131).
+              const hm = Math.round(realHeight(ctx.frame, exagRef.current, ll.hM));
               text = `${formatLatLon(ll.latDeg, ll.lonDeg, 3)} · ${hm > 0 ? '+' : ''}${formatInt(hm)} m`;
             }
           }
@@ -1330,6 +1390,7 @@ export default function Stage3D() {
         fps={fpsText}
         live={live}
         polar={frame?.polar === true}
+        exaggeration={kind && kind !== 'smooth' ? { value: exagPick, choices: EXAGGERATIONS, onPick: setExagPick } : null}
       />
     </div>
   );
