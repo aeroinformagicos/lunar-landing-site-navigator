@@ -493,6 +493,13 @@ input[aria-invalid='true'] {
   fill: rgb(255 255 255 / 4%);
 }
 
+/* P-09 (D-157): outline of the whole plot (time axis before, during and after the mission). */
+.timeline__frame {
+  fill: none;
+  stroke: var(--c-border-strong);
+  stroke-width: 1;
+}
+
 .timeline__zero {
   stroke: var(--c-text-muted);
   stroke-width: 1;

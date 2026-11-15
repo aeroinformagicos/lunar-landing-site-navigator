@@ -16,7 +16,7 @@ import type { MissionResult } from '../metrics/useMission';
 import { barSegments, cursorFromX, dayTicks, elevationDomain, eventLabel, timeScale } from './scale';
 
 const H = 360;
-const PAD_L = 44;
+const PAD_L = 62; // P-09 (D-157): room for «-21.17°» (was 44: the minus sign was cut off)
 const PAD_R = 12;
 const PLOT_TOP = 10;
 const PLOT_H = 200;
@@ -215,6 +215,8 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
             <rect key={`t${tw.startUnix}`} x={x.x(tw.startUnix)} y={PLOT_TOP} width={Math.max(2, x.x(tw.endUnix) - x.x(tw.startUnix))} height={PLOT_H} fill="var(--c-eclipse)" opacity={0.35} data-testid="totality-band" />
           ))}
           {/* Mission zone */}
+          {/* P-09 (D-157): the plot frame covers the whole time axis, so the curves before and after the mission stay inside the chart. */}
+          <rect x={PAD_L} y={PLOT_TOP} width={Math.max(0, width - PAD_R - PAD_L)} height={PLOT_H} className="timeline__frame" />
           <rect x={x.x(scenario.landingUnix)} y={PLOT_TOP} width={x.x(end) - x.x(scenario.landingUnix)} height={PLOT_H} className="timeline__mission" />
           {/* 0° line and elevation labels */}
           {y0 >= PLOT_TOP && y0 <= PLOT_TOP + PLOT_H && <line x1={PAD_L} x2={width - PAD_R} y1={y0} y2={y0} className="timeline__zero" />}
