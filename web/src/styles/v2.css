@@ -932,6 +932,10 @@
 
 .ui-v2 .v2-summary {
   max-width: 560px;
+  /* Mentor feedback (D-175): a little more air and letter spacing in the main sentence. */
+  margin-top: 6px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
 
 .ui-v2 .v2-summary .summary {

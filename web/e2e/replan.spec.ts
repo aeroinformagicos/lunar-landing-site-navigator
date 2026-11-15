@@ -35,7 +35,7 @@ test('keyboard: arrows move the active cell, Enter selects it and sets the landi
   await page.keyboard.press('ArrowDown');
   await expect(page.locator('[data-cell="1-2"]')).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(page.getByTestId('cell-detail')).toHaveText(new RegExp(`^B · ${re(pair[1].short_name)} · Landing ${utc(landingUnix + 2 * DAY)} UTC · Sun [✓✕] · Earth [✓✕] · Longest night [\\d.]+ h [✓✕]$`));
+  await expect(page.getByTestId('cell-detail')).toHaveText(new RegExp(`^B · ${re(pair[1].short_name)} · Landing ${utc(landingUnix + 2 * DAY)} UTC · Sun [✓⊗] · Earth [✓⊗] · Longest night [\\d.]+ h [✓⊗]$`));
   await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText(`Landing ${utc(landingUnix + 2 * DAY)} UTC`);
 });
 
