@@ -35,7 +35,7 @@ function useBlockerDist(): number | null {
     if (model.status !== 'ready' || model.data.smooth) return null;
     const { table, frame, mask } = model.data;
     if (!findSegment(table, scenarioB.landingUnix)) return null;
-    const b = blockerAt(mask, skyAt(table, frame, scenarioB.landingUnix).sun.azDeg);
+    const b = blockerAt(mask, skyAt(table, frame, scenarioB.landingUnix).earth.azDeg);
     return Number.isFinite(b.distM) ? b.distM : null;
   }, [model, scenarioB]);
 }

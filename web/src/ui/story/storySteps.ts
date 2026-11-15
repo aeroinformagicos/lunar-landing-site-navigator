@@ -117,10 +117,14 @@ export const storySteps: StoryStep[] = [
   },
   {
     seconds: [18, 27],
-    apply: (ctx) => ({ ...base(ctx, 2), activeScenarioId: 'B', tab: 'section', focusBody: 'sun' }),
+    // P-02 (D-150): at the published B the Sun is up at landing; what is missing is the Earth, hidden by
+    // the slope the lander stands on (blocking point 0.0 km). The step shows the profile toward Earth.
+    apply: (ctx) => ({ ...base(ctx, 2), activeScenarioId: 'B', tab: 'section', focusBody: 'earth' }),
     view: main,
     text: (ctx) =>
-      `Here is why: a ridge ${ctx.blockerDistM !== null ? storyDistance(ctx.blockerDistM) : 'nearby'} away blocks the Sun. Every answer comes with its reason.`,
+      ctx.blockerDistM !== null && ctx.blockerDistM >= 1000
+        ? `Here is why: a ridge ${storyDistance(ctx.blockerDistM)} away hides the Earth, so there is no direct radio link. Every answer comes with its reason.`
+        : 'Here is why: the ground right around the lander hides the Earth, so there is no direct radio link. Every answer comes with its reason.',
   },
   {
     seconds: [27, 37],
