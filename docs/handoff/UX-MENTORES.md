@@ -48,3 +48,14 @@ Sol cuadrado en 3D, botón Apply de la fecha y P-04, P-05, P-06, P-07, P-08, P-0
   estos cambios** (comprobado en un worktree aparte): `story.spec.ts` (texto del paso 3, P-02),
   `validation.spec.ts:38` («Manual» en A3, D-151) y dos de `stage3d-scenes.spec.ts` (3D intermitente).
   No son de esta tarea; quedan para quien lleve P-02 / D-151 / 3D.
+
+## Segunda ronda (12:30, equipo y diseñadora de UI)
+
+| Petición | Estado | Qué se hizo | Decisión |
+| --- | --- | --- | --- |
+| Primera pantalla 3D menos cargada | Hecho | Los controles 3D empiezan plegados (un botón «3D controls»); se recuerda si el usuario los abre. Las e2e los abren por `storageState`. | D-177 |
+| Pie ilegible sobre el terreno 3D e innecesario | Hecho | Fuera la línea técnica «Terrain … · Ephemeris …» (sigue en los controles 3D, «More», v1 y Validation). Créditos y nota de IA se quedan, en una línea con fondo oscuro. | D-178 |
+| Replan como barras de calendario (tipo Airbnb) | Hecho | Días que sirven (✓ / !) unidos en una barra redondeada por tramo; los que no sirven, ⊗ rojo pequeño sin bloque. Mismos botones, etiquetas y teclado. | D-179 |
+| ¿Contraste aplicado? | Comprobado | Medido en 2D: AA sin fallos. En 3D el problema era el pie sobre el terreno iluminado: resuelto con D-178. | — |
+
+*Decidido por Claude Code por delegación de I2* (D-177, D-178, D-179).
