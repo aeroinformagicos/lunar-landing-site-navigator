@@ -42,3 +42,9 @@ Sol cuadrado en 3D, botón Apply de la fecha y P-04, P-05, P-06, P-07, P-08, P-0
 - Antes de cada commit: `npx vitest run` (440/440) y `tsc --noEmit` (la parte web; los cambios no tocan Python).
   `make test` completo tarda ~3 min (P-18), así que se pasó al principio y al final.
 - Pruebas e2e actualizadas a «Not suitable» y ⊗: `b2`, `replan`, `v2/demo-pair`, `v2/extras`, `v2/shell`.
+- Al final: `make check` en verde; `make test` en verde (las dos pruebas de tiempo `budgets.perf` solo fallan
+  si se ejecutan a la vez que las e2e, por carga de CPU; solas pasan 5/5).
+- e2e completas (`npx playwright test`): 135 pasan, 4 fallan, y **las mismas 4 fallan en `8fa670c`, antes de
+  estos cambios** (comprobado en un worktree aparte): `story.spec.ts` (texto del paso 3, P-02),
+  `validation.spec.ts:38` («Manual» en A3, D-151) y dos de `stage3d-scenes.spec.ts` (3D intermitente).
+  No son de esta tarea; quedan para quien lleve P-02 / D-151 / 3D.
