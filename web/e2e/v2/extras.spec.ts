@@ -45,3 +45,13 @@ test('(4) requirements: explained as editable team defaults, and reachable from 
   await night.fill('48');
   await expect(now.getByText('No night over 48 h')).toBeVisible();
 });
+
+test('(5) Replan says what to set, what the columns and icons mean, and answers "when can I land here?"', async ({ page }) => {
+  await openV2(page);
+  await page.getByRole('tab', { name: 'Plan' }).click();
+  await page.getByRole('tab', { name: 'Replan' }).click();
+  await expect(page.getByText(/Each column is a later landing: \+0 is the planned date \(.* UTC\), \+1 d one day later/)).toBeVisible();
+  await expect(page.locator('.replan__legend')).toContainText("✓ Works · ! Tight · ✕ Doesn't work · – no data");
+  await expect(page.getByRole('columnheader', { name: /^When can I land here\?/ })).toBeVisible();
+  await expect(page.getByTestId('next-window').first()).toHaveText(/^(Next valid landing window: .* UTC \(.*\)|No valid landing window in the next 90 days\.)$/, { timeout: 30_000 });
+});

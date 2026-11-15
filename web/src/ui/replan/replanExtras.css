@@ -1,0 +1,26 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* T-90 (proposal 5): «When can I land here?» stays in view while the 31-column matrix scrolls. */
+.replan__matrix .replan__window,
+.replan__matrix .replan__window-head {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--c-bg-1, #162032);
+  box-shadow: -8px 0 8px -6px rgba(0, 0, 0, 0.6);
+}
+
+.replan__matrix .replan__window-head {
+  text-align: left;
+  padding-left: 8px;
+}
+
+.replan__intro {
+  max-width: 72em;
+  margin: 0 0 8px;
+  line-height: 1.45;
+}
+
+.replan__legend {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
