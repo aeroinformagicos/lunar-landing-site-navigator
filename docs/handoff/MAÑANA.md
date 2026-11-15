@@ -3,9 +3,9 @@
 
 Escrito por Claude Code por delegación de I2 a las 03:40 (T-94). Los fallos P-xx están descritos, con capturas, en
 `docs/handoff/T-94.md` §2. Peticiones abiertas al escribir esto (`gh pr list`):
-[#55 T-64](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/55) y
-[#56 T-92](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/56); la de T-94 se abre al terminar esta
-tarea. T-74 y T-91 tienen rama subida pero aún no petición; T-90 y T-93 no tenían rama en GitHub a las 03:40.
+[#55 T-64](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/55),
+[#56 T-92](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/56), [#57 T-74](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/57), [#58 T-91](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/58) y
+[#59 T-94](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/59) (actualizado a las 03:45). T-90 y T-93 no tenían rama en GitHub a esa hora.
 
 ## 1. Integrar, en este orden
 
@@ -19,10 +19,10 @@ claves nuevas, no cambios); en `en.json`, comprobar después que el JSON sigue s
 | # | Rama / petición | Qué trae | Riesgo |
 | --- | --- | --- | --- |
 | 1 | `t-64-fixes-v2` · [#55](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/55) (I1, en el carril de I2 por D-120) | Barra de tiempo con relleno y leyenda, 2D quieta al reproducir, indicador de rumbo en lugar de la tira de 360°, paneles que no pisan la franja inferior, maquetación de tableta y móvil | **Medio.** 48 ficheros, toca `ui/shell`, estilos, `timeline` y `summary`. Su propio `make test-all` dio 119/123 en paralelo (fallos de carga; 3 pasan solos; `stage3d.spec.ts:58` también falla a veces en `main`). Debería arreglar P-04 (tableta), P-12 (móvil) y parte de P-07: **comprobarlo a 768 × 1024 y 390 × 844**. Lo más visible: ir primero. |
-| 2 | `t-74-realismo-3d` (I3, sin petición a las 03:40) | Exageración vertical ×2 (×1 a ras de suelo), normales de cráter, luz de Tierra, encuadre lateral, cielo; en tableta los controles 3D se pliegan | **Medio.** Cambia el aspecto de la 3D justo antes de decidir 3D o 2D por defecto; comparte `ui/shell` y `en.json` con T-64. Tras integrar: medir fps en el portátil de la demo (`?fps=1`) y mirar si arregla P-06 (Sol detrás del conmutador) y P-07. **Con T-64 y T-74 dentro, decidir 3D o 2D por defecto.** |
+| 2 | `t-74-realismo-3d` · [#57](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/57) (I3) | Exageración vertical ×2 (×1 a ras de suelo), normales de cráter, luz de Tierra, encuadre lateral, cielo; en tableta los controles 3D se pliegan | **Medio.** Cambia el aspecto de la 3D justo antes de decidir 3D o 2D por defecto; comparte `ui/shell` y `en.json` con T-64. Tras integrar: medir fps en el portátil de la demo (`?fps=1`) y mirar si arregla P-06 (Sol detrás del conmutador) y P-07. **Con T-64 y T-74 dentro, decidir 3D o 2D por defecto.** |
 | 3 | `t-92-par-demo` · [#56](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/56) (I1) | Filas «Sun now» / «Earth now» frente al horizonte real en Compare y texto verdadero del paso 2 | **Bajo.** 20 ficheros; choca con T-64 en `app.css`. **Arregla P-01.** No toca el paso 3 (P-02 sigue). |
-| 4 | `t-91-regiones-2022` (I1, sin petición) | Las 8 regiones de la lista de 2022 que no siguieron en 2024, como puntos candidatos, con máscaras, perfiles y `sites.json` nuevos | **Medio.** Cambia datos publicados (`web/public/data/`): mirar que `check-contract` siga en verde y que el par de la demo y la historia no cambien. Choca con T-94 en `SOURCES.md` (las dos añaden filas). |
-| 5 | `t-94-revision-final` (esta) | README final, `SOURCES.md`, `AI_USAGE.md`, guion de capturas, traspaso con P-01–P-21, este fichero, D-140–D-145 | **Bajo.** Sin código de la aplicación. Revisar sobre todo el README (texto que leerá el jurado). |
+| 4 | `t-91-regiones-2022` · [#58](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/58) (I1) | Las 8 regiones de la lista de 2022 que no siguieron en 2024, como puntos candidatos, con máscaras, perfiles y `sites.json` nuevos | **Medio.** Cambia datos publicados (`web/public/data/`): mirar que `check-contract` siga en verde y que el par de la demo y la historia no cambien. Choca con T-94 en `SOURCES.md` (las dos añaden filas). |
+| 5 | `t-94-revision-final` · [#59](https://github.com/aeroinformagicos/lunar-landing-site-navigator/pull/59) (esta) | README final, `SOURCES.md`, `AI_USAGE.md`, guion de capturas, traspaso con P-01–P-21, este fichero, D-140–D-145 | **Bajo.** Sin código de la aplicación. Revisar sobre todo el README (texto que leerá el jurado). |
 | 6 | `t-90` (I3: historia guiada, Map, Replan, TopBar) | Desconocido a las 03:40 | **Alto** por amplitud y hora. Toca justo lo que más se enseña. Si llega tarde o rompe algo, no integrar: la demo funciona sin ella. Ver si arregla P-02, P-08, P-10, P-11. |
 | 7 | `t-93` (borrador sobre T-64) | Desconocido a las 03:40 | **Alto/medio.** Depende de T-64; integrar solo si T-64 ya está dentro y queda tiempo. |
 
