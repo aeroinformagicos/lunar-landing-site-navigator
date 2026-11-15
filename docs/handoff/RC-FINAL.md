@@ -83,4 +83,29 @@ falló en esta vuelta.
   GitHub. Sigue pendiente lo de D-141: cada persona dice si le parece bien.
 - README (con «Use of AI» y «License»), SOURCES, AI_USAGE y LICENSE (MIT) presentes y al día.
 
-LISTO PARA LA VISTA PREVIA
+
+---
+
+# Tercera tanda (rama `i1-fix2`, 15/11/2026, 12:38–13:15)
+
+Rama `i1-fix2` desde `rc-final` (`3dc9571`, que ya traía D-177–D-179 de I2), integrada con `--no-ff` sobre D-180 de I2
+sin conflictos. Decisiones D-161 a D-163, firmadas por delegación de I1. Todo reproducido con Playwright antes y
+después (puntero fino salvo donde se dice «táctil»).
+
+| Punto | Estado | Commit · decisión | Notas |
+| --- | --- | --- | --- |
+| 1 Portátil con ventana pequeña | **Arreglado** | `15d109b` · D-161 | La causa real era la **altura**: por debajo de ~680 px la franja inferior tapaba Sites/Setup y «Works», «3D controls» pisaba las pestañas y Setup abierto tenía altura negativa. Con `pointer: fine`: franja compacta bajo 760 px (cifras con `clamp()`, resumen en 2 líneas + «More») y bajo 680 px (resumen en 1 línea, cifras a la derecha de las pestañas, paneles con altura útil). Comprobado a 811×599, 1024×640, 1280×720 y 1366×768. La maquetación de tableta por **ancho** se mantiene: la necesitan las pastillas (no caben en una fila a 811 px) y los 44 px ya dependían de `pointer: coarse` |
+| 2 P-07 (panel de controles 3D a 1280×720) | **Ya estaba** (I2, D-177) | — | Plegado de inicio; a 1280×720 ya no pisa resumen ni cifras |
+| 2 P-06 (Sol detrás del conmutador 3D/2D) | **Pendiente** | — | En la entrada a 1280×720 el Sol no queda tras el conmutador, pero «Centre on Sun» lo deja arriba, junto a las pastillas. Arreglar el encuadre de la cámara no cabía en el tiempo |
+| 3 P-12 móvil (390×844, 360×800, táctil) | **Arreglado** (pastillas) | `763e528` · D-162 | Las pastillas pasan a dos filas con el nombre entero. La barra de tiempo fija solo tapa lo de debajo hasta desplazar (la página reserva su altura); sin desbordamiento horizontal |
+| 4 P-04 tableta, fila de cifras | **Arreglado** | `5ad38eb` · D-163 | Cifras en fila propia con rótulos en una línea |
+| 5 Sol cuadrado (D-154) | **Comprobado** | — | Con `?q=bajo`, tras 30 arrastres rápidos de la barra de tiempo y «Centre on Sun», el Sol sale redondo con brillo suave, sin cuadrado |
+| 6 P-08, P-10, P-13, P-20 | **Pendiente** | — | Sin tiempo |
+
+Pruebas tras integrar (`rc-final` con `i1-fix2` y D-180 de I2): `make check` en verde; `make test-all`: pytest 625 + 2
+xfail, vitest 440, e2e 133 de 139. Las 6 en rojo (`best.spec.ts:34`, `stage3d.spec.ts:58`, `:73`, `:90`,
+`stage3d-scenes.spec.ts:95`, `:162`) **pasan las 6 repetidas solas** (`--workers=1`, 42 s): intermitentes por carga.
+Dos de ellas duraron 1,2 h, lo que indica que el portátil se suspendió durante la vuelta; por eso esta tanda se
+cerró a las 14:20 y no a las 13:15. No se ha deshecho ningún commit.
+
+LISTO PARA LA VISTA PREVIA FINAL
