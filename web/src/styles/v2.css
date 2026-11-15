@@ -474,7 +474,12 @@
 
 .ui-v2 .fp__body {
   padding: 8px 20px 18px;
-  overflow: hidden;
+  min-height: 0;
+  /* Nothing is ever cut: if a short window cannot fit the panel, its body scrolls (T-64 e). */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-muted) rgba(248, 250, 252, 0.06);
 }
 
 .ui-v2 .fp-tab {
@@ -678,6 +683,32 @@
   font-size: 13px;
 }
 
+.ui-v2 .v2-checks--cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+}
+
+.ui-v2 .v2-checks__col ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ui-v2 .v2-checks__head {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ui-v2 .v2-check--none {
+  color: var(--c-muted);
+}
+
 .ui-v2 .v2-check {
   display: flex;
   align-items: center;
@@ -695,7 +726,16 @@
 }
 
 .ui-v2 .v2-check--fail {
-  color: var(--c-sun-2);
+  color: var(--c-nogo);
+}
+
+/* Mentor feedback (D-174): one colour code for alerts everywhere — green works / met, yellow tight,
+   red not suitable / not met — always with its icon (✓ ! ⊗) and word, never colour alone. Before,
+   "not suitable" was orange in the ranking and Compare and red in the Replan matrix, and "not met"
+   was amber like "tight". */
+.ui-v2 .compare__status--no_go,
+.ui-v2 .status-chip--no_go {
+  color: var(--c-nogo);
 }
 
 .ui-v2 .v2-eclipse {
@@ -821,6 +861,7 @@
 }
 
 .ui-v2 .v2-fig {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -880,8 +921,16 @@
 }
 
 .ui-v2 .v2-fig__help {
+  /* Mentor feedback (D-176): a floating note above the figure, so opening it on hover never moves
+     the layout (and the icon never slips out from under the pointer). */
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 6px);
+  z-index: 30;
+  width: max-content;
   max-width: 300px;
-  margin: 4px 0 0;
+  margin: 0;
+  box-shadow: var(--shadow-panel);
   padding: 8px 10px;
   border: 1px solid var(--c-line);
   border-radius: var(--radius-sm);
@@ -892,6 +941,10 @@
 
 .ui-v2 .v2-summary {
   max-width: 560px;
+  /* Mentor feedback (D-175): a little more air and letter spacing in the main sentence. */
+  margin-top: 6px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
 
 .ui-v2 .v2-summary .summary {
@@ -974,6 +1027,44 @@
   color: var(--c-text-2);
 }
 
+.ui-v2 .v2-track-wrap {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Legend of the two bars, aligned with them (T-64 d). */
+.ui-v2 .v2-track__legend {
+  display: flex;
+  flex-direction: column;
+  padding-top: 4px;
+  font: 500 12px/14px var(--font-v2-sans);
+  color: var(--c-text-2);
+  white-space: nowrap;
+}
+
+.ui-v2 .v2-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ui-v2 .v2-legend i {
+  display: inline-block;
+  width: 14px;
+  height: 5px;
+  border-radius: 3px;
+}
+
+.ui-v2 .v2-legend--sun i {
+  background: var(--c-sun);
+}
+
+.ui-v2 .v2-legend--earth i {
+  background: repeating-linear-gradient(135deg, var(--c-earth) 0 4px, rgba(56, 189, 248, 0.55) 4px 6px);
+}
+
 .ui-v2 .v2-track {
   position: relative;
   flex: 1;
@@ -981,11 +1072,31 @@
   height: 52px;
 }
 
+/* Elapsed part of the mission (landing → cursor) and the dimmed rest (T-64 a). */
+.ui-v2 .v2-track__elapsed {
+  position: absolute;
+  left: 0;
+  top: 3px;
+  height: 30px;
+  border-radius: 4px 0 0 4px;
+  background: rgba(248, 250, 252, 0.1);
+  pointer-events: none;
+}
+
+.ui-v2 .v2-track__future {
+  position: absolute;
+  right: 0;
+  top: 3px;
+  height: 30px;
+  background: rgba(10, 14, 23, 0.5);
+  pointer-events: none;
+}
+
 .ui-v2 .v2-track__bar {
   position: absolute;
   left: 0;
   right: 0;
-  height: 5px;
+  height: 6px;
   border-radius: 3px;
   background: var(--c-line);
   overflow: hidden;
@@ -1008,12 +1119,32 @@
 
 .ui-v2 .v2-track__cursor {
   position: absolute;
-  top: 2px;
+  top: 0;
   width: 2px;
-  height: 34px;
+  height: 36px;
   margin-left: -1px;
   background: var(--c-text);
+  box-shadow: 0 0 0 1px rgba(10, 14, 23, 0.8);
   pointer-events: none;
+}
+
+/* A round handle between the two bars: the cursor reads as the thing that moves (T-64 a). */
+.ui-v2 .v2-track__knob {
+  position: absolute;
+  left: 50%;
+  top: 11px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border: 2px solid var(--c-bg-0);
+  border-radius: 50%;
+  background: var(--c-text);
+}
+
+.ui-v2 .v2-track__slider:focus-visible + .v2-track__ticks,
+.ui-v2 .v2 .v2-track__slider:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
 }
 
 .ui-v2 .v2 .v2-track__slider {
@@ -1085,13 +1216,18 @@
   white-space: nowrap;
 }
 
+/* Mission day and time: the first thing read on the bar (T-64 d). */
 .ui-v2 .v2-readout__day {
-  font-size: 18px;
+  font-size: 24px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
 }
 
 .ui-v2 .v2-readout__utc {
-  font-size: 12px;
-  color: var(--c-muted);
+  font-size: 13px;
+  color: var(--c-text-2);
+  font-variant-numeric: tabular-nums;
 }
 
 .ui-v2 .v2-provenance {
@@ -1106,6 +1242,10 @@
 
 .ui-v2 .v2-credits {
   font-family: var(--font-v2-sans);
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(10, 14, 23, 0.78);
 }
 
 /* Data views open: a compact strip (figures at 28 px, no summary) so the sheet has room (D-111). */
@@ -1187,6 +1327,15 @@
   border-color: var(--c-line);
   border-radius: var(--radius-panel);
   background: rgba(17, 24, 39, 0.96);
+}
+
+/* Dialogs (site picker, shortcuts) above every floating layer of the shell: header and pills (20), panels
+   (15), minimap (12) and the phone time bar (30); below the banners (60) and the skip link (70). The
+   backdrop kept the v1 value (10) and the pills, the 3D/2D switch, the panels and the minimap were drawn
+   over the site picker (T-64 e). */
+.ui-v2 .dialog-backdrop {
+  z-index: 50;
+  background: rgba(10, 14, 23, 0.6);
 }
 
 /* Shorter windows: smaller figures and the first sentence only (D-101). */
@@ -1309,6 +1458,23 @@
   stroke-opacity: 0.75;
 }
 
+/* The part of the path already flown (landing → cursor): solid and brighter (T-64 a). */
+.ui-v2 .v2-scene__trace--past {
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ui-v2 .v2-scene__trace--sun-past {
+  stroke: var(--c-sun);
+  stroke-opacity: 0.85;
+}
+
+.ui-v2 .v2-scene__trace--earth-past {
+  stroke: var(--c-earth);
+  stroke-opacity: 0.85;
+}
+
 .ui-v2 .v2-scene__horizon {
   fill: none;
   stroke: var(--c-text);
@@ -1345,16 +1511,19 @@
   fill: var(--c-text);
   paint-order: stroke;
   stroke: var(--c-bg-0);
-  stroke-width: 3px;
-  stroke-opacity: 0.7;
+  stroke-width: 4px;
+  stroke-linejoin: round;
 }
 
+/* Opaque halo: the dotted traces slide behind the labels while playing and used to show through the
+   letters, which read as flicker (T-64 b). Tabular figures keep the numbers from shifting. */
 .ui-v2 .v2-scene__data {
   font: 400 12px var(--font-v2-mono);
+  font-variant-numeric: tabular-nums;
   paint-order: stroke;
   stroke: var(--c-bg-0);
-  stroke-width: 3px;
-  stroke-opacity: 0.7;
+  stroke-width: 4px;
+  stroke-linejoin: round;
 }
 
 .ui-v2 .v2-scene__data--sun {
@@ -1382,35 +1551,80 @@
   pointer-events: none;
 }
 
-.ui-v2 .v2-strip {
-  position: absolute;
-  left: 0;
-  top: 0;
+/* The 360° strip on top became the heading indicator next to the time bar (T-64, D-120 c). */
+.ui-v2 .v2-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+.ui-v2 .v2-heading__dial {
   display: block;
+  flex: none;
   cursor: pointer;
   touch-action: none;
-  background: rgba(10, 14, 23, 0.6);
-  border-bottom: 1px solid var(--c-line);
+  border-radius: 50%;
 }
 
-.ui-v2 .v2-strip__ground {
-  fill: var(--c-muted);
-  fill-opacity: 0.22;
+.ui-v2 .v2-heading__dial:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
 }
 
-.ui-v2 .v2-strip__bracket {
-  fill: rgba(255, 255, 255, 0.06);
+.ui-v2 .v2-heading__ring {
+  fill: rgba(10, 14, 23, 0.6);
+  stroke: var(--c-muted);
+  stroke-width: 1;
+}
+
+.ui-v2 .v2-heading__wedge {
+  fill: rgba(248, 250, 252, 0.22);
   stroke: var(--c-text);
-  stroke-opacity: 0.6;
+  stroke-width: 1;
+  stroke-opacity: 0.8;
 }
 
-/* With the strip on top, the header and the pills sit a little lower (mockup: rulers on top). */
-.ui-v2 .v2:not(.v2--sheet) {
-  --top-pills: clamp(40px, 6.5vh, 58px);
+.ui-v2 .v2-heading__n {
+  font: 600 9px var(--font-v2-mono);
+  fill: var(--c-text-2);
 }
 
-.ui-v2 .v2:not(.v2--sheet) .v2-brand {
-  top: clamp(38px, 6.2vh, 54px);
+.ui-v2 .v2-heading__text {
+  font: 400 12px var(--font-v2-mono);
+  color: var(--c-text-2);
+  white-space: nowrap;
+}
+
+/* Narrower desktops and tablets: the time bar keeps its track wide enough. */
+@media (max-width: 1279px) {
+  .ui-v2 .v2-time {
+    gap: 10px;
+  }
+  .ui-v2 .v2-readout {
+    min-width: 0;
+  }
+  .ui-v2 .v2-readout__day {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 1099px) {
+  .ui-v2 .v2-heading__text {
+    display: none;
+  }
+  /* Tablets: buttons, mission time and heading on one row; the legend and the track below, full width. */
+  .ui-v2 .v2-time {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .ui-v2 .v2-track-wrap {
+    order: 9;
+    flex: 1 1 100%;
+  }
+  .ui-v2 .v2-readout {
+    margin-left: auto;
+  }
 }
 
 /* Horizon detail (right panel) */
@@ -1567,6 +1781,16 @@
 /* Story card (Learn) above the time bar. */
 .ui-v2 .story {
   bottom: calc(var(--bottom-h, 200px) + 8px);
+}
+
+/* P-11 (D-153): in Learn the central sheet and the right panel end above the story card (its height is
+   measured into --story-h) and scroll inside, so the card never hides what the step explains. */
+.ui-v2 .v2--learn .v2-sheet {
+  bottom: calc(var(--bottom-h, 200px) + var(--story-h, 0px) + 16px);
+}
+
+.ui-v2 .v2--learn .v2-right {
+  max-height: calc(100vh - 130px - var(--bottom-h, 200px) - var(--story-h, 0px) - 16px);
 }
 
 /* ---- Phones (< 768 px): one column, 2D, panels inline (15 §9, simplified, D-112) ---- */
@@ -1820,4 +2044,401 @@
 /* The `main` landmark only wraps the stage's tab panel; it adds no box of its own. */
 .ui-v2 .v2-main {
   display: contents;
+}
+
+/* ---- T-64 (D-120 e): panels never run into the bottom strip ----
+   The open left panel ends above the strip; with room (≥ 1400 px), the figures and the summary move
+   right of the panel and the panel only has to clear the tabs and the time bar. On narrower windows
+   the summary folds while a left panel is open and the panel body scrolls if it still does not fit.
+   The right panel ends above the tabs and the time bar. */
+.ui-v2 .v2-left {
+  max-height: calc(100vh - 150px - var(--bottom-h, 360px));
+}
+
+.ui-v2 .v2-left .fp,
+.ui-v2 .v2-right .fp {
+  min-height: 0;
+  max-height: 100%;
+}
+
+.ui-v2 .v2-right {
+  max-height: calc(100vh - 130px - var(--bottom-low-h, 200px));
+}
+
+@media (max-height: 800px) {
+  .ui-v2 .v2-left {
+    max-height: calc(100vh - 132px - var(--bottom-h, 330px));
+  }
+  .ui-v2 .v2-right {
+    max-height: calc(100vh - 112px - var(--bottom-low-h, 200px));
+  }
+}
+
+@media (min-width: 1280px) {
+  .ui-v2 .v2:has(.v2-left .fp):not(.v2--sheet) .v2-mission {
+    margin-left: calc(296px + 48px - var(--gutter));
+  }
+  .ui-v2 .v2:has(.v2-left .fp):not(.v2--sheet) .v2-summary {
+    max-width: 520px;
+  }
+  .ui-v2 .v2:has(.v2-left .fp):not(.v2--sheet) .v2-left {
+    max-height: calc(100vh - 150px - var(--bottom-low-h, 200px));
+  }
+}
+
+@media (min-width: 1280px) and (max-height: 800px) {
+  .ui-v2 .v2:has(.v2-left .fp):not(.v2--sheet) .v2-left {
+    max-height: calc(100vh - 132px - var(--bottom-low-h, 200px));
+  }
+}
+
+/* 1280–1399 px: the shifted figures need the minimap's corner while a left panel is open. */
+@media (min-width: 1280px) and (max-width: 1399px) {
+  .ui-v2 .v2:has(.v2-left .fp) .v2-minimap {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1399px) {
+  .ui-v2 .v2:has(.v2-left .fp) .v2-summary {
+    display: none;
+  }
+}
+
+/* ---- T-64 (D-120 f): tablets (768–1099 px): the pills and the 3D / 2D switch go to a second row,
+   so they no longer run over the brand and the mode tabs. */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .ui-v2 .v2-pills {
+    left: var(--gutter);
+    top: calc(var(--top-pills) + 60px);
+    transform: none;
+  }
+  .ui-v2 .v2-pills .pill:not(.pill--add) {
+    max-width: 180px;
+  }
+  .ui-v2 .v2-toggle {
+    left: auto;
+    right: var(--gutter);
+    top: calc(var(--top-pills) + 60px);
+    transform: none;
+  }
+  .ui-v2 .v2-left {
+    top: calc(var(--top-pills) + 120px);
+    max-height: calc(100vh - var(--top-pills) - 120px - var(--bottom-h, 360px));
+  }
+  .ui-v2 .v2-right {
+    top: calc(var(--top-pills) + 120px);
+    max-height: calc(100vh - var(--top-pills) - 120px - var(--bottom-low-h, 200px));
+  }
+  .ui-v2 .v2-brand__motto {
+    max-width: 230px;
+  }
+  /* P-04 (D-160): the central sheet (Compare, Map, Timeline, Replan…) uses the full width under the pills
+     and the Sites / Setup tabs, so Compare shows both columns. */
+  .ui-v2 .v2-sheet {
+    left: var(--gutter);
+    right: var(--gutter);
+    top: calc(var(--top-pills) + 236px);
+  }
+}
+
+/* ---- T-64 (D-120 f): phones (< 768 px) ----
+   Compact time bar (buttons and the mission time on one row, the legend and the track below), figures
+   whose labels wrap inside their column, view tabs that fit at 360 px and a heading dial without text. */
+@media (max-width: 767px) {
+  .ui-v2 .v2-time {
+    gap: 6px 8px;
+  }
+  .ui-v2 .v2-track-wrap {
+    order: 9;
+    flex: 1 1 calc(100% - 56px);
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ui-v2 .v2-track__legend {
+    flex-direction: row;
+    gap: 14px;
+    padding: 0;
+  }
+  .ui-v2 .v2-track {
+    min-width: 0;
+  }
+  .ui-v2 .v2-heading {
+    order: 10;
+    align-self: flex-end;
+  }
+  .ui-v2 .v2-heading__text {
+    display: none;
+  }
+  .ui-v2 .v2-step,
+  .ui-v2 .v2-speed {
+    padding: 0 4px;
+  }
+  .ui-v2 .v2-readout {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .ui-v2 .v2-readout__day {
+    font-size: 18px;
+  }
+  .ui-v2 .v2-readout__utc {
+    font-size: 12px;
+  }
+  .ui-v2 .v2-fig__label {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: 0;
+  }
+  .ui-v2 .v2-fig__share {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .ui-v2 .v2-fig__dot {
+    display: none;
+  }
+  .ui-v2 .v2-fig__label .v2-help {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: -10px;
+  }
+  .ui-v2 .v2-tabs {
+    gap: 4px 12px;
+  }
+  .ui-v2 .tab--view {
+    letter-spacing: 0.04em;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Flex items with a z-index are stacking contexts: the bottom strip (and its fixed time bar) must sit
+     above the inline panels, or the panels slid over the time bar when scrolling (T-64 f). */
+  .ui-v2 .v2-left,
+  .ui-v2 .v2-right {
+    z-index: 1;
+  }
+  .ui-v2 .v2-bottom {
+    z-index: 30;
+  }
+  /* The scene leaves room for the verdict and the figures above the fixed time bar. */
+  .ui-v2 .v2-stage {
+    height: clamp(260px, 40svh, 420px);
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Mission time on its own line: day and UTC side by side. */
+  .ui-v2 .v2-readout {
+    order: 8;
+    flex: 1 1 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .ui-v2 .v2-readout__day {
+    font-size: 18px;
+  }
+  .ui-v2 .v2-tabs {
+    gap: 4px 10px;
+  }
+  .ui-v2 .tab--view {
+    letter-spacing: 0.02em;
+  }
+}
+
+/* ---- T-93 (D-123): Power & comms ---- */
+.ui-v2 .v2-figswitch {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.ui-v2 .v2-figswitch__opt[aria-pressed='true'] {
+  border-color: var(--c-earth);
+  background: rgba(56, 189, 248, 0.14);
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+.ui-v2 .v2-power .v2-fig__value {
+  white-space: nowrap;
+}
+
+.ui-v2 .v2-power .v2-fig__unit {
+  font-size: 16px;
+}
+
+.ui-v2 .v2-power__sub {
+  margin: 0;
+  font: 400 12px var(--font-v2-mono);
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-power__assume {
+  max-width: 600px;
+  pointer-events: auto;
+}
+
+.ui-v2 .v2-power__note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-power__note > span:first-child {
+  color: var(--c-warn);
+}
+
+.ui-v2 .v2-power__form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ui-v2 .v2-power__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-power__field input,
+.ui-v2 .v2-power__field select {
+  min-height: 36px;
+  font-family: var(--font-v2-mono);
+}
+
+.ui-v2 .v2-power__sources {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+@media (pointer: coarse), (max-width: 767px) {
+  .ui-v2 .v2-power__field input,
+  .ui-v2 .v2-power__field select {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 767px) {
+  .ui-v2 .v2-power .v2-fig__unit {
+    display: block;
+    font-size: 12px;
+  }
+}
+
+/* P-11 (D-153), phones: the story card is pinned to the bottom of the screen at full width and the page
+   keeps room for it below its last line, so everything the step explains can be scrolled above the card. */
+@media (max-width: 767px) {
+  .ui-v2 .story {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--time-h, 150px);
+    z-index: 31;
+    width: auto;
+    transform: none;
+    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+    max-height: 40svh;
+    overflow: auto;
+  }
+  .ui-v2 .v2--learn {
+    padding-bottom: calc(var(--time-h, 150px) + var(--story-h, 0px) + 16px);
+  }
+}
+
+/* ---- D-161: small laptop windows with a mouse (e.g. 811 × 599, 1024 × 640, 1280 × 720 at 1×) ----
+   Below ~760 px of height the bottom strip (figures, summary, view tabs, time bar) took most of the window
+   and, below ~680 px, ran over the Sites / Setup tabs, and the open Setup panel got a negative height. With a
+   fine pointer the strip is compacted (figures with clamp(), summary clamped with «More», smaller play
+   button) and the side panels keep a usable height. Touch devices keep the tablet / phone layout. */
+@media (pointer: fine) and (max-height: 760px) {
+  .ui-v2 .v2-fig__value {
+    font-size: clamp(28px, 6.2vh, 48px);
+  }
+  .ui-v2 .v2-fig__unit {
+    font-size: 15px;
+  }
+  .ui-v2 .v2-summary {
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .ui-v2 .v2-summary:not(.v2-summary--all) .summary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+  .ui-v2 .v2-summary .summary p {
+    font-size: 13px;
+  }
+  .ui-v2 .v2-play {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (pointer: fine) and (max-height: 680px) {
+  .ui-v2 .v2-summary:not(.v2-summary--all) .summary {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+  /* The figures start right of the Sites / Setup tabs, so «Works» and the first figure stay visible. */
+  .ui-v2 .v2-mission {
+    margin-left: 200px;
+  }
+  /* The folded «3D controls» button goes under «Now at site», away from the view tabs. */
+  .ui-v2 .stage3d__controls--closed {
+    top: 214px;
+    right: 16px;
+    bottom: auto;
+  }
+  /* Open side panels keep a usable height and are drawn above the strip. */
+  .ui-v2 .v2-left,
+  .ui-v2 .v2-right {
+    z-index: 16;
+    max-height: max(260px, calc(100vh - 150px - 24px));
+  }
+}
+
+/* P-12 (D-162), phones: the scenario pills wrap to a second row instead of cutting the site name
+   («A · Ma…»); each pill shows its full short name. */
+@media (max-width: 767px) {
+  .ui-v2 .v2-pills {
+    flex-wrap: wrap;
+    overflow: visible;
+    row-gap: 8px;
+  }
+  .ui-v2 .v2-pills .pill,
+  .ui-v2 .v2-pills .pill--scenario span {
+    max-width: none;
+    flex-shrink: 0;
+  }
+}
+
+/* P-04 (D-163), tablets: with a data view open, the «Works» line and the figures no longer share one row
+   (their labels broke into three lines and «1.1 h» ran off the screen): the figures take a row of their own. */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .ui-v2 .v2--sheet .v2-mission {
+    flex-wrap: wrap;
+    gap: 6px 24px;
+  }
+  .ui-v2 .v2--sheet .v2-figs {
+    flex: 1 1 100%;
+    gap: 24px;
+  }
+  .ui-v2 .v2--sheet .v2-fig__label {
+    white-space: nowrap;
+  }
 }

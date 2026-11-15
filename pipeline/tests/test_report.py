@@ -75,8 +75,9 @@ def test_without_results_every_case_is_skipped_and_the_headline_is_pending(dirs)
     doc = build(dirs)
     assert [h["id"] for h in doc["headline"]] == list(report.HEADLINE_ORDER)
     assert all(h["status"] == "skipped" for h in doc["headline"])
-    assert len(doc["cases"]) == 21 and all(c["status"] == "skipped" for c in doc["cases"])
-    assert doc["summary"] == {"total": 21, "passed": 0, "failed": 0, "manual": 0, "skipped": 21,
+    # A3 is always manual: an open discrepancy written by hand (decision D-151).
+    assert len(doc["cases"]) == 21 and all(c["status"] == "skipped" for c in doc["cases"] if c["id"] != "A3")
+    assert doc["summary"] == {"total": 21, "passed": 0, "failed": 0, "manual": 1, "skipped": 20,
                               "horizons_comparisons": 0, "horizons_max_abs_err_deg": None}
     assert doc["git_commit"] == "abc1234"
     assert doc["contract_version"] == (REPO_ROOT / "contract" / "VERSION").read_text(encoding="utf-8").strip()
@@ -118,20 +119,20 @@ def test_recorded_cases_fill_the_report_and_the_headline(dirs):
     ]
     assert a7b7["status"] == "skipped" and a7b7["rows"] == [] and "figures" not in a7b7
     s = doc["summary"]
-    assert (s["passed"], s["failed"], s["skipped"]) == (2, 0, 19)
+    assert (s["passed"], s["failed"], s["skipped"]) == (2, 0, 18)
     assert (s["horizons_comparisons"], s["horizons_max_abs_err_deg"]) == (3, 2.5e-5)
 
 
-def test_a3_is_retired_whatever_the_results_folder_holds(dirs):
-    # Decision D-95: A3 stays visible in the list of checks as retired, with its reason and figures.
+def test_a3_is_an_open_discrepancy_whatever_the_results_folder_holds(dirs):
+    # Decision D-151 (revises D-95): A3 is shown as manual, with expected, obtained and why they differ.
     report.write_case(dirs[0], "A3", "fail", "e", "Sunset 18:53:55 UTC", "30 min", SRC,
                       [detail("Sunset", "w", "2025-03-16T18:53:55Z", 38.92, "min", False)], "stale")
     doc = build(dirs)
     assert "A3" not in [h["id"] for h in doc["headline"]]
     a3 = next(c for c in doc["cases"] if c["id"] == "A3")
-    assert (a3["status"], a3["details"]) == ("skipped", [])
-    assert a3["note"].startswith("Retired (decision D-95)") and "18:54 UTC" in a3["note"]
-    assert a3["obtained"] == report.RETIRED_A3_OBTAINED
+    assert (a3["status"], a3["details"]) == ("manual", [])
+    assert a3["note"].startswith("Open discrepancy (decision D-151)") and "18:54 UTC" in a3["note"]
+    assert "18:00-18:15 UTC" in a3["expected"] and "18:54 UTC" in a3["obtained"]
     assert doc["summary"]["failed"] == 0
 
 

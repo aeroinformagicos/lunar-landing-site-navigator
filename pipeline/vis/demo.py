@@ -423,10 +423,14 @@ def read_both_band(layers_dir: str | Path, months: Sequence[str]) -> np.ndarray:
 
 
 def region_alternatives(catalog: dict, light_dirs: Sequence[Path], log: Callable[[str], None]) -> list[dict]:
-    """Candidate-region sites with a relief mask on disk, in catalog order (smooth ones are left out)."""
+    """Candidate-region sites with a relief mask on disk, in catalog order (smooth ones are left out).
+
+    Only sites of a region with a box (``region_id``): the points of the 2022 list (T-91, D-122) have
+    none and are not alternatives for the demo pair.
+    """
     out = []
     for s in catalog["sites"]:
-        if s.get("type") != "candidate_region" or s.get("relief") == "smooth":
+        if s.get("type") != "candidate_region" or not s.get("region_id") or s.get("relief") == "smooth":
             continue
         for d in light_dirs:
             path = Path(d) / "horizon" / f"{s['id']}.json"

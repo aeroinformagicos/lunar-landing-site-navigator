@@ -70,7 +70,7 @@ describe('story steps (10 §11)', () => {
   });
 
   it('3: scenario B active, Cross-section toward the Sun', () => {
-    expect(storySteps[2].apply(ctx())).toMatchObject({ activeScenarioId: 'B', tab: 'section', focusBody: 'sun', comparing: false });
+    expect(storySteps[2].apply(ctx())).toMatchObject({ activeScenarioId: 'B', tab: 'section', focusBody: 'earth', comparing: false });
   });
 
   it('4: A in the reduced Replan matrix, active column from +0 to +12 d', () => {
@@ -114,8 +114,9 @@ describe('texts with numbers from the data', () => {
     const [a, b] = sites.defaults.demo_pair.map((id) => sites.sites.find((s) => s.id === id)!);
     const d = siteDistanceM(a, b);
     expect(d).toBeGreaterThan(20_000);
-    expect(storySteps[1].text(ctx())).toBe(`These two sites are ${storyDistance(d)} apart. One has sunlight and a direct radio link to Earth. The other has neither.`);
-    expect(storySteps[2].text(ctx({ blockerDistM: 41_230 }))).toBe('Here is why: a ridge 41 km away blocks the Sun. Every answer comes with its reason.');
+    expect(storySteps[1].text(ctx())).toBe(`These two sites are ${storyDistance(d)} apart. At one, the Sun (power) and the Earth (radio link) are both in view for most of the mission. At the other, almost never, and the mission fails.`);
+    expect(storySteps[2].text(ctx({ blockerDistM: 41_230 }))).toBe('Here is why: a ridge 41 km away hides the Earth, so there is no direct radio link. Every answer comes with its reason.');
+    expect(storySteps[2].text(ctx({ blockerDistM: 0 }))).toBe('Here is why: the ground right around the lander hides the Earth, so there is no direct radio link. Every answer comes with its reason.');
   });
 
   it('great-circle distance: a quarter of a meridian', () => {

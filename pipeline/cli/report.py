@@ -11,8 +11,8 @@ two tests writes one *part* each (``<case_id>.<part>.json``); :func:`merge_parts
   (``{case_id, status, obtained, note, signed_by}``), which A1 and A3 edit;
 - the headline is A1 (JPL Horizons), B3 and A7B7, in that order; A7B7 combines A7 and B7;
 - A10 is computed and recorded but not published (11 §4, A10);
-- A3 is retired (decision D-95): it stays in the list of checks as ``skipped`` with the reason, and a
-  stale ``A3.json`` in the results folder is ignored.
+- A3 is an open discrepancy (decision D-151, revises D-95): it is listed as ``manual`` with what Firefly
+  implies, what we obtain and why they differ; a stale ``A3.json`` in the results folder is ignored.
 
 Nothing here decides whether a case passes: the status is the one the test recorded.
 """
@@ -38,7 +38,7 @@ CASE_ID = re.compile(r"^[AB][0-9]{1,2}$")
 PART = re.compile(r"^[a-z0-9_]+$")
 
 FIREFLY = {"label": "Firefly Aerospace, Blue Ghost Mission 1 updates", "url": "https://fireflyspace.com/?p=3379"}
-# Firefly's end-of-mission note: last data and "5 hours into the lunar night" (retired case A3).
+# Firefly's end-of-mission note: last data and "5 hours into the lunar night" (case A3, open discrepancy).
 FIREFLY_END = {"label": "Firefly Aerospace, end of Blue Ghost Mission 1 surface operations",
                "url": "https://fireflyspace.com/news/"
                       "firefly-aerospace-successfully-completes-14-days-of-surface-operations-on-the-moon"}
@@ -58,8 +58,9 @@ CASES: list[dict] = [
      "expected": "0 deg crossings of the 1-minute Horizons series at 3 sites",
      "tolerance": "5 min", "source": HORIZONS},
     {"id": "A3", "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
-     "expected": "Sunset between 18:00 and 18:15 UTC (last data 23:15 UTC, 5 hours into the lunar night)",
-     "tolerance": "30 min", "source": FIREFLY_END, "retired": True},
+     "expected": "Sunset around 18:00-18:15 UTC (last data about 23:15 UTC, "
+                 "\"just over 5 hours into the lunar night\")",
+     "tolerance": "30 min", "source": FIREFLY_END, "open_discrepancy": True},
     {"id": "A4", "title": "Horizon of a smooth sphere and of a 3 km mountain, by hand",
      "expected": "-0.087, -0.615, -1.943 and 2.606 deg", "tolerance": "0.005 deg",
      "source": {"label": "Hand calculation with R = 1737.4 km", "url": ""}},
@@ -135,17 +136,18 @@ PENDING_NOTE = "Not run in this build."
 # A7B7 before the overnight run (decision D-95): a plain "computed tonight", not an error.
 TONIGHT_NOTE = ("Computed tonight: this comparison needs the full south pole terrain run. "
                 "The result appears here when it finishes.")
-# A3 retired (decision D-95). Figures: docs/handoff/A3-investigacion.md §2 (SLDEM2015, observer 2 m;
-# smooth Moon at 0 m; one 59 m pixel of site position moves the centre sunset from -51 to +33 min).
-RETIRED_A3_OBTAINED = "Sun starts to set 18:20 UTC, centre on the horizon 18:54 UTC, fully set 19:28 UTC"
-RETIRED_A3_NOTE = (
-    "Retired (decision D-95): the check was badly posed, not failed. Firefly published no sunset time, "
-    "only that the final data arrived around 23:15 UTC, \"just over 5 hours into the lunar night\"; the "
-    "18:00-18:15 UTC window was our own deduction. With real terrain (SLDEM2015, observer 2 m) our model "
-    "has the Sun start to set at 18:20 UTC, its centre on the horizon at 18:54 UTC and fully set at "
-    "19:28 UTC, against 20:11 UTC on a smooth Moon. The horizon there is an 11 m rise 800 m away: moving "
-    "the site by one terrain pixel (59 m) moves the sunset by up to 51 minutes, more than any useful "
-    "tolerance. The model is unchanged."
+# A3 shown as an open discrepancy (decision D-151, revises D-95). Figures: docs/handoff/A3-investigacion.md
+# §2 (SLDEM2015, observer 2 m; smooth Moon at 0 m; one 59 m pixel of site position moves the centre sunset
+# from -51 to +33 min). Firefly: final data around 6:15 pm CDT (23:15 UTC), "just over 5 hours into the
+# lunar night".
+A3_OBTAINED = ("Centre of the Sun on the horizon 18:54 UTC (starts to set 18:20 UTC, fully set 19:28 UTC; "
+               "smooth Moon 20:11 UTC)")
+A3_NOTE = (
+    "Open discrepancy (decision D-151): not passed and not hidden. Firefly gives no exact sunset time, only "
+    "that the final data arrived around 23:15 UTC, \"just over 5 hours into the lunar night\", which puts "
+    "sunset around 18:00-18:15 UTC. Our sunset (centre of the Sun) is 18:54 UTC, about 40 minutes later. "
+    "The exact time depends on terrain near the lander smaller than our 59 m map: the horizon there is an "
+    "11 m rise 800 m away, and moving the site by one 59 m pixel moves our sunset by up to 51 minutes."
 )
 
 
@@ -282,9 +284,8 @@ def read_manual(path: Path) -> dict[str, dict]:
 def build_case(case: dict, recorded: list[dict] | None, manual: dict | None) -> dict:
     base = {"id": case["id"], "group": case["id"][0], "title": case["title"], "expected": case["expected"],
             "tolerance": case["tolerance"], "source": dict(case["source"])}
-    if case.get("retired"):
-        return {**base, "status": "skipped", "obtained": RETIRED_A3_OBTAINED, "details": [],
-                "note": RETIRED_A3_NOTE}
+    if case.get("open_discrepancy"):
+        return {**base, "status": "manual", "obtained": A3_OBTAINED, "details": [], "note": A3_NOTE}
     if recorded:
         r = merge_parts(recorded)
         return {**base, "status": r["status"], "obtained": r["obtained"], "details": r["details"],

@@ -21,7 +21,7 @@ test('brand, motto, scenario pills, stage and figures of the demo pair', async (
   await expect(pills.getByRole('button', { name: `B · ${pair[1].short_name}` })).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('#main-view')).toBeVisible();
   await expect(page.locator('.figure--sunlight .figure__value')).toHaveText(/^[\d.]+ h · (\d+|<1|>99) %$/, { timeout: 20_000 });
-  await expect(page.getByTestId('status-chip')).toHaveText(/^(✓ Works|! Tight|✕ Doesn't work)$/);
+  await expect(page.getByTestId('status-chip')).toHaveText(/^(✓ Works|! Tight|⊗ Not suitable)$/);
   await expect(page.getByRole('tab', { name: 'Horizon' })).toHaveAttribute('aria-selected', 'true');
   // Picking pill B makes B the active scenario everywhere.
   await pills.getByRole('button', { name: `B · ${pair[1].short_name}` }).click();

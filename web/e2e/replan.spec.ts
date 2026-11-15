@@ -18,13 +18,13 @@ test('matrix: one row per scenario, 31 dates, base column, next window per row',
   await expect(page.locator('[data-cell^="0-"]')).toHaveCount(31);
   await expect(page.locator('.replan__matrix thead th').nth(1)).toHaveText('+0');
   await expect(page.locator('.replan__matrix thead th').nth(2)).toHaveText('+1 d');
-  await expect(page.locator('[data-cell="0-0"]')).toHaveAttribute('aria-label', new RegExp(`^A · ${re(pair[0].short_name)}, landing ${utc(landingUnix)} UTC: (Works|Tight|Doesn't work)$`));
+  await expect(page.locator('[data-cell="0-0"]')).toHaveAttribute('aria-label', new RegExp(`^A · ${re(pair[0].short_name)}, landing ${utc(landingUnix)} UTC: (Works|Tight|Not suitable)$`));
   for (const w of await page.getByTestId('next-window').allInnerTexts()) {
     expect(w).toMatch(/^(Next valid landing window: .* UTC \(.*\)|No valid landing window in the next 90 days\.)$/);
   }
   if (candidates.length === 0) await expect(page.getByText('No candidate regions in this build.')).toBeVisible();
   else await expect(page.getByTestId('alternative')).toHaveText(/^(Best alternative: .+ — (Works|Tight), (\d+|<1|>99) % Sun \+ Earth\.|No candidate region works for this landing\.)$/, { timeout: 30_000 });
-  await expect(page.getByTestId('status-chip')).toHaveText(/^(✓ Works|! Tight|✕ Doesn't work)$/);
+  await expect(page.getByTestId('status-chip')).toHaveText(/^(✓ Works|! Tight|⊗ Not suitable)$/);
 });
 
 test('keyboard: arrows move the active cell, Enter selects it and sets the landing', async ({ page, request }) => {
@@ -35,7 +35,7 @@ test('keyboard: arrows move the active cell, Enter selects it and sets the landi
   await page.keyboard.press('ArrowDown');
   await expect(page.locator('[data-cell="1-2"]')).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(page.getByTestId('cell-detail')).toHaveText(new RegExp(`^B · ${re(pair[1].short_name)} · Landing ${utc(landingUnix + 2 * DAY)} UTC · Sun [✓✕] · Earth [✓✕] · Longest night [\\d.]+ h [✓✕]$`));
+  await expect(page.getByTestId('cell-detail')).toHaveText(new RegExp(`^B · ${re(pair[1].short_name)} · Landing ${utc(landingUnix + 2 * DAY)} UTC · Sun [✓⊗] · Earth [✓⊗] · Longest night [\\d.]+ h [✓⊗]$`));
   await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText(`Landing ${utc(landingUnix + 2 * DAY)} UTC`);
 });
 

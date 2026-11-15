@@ -12,9 +12,11 @@ import { SitePicker } from '../scenario/SitePicker';
 import { WelcomeCard } from '../welcome/WelcomeCard';
 import { welcomePending } from '../welcome/welcome';
 import { Figures, Provenance, SummaryBlock, TimeBar, Verdict, ViewTabs } from './BottomStrip';
+import { FiguresSwitch, PowerAssumptionsBlock, PowerFigures, usePowerUi } from '../power/PowerComms';
 import { NowPanel, SetupPanel, SitesPanel } from './Panels';
 import { can3d } from '../../state/viewMode';
 import { Minimap } from './Minimap';
+import { onOpenLeftPanel } from './openPanel';
 import { Stage } from './Stage';
 import { Brand, ModeNav, ScenarioPills, ViewToggle } from './TopBar';
 import { ActiveContext, BottomStripContext, useActiveData } from './useActive';
@@ -40,6 +42,8 @@ export default function ShellV2() {
   const comparing = useAppStore((s) => s.comparing);
   const viewNotice = useAppStore((s) => s.viewNotice);
   const viewMode = useAppStore((s) => s.viewMode);
+  const storyStep = useAppStore((s) => s.storyStep);
+  const figView = usePowerUi((s) => s.view);
   const dismissViewNotice = useAppStore((s) => s.dismissViewNotice);
   const init = useAppStore((s) => s.init);
   const addScenario = useAppStore((s) => s.addScenario);
@@ -57,6 +61,16 @@ export default function ShellV2() {
     writePanelOpen('setup', which === 'setup');
   };
   const [welcome, setWelcome] = useState(welcomePending);
+  // T-90 (proposal 4): another panel can open Setup (or Sites) and focus a control in it.
+  useEffect(
+    () =>
+      onOpenLeftPanel(({ which, focus }) => {
+        setLeft(which);
+        if (focus) window.setTimeout(() => document.querySelector<HTMLElement>(focus)?.focus(), 50);
+      }),
+    // `setLeft` only writes state and storage; subscribing once is enough.
+    [],
+  );
 
   const onHelp = useCallback(() => setHelp(true), []);
   // The stage views end where the bottom strip starts: its height is measured, not assumed.
@@ -70,10 +84,17 @@ export default function ShellV2() {
     const set = () => {
       const px = Math.ceil(bottom.getBoundingClientRect().height) + 24;
       root.style.setProperty('--bottom-h', `${px}px`);
+      // Below the figures: view tabs, time bar and credits. Open left panels end above this when the
+      // figures move aside for them (T-64 e).
+      const mission = bottom.querySelector<HTMLElement>('.v2-mission');
+      const low = px - (mission ? Math.ceil(mission.getBoundingClientRect().height) + 16 : 0);
+      root.style.setProperty('--bottom-low-h', `${low}px`);
       setBottomH(px);
     };
     const ro = new ResizeObserver(set);
     ro.observe(bottom);
+    const mission = bottom.querySelector('.v2-mission');
+    if (mission) ro.observe(mission);
     set();
     return () => ro.disconnect();
   }, []);
@@ -116,7 +137,12 @@ export default function ShellV2() {
   return (
     <ActiveContext.Provider value={active}>
       <BottomStripContext.Provider value={bottomH}>
-      <div ref={rootRef} className={`v2${learning ? ' v2--learn' : ''}${onHorizon ? '' : ' v2--sheet'}`}>
+      <div
+        ref={rootRef}
+        className={`v2${learning ? ' v2--learn' : ''}${onHorizon ? '' : ' v2--sheet'}`}
+        // T-90 (proposal 1): the guided story dims what each step does not talk about (ui/story/storySpot.css).
+        data-story-step={learning && storyStep !== null ? storyStep : undefined}
+      >
         <a className="v2-skip" href="#main-view">
           {t('shell.skip')}
         </a>
@@ -141,8 +167,11 @@ export default function ShellV2() {
         <section ref={bottomRef} className="v2-bottom" aria-label={t('panel.label')}>
           <div className="v2-mission">
             <Verdict />
-            {!learning && <Figures />}
-            {!learning && onHorizon && <SummaryBlock />}
+            {/* T-93 (D-123): the same mission read as visibility or as power and comms. */}
+            {!learning && <FiguresSwitch />}
+            {!learning && (figView === 'power' ? <PowerFigures /> : <Figures />)}
+            {!learning && figView === 'power' && <PowerAssumptionsBlock />}
+            {!learning && onHorizon && figView === 'visibility' && <SummaryBlock />}
           </div>
           <ViewTabs />
           <TimeBar />

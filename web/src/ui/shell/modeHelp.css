@@ -1,0 +1,31 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* One line under Explore / Plan / Learn saying what the active mode is for (T-90, proposal 8). */
+.ui-v2 .v2-modes__help {
+  position: absolute;
+  top: calc(100% - 4px);
+  right: 10px;
+  margin: 0;
+  white-space: nowrap;
+  color: var(--c-muted);
+  font: 400 13px/1.35 var(--font-v2-sans);
+  text-align: right;
+  pointer-events: none;
+}
+
+/* Tablets: the top bar is already full; the tabs keep the line as their description. */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .ui-v2 .v2-modes__help {
+    display: none;
+  }
+}
+
+/* Phones: the bar is a column, the line wraps under the tabs. */
+@media (max-width: 767px) {
+  .ui-v2 .v2-modes__help {
+    position: static;
+    flex-basis: 100%;
+    white-space: normal;
+    padding: 0 10px;
+    text-align: left;
+  }
+}

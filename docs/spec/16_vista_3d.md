@@ -160,7 +160,7 @@ Sombreador propio (`ShaderMaterial`), no `MeshStandardMaterial`:
 
 - **Reflectancia**: modelo lunar-Lambert de McEwen, `I = A·[ 2·L(α)·cos i/(cos i + cos e) + (1 − L(α))·cos i ]`, con `i` el ángulo de incidencia, `e` el de emisión (hacia la cámara) y α el ángulo de fase. `L(α)` con el polinomio de McEwen (1991/1996). **Los coeficientes y la fuente exacta se verifican en T-71 antes de usarlos** (documentación del modelo `LunarLambertMcEwen` de USGS ISIS) y se anotan en `docs/constants.md` con su fuente; si no se encuentran, `L = 0,5` constante con la nota «visual only» (CLAUDE.md §2: ninguna constante sin fuente).
 - **Albedo**: gris neutro `A = 0,12` modulado ±15 % por ruido de baja frecuencia anclado al mapa (para que el relieve se lea), visual.
-- **Detalle cercano**: ruido procedural fBm de 3 octavas (longitudes de onda 40, 12 y 3 m) que modula el albedo (±10 %) y perturba la normal; entra con la distancia a la cámara entre 6 y 1,5 km y se desactiva en el nivel `bajo`. Es textura inventada, no relieve: el texto del §6.7 lo cubre.
+- **Detalle cercano** (D-133, T-74): cráteres pequeños en cuatro escalas (celdas de 640, 170, 46 y 12 m) y rugosidad del regolito (3 m y 0,8 m) que doblan la normal y cambian poco el albedo; cada escala se apaga cuando sus cráteres miden pocos píxeles; se desactiva en el nivel `bajo`. Es textura inventada, no relieve: el texto del §6.7 lo cubre.
 - **Trama de huecos** (§2.2) y **capa proyectada** (§9) se mezclan en este mismo sombreador.
 
 ### 6.3 Sombras proyectadas: horizonte por celda en la GPU (D-97 i)
@@ -193,8 +193,8 @@ El sombreado del terreno es `luz × reflectancia + tierra + ambiente` (§6.4). *
 
 ### 6.4 Luz de la Tierra y ambiente
 
-- **Luz de la Tierra** (tierra clara, *earthshine*): direccional desde la Tierra (§5.1), intensidad `0,004 × fase_iluminada_de_la_Tierra` (visual, unas 1/750 de la luz del Sol), color `#AFC6E8`, sin sombras. Hace legibles, muy tenues, las zonas en sombra del lado de la Tierra (0° E), como en la realidad.
-- **Ambiente**: 0,002, gris neutro. Nada más: las sombras del polo son casi negras y así se ven (realismo).
+- **Luz de la Tierra** (tierra clara, *earthshine*): direccional desde la Tierra (§5.1), intensidad `0,03 × fase_iluminada_de_la_Tierra` (visual, como una cámara expuesta para las sombras; D-132, T-74; antes 0,004), color `#AFC6E8`, sin sombras. Hace legibles, muy tenues, las zonas en sombra del lado de la Tierra (0° E), como en la realidad.
+- **Ambiente**: 0,004, gris neutro (D-132). Nada más: las sombras del polo son casi negras y así se ven (realismo).
 
 ### 6.5 Curvatura
 
@@ -202,7 +202,7 @@ Sale de las posiciones reales (§3.2): a 200 km del ancla el suelo cae 11,5 km (
 
 ### 6.6 Lo que no se hace
 
-Sin exageración vertical (×1 siempre, para que el modo a ras de suelo coincida con el panorama; D-97 k), sin atmósfera, sin niebla, sin desenfoque de profundidad, sin texturas de imágenes reales, sin posprocesado salvo el halo del Sol y el mapeo de tonos.
+Exageración vertical solo de dibujo: ×2 por defecto en `Orbit` y `Fly`, con ×1 y ×3 en el botón `Height ×k` y rotulada en el grupo de controles; `Ground` siempre ×1 para coincidir con el panorama (D-131, T-74; antes D-97 k la prohibía). Sin atmósfera, sin niebla, sin desenfoque de profundidad, sin texturas de imágenes reales, sin posprocesado salvo el halo del Sol y el mapeo de tonos.
 
 ### 6.7 Aviso obligatorio
 
@@ -300,7 +300,7 @@ En el grupo de controles (§10.1):
 
 - Botón `Overlay` del grupo de controles: `None` (por defecto en la 3D), `Sunlight`, `Earth contact`, `Sun + Earth`. Elegir una capa la escribe en el almacén (`setMapLayer`), de modo que el mapa 2D queda igual; el periodo es el del almacén (`mapPeriod`) y se cambia en la vista del mapa (la 3D lo rotula: `Period: Aug 2027 · change it in the Map view`). Solo en la escena polar.
 - `layers/<period>.bin.gz` (`09` §9.2) → textura `R8` de 752 × 672 por banda, misma rejilla que el DEM, sin reproyección. Color con las rampas del mapa 2D (`rampStep` y `rampColour` de `ui/map/mapData.ts`, que I2 actualiza con la paleta v2 de `15_interfaz_v2.md`) en una tabla de 11 colores; 255 = sin dato, transparente con la trama de puntos.
-- Mezcla en el material: `mix(regolito iluminado, color de la rampa × (0,55 + 0,45·cos i), 0,7)`, para que el relieve se siga leyendo bajo la capa.
+- Mezcla en el material: `mix(regolito iluminado, color de la rampa × sombreado, 0,68)`, con un sombreado de mapa de luz fija del noroeste oscurecido en la sombra proyectada, para que el relieve se siga leyendo bajo la capa (D-135, T-74; antes `0,55 + 0,45·cos i`).
 - Leyenda en el grupo de controles: rampa de 0 a 100 %, `Share of time (%)`, el criterio `Sun or Earth centre above the real horizon, observer at 2 m` y el periodo. Mismos textos que el mapa (`10` §6.4).
 - Plan B (`source = nasa_avgvisib`): solo `Sunlight` y la banda fija de `10` §6.4.
 

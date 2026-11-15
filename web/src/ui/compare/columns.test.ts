@@ -86,9 +86,21 @@ describe('columns with 2, 3 and 4 scenarios (F8)', () => {
     expect(commonRange(cols)).toEqual({ t0: LANDING, t1: LANDING + 14 * DAY_S });
   });
 
+  it('T-92: Sun and Earth now against the real horizon (margin = elevation − horizon, 07 §5)', () => {
+    const low = computeColumn(model(formulaMask('flat:-90')), scenario('A'), 'A', LANDING + DAY_S, DEFAULT_REQUIREMENTS);
+    expect(low.sunNow!.visible).toBe(true);
+    expect(low.earthNow!.visible).toBe(true);
+    expect(low.sunNow!.marginDeg).toBeCloseTo(low.sunElNow! + 90, 6);
+    const high = computeColumn(model(formulaMask('flat:45')), scenario('B'), 'B', LANDING + DAY_S, DEFAULT_REQUIREMENTS);
+    expect(high.sunNow!.visible).toBe(false);
+    expect(high.earthNow!.visible).toBe(false);
+    expect(high.sunNow!.marginDeg).toBeCloseTo(high.sunElNow! - 45, 6);
+  });
+
   it('the cursor outside a scenario’s table gives dashes, not errors', () => {
     const c = computeColumn(model(demoA), scenario('A'), 'A', isoToUnix('1990-01-01T00:00:00Z'), DEFAULT_REQUIREMENTS);
     expect(c.sunElNow).toBeNull();
+    expect(c.sunNow).toBeNull();
     expect(c.nextSun).toBe('—');
   });
 });

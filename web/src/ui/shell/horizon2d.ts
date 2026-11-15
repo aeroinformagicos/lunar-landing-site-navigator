@@ -37,6 +37,25 @@ export function stageView(
   return { view: { ...base, el: hor + ((horizonFrac - 0.5) * h) / k }, arrow: null };
 }
 
+/** While playing, the body may come this close (degrees) to an edge of the 40° view before it turns. */
+export const FOLLOW_EDGE_DEG = 6;
+
+/**
+ * Centre of the 2D view while the mission plays (T-64, D-120 a): the view stays still while the body
+ * crosses it, so the body is seen moving along its path instead of the ground sliding under a fixed
+ * body; when the body gets within `edge` degrees of a side, the view turns so the body sits
+ * `half − 2·edge` degrees on the other side of the centre and has room to travel again.
+ * `prev` null (not following yet) centres on the body.
+ */
+export function followAz(prev: number | null, bodyAz: number, half = VIEW_WIDTH_DEG / 2, edge = FOLLOW_EDGE_DEG): number {
+  const wrap = (a: number) => ((a % 360) + 360) % 360;
+  if (prev === null) return wrap(bodyAz);
+  let d = bodyAz - prev;
+  d = ((d % 360) + 540) % 360 - 180;
+  if (Math.abs(d) <= half - edge) return wrap(prev);
+  return wrap(bodyAz + Math.sign(d) * (half - 2 * edge));
+}
+
 /** Horizon height that keeps the line above the bottom strip: at most `HORIZON_AT`, at least 30 %. */
 export function horizonFracFor(h: number, bottomStripPx: number): number {
   return Math.min(HORIZON_AT, Math.max(0.3, (h - bottomStripPx - 24) / h));

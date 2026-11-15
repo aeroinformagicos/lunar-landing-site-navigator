@@ -14,7 +14,19 @@ import { countdownText, requirementChecks } from '../metrics/derive';
 import { ScenarioCard } from '../scenario/ScenarioColumn';
 import { FloatingPanel } from './FloatingPanel';
 import { HorizonDetail } from './HorizonDetail';
+import { openLeftPanel, REQUIREMENTS_FOCUS } from './openPanel';
+import { requestBestSite } from '../optimal/request';
 import { useActive } from './useActive';
+import { useView2d } from './view2d';
+
+/** Between 768 and 1279 px wide, Now at site opens folded (15 §3.2). */
+function tabletWidth(): boolean {
+  try {
+    return window.matchMedia('(min-width: 768px) and (max-width: 1279px)').matches;
+  } catch {
+    return false;
+  }
+}
 
 const SitesIcon = (
   <svg className="fp-icon" width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
@@ -64,6 +76,10 @@ export function SitesPanel({ onPick, open, onOpenChange }: LeftProps & { onPick:
             {t('scenario.compare')}
           </Button>
         )}
+        {/* T-90 (proposal 9): the best-site search, reachable from the main view. */}
+        <Button variant="secondary" onClick={requestBestSite}>
+          {t('best.find_best')}
+        </Button>
       </div>
       {full && (
         <p id="v2-max-scenarios" className="v2-note">
@@ -89,6 +105,7 @@ export function SetupPanel({ open, onOpenChange }: LeftProps) {
         <h3 id="v2-req-title" className="v2-section__title">
           {t('panel.requirements')}
         </h3>
+        <p className="v2-note">{t('panel.requirements_help')}</p>
         <label className="field__check">
           <input type="checkbox" checked={req.needSunAtLanding} onChange={(e) => setRequirements({ needSunAtLanding: e.target.checked })} />
           {t('req.sun')}
@@ -147,12 +164,12 @@ export function NowPanel() {
   );
 
   return (
-    <FloatingPanel id="now" title={t('panel.now_at', { id: scenario.id })} side="right" defaultOpen={true} className="fp--now">
+    <FloatingPanel id="now" title={t('panel.now_at', { id: scenario.id })} side="right" defaultOpen={!tabletWidth()} className="fp--now">
       {detail && now ? (
         <p className="v2-now-line">
           <span className="v2-dl__v--sun">☀ {formatDeg(now.sky.sun.elDeg)}</span>
           <span className="v2-dl__v--earth">◐ {formatDeg(now.sky.earth.elDeg)}</span>
-          {checks.some((c) => !c.ok) ? <span className="v2-check--fail">✕ {checks.filter((c) => !c.ok).length}</span> : <span>✓</span>}
+          {checks.some((c) => !c.ok) ? <span className="v2-check--fail">⊗ {checks.filter((c) => !c.ok).length}</span> : <span>✓</span>}
         </p>
       ) : now ? (
         <dl className="v2-dl">
@@ -165,18 +182,37 @@ export function NowPanel() {
       ) : (
         <p className="v2-note">{resource.status === 'ready' ? t('metrics.outside') : t('metrics.loading')}</p>
       )}
+      {/* T-90 (proposal 3): what the elevations and the margin are measured from. */}
+      {!detail && now && <p className="v2-note">{t('now.reference')}</p>}
 
       {!detail && checks.length > 0 && (
-        <ul className="v2-checks" aria-label={t('metrics.status')}>
-          {checks.map((c) => (
-            <li key={c.key} className={c.ok ? 'v2-check v2-check--ok' : 'v2-check v2-check--fail'}>
-              <span className="v2-check__mark" aria-label={c.ok ? 'met' : 'not met'}>
-                {c.ok ? '✓' : '✕'}
-              </span>
-              {c.ok ? checkLabel(c.key) : t('req.not_met', { req: checkLabel(c.key) })}
-            </li>
+        // Mentor feedback (D-171): requirements split into Met / Not met columns instead of repeating
+        // "not met" on every row.
+        <div className="v2-checks v2-checks--cols" role="group" aria-label={t('metrics.status')}>
+          {([true, false] as const).map((ok) => (
+            <div key={String(ok)} className="v2-checks__col">
+              <p className={ok ? 'v2-checks__head v2-check--ok' : 'v2-checks__head v2-check--fail'}>
+                {t(ok ? 'req.col_met' : 'req.col_not_met')}
+              </p>
+              <ul>
+                {checks.filter((c) => c.ok === ok).map((c) => (
+                  <li key={c.key} className={c.ok ? 'v2-check v2-check--ok' : 'v2-check v2-check--fail'}>
+                    <span className="v2-check__mark" aria-label={c.ok ? 'met' : 'not met'}>
+                      {c.ok ? '✓' : '⊗'}
+                    </span>
+                    {checkLabel(c.key)}
+                  </li>
+                ))}
+                {!checks.some((c) => c.ok === ok) && <li className="v2-check v2-check--none">—</li>}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
+      )}
+      {!detail && checks.length > 0 && (
+        <Button variant="ghost" onClick={() => openLeftPanel({ which: 'setup', focus: REQUIREMENTS_FOCUS })}>
+          {t('panel.requirements_change')}
+        </Button>
       )}
 
       {now && now.sky.eclipse.kind !== 'none' && (
@@ -190,7 +226,10 @@ export function NowPanel() {
       <div className="v2-focus">
         <div className="v2-focus__pills" role="group" aria-label={t('pano.centre_on')}>
           {(['sun', 'earth'] as const).map((b) => (
-            <button key={b} type="button" className={`pill pill--small pill--${b}`} aria-pressed={focus === b} onClick={() => setFocus(b)}>
+            <button key={b} type="button" className={`pill pill--small pill--${b}`} aria-pressed={focus === b} onClick={() => {
+                setFocus(b);
+                useView2d.getState().recentre(); // the 2D view centres on it again (D-120 a)
+              }}>
               {t(b === 'sun' ? 'pano.centre_sun' : 'pano.centre_earth')}
             </button>
           ))}

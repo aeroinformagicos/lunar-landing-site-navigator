@@ -54,15 +54,15 @@ test(`B2: Blue Ghost 1 works at the real landing and fails 14 days later (night 
   await expect(page.locator('[data-cell="0-0"]')).toHaveAttribute('aria-label', 'A · Blue Ghost 1, landing 2025-03-02 08:34 UTC: Works');
   // Delay +14 d: does not work.
   const late = page.locator('[data-cell="0-14"]');
-  await expect(late).toHaveAttribute('aria-label', "A · Blue Ghost 1, landing 2025-03-16 08:34 UTC: Doesn't work");
+  await expect(late).toHaveAttribute('aria-label', "A · Blue Ghost 1, landing 2025-03-16 08:34 UTC: Not suitable");
 
   // The reason is the night: the Sun is still up at landing and the longest night fails.
   await late.click();
-  await expect(page.getByTestId('cell-detail')).toHaveText(/^A · Blue Ghost 1 · Landing 2025-03-16 08:34 UTC · Sun ✓ · Earth [✓✕] · Longest night [\d.]+ h ✕$/);
+  await expect(page.getByTestId('cell-detail')).toHaveText(/^A · Blue Ghost 1 · Landing 2025-03-16 08:34 UTC · Sun ✓ · Earth [✓⊗] · Longest night [\d.]+ h ⊗$/);
   // The click set that landing in the scenario: the panel's full chip agrees with the matrix.
   await expect(await scenarioCard(page, ui)).toContainText('Landing 2025-03-16 08:34 UTC');
-  await expect(page.getByTestId('status-chip')).toHaveText("✕ Doesn't work");
-  await expect(page.getByRole('list', { name: 'Requirements' }).getByRole('listitem').filter({ hasText: 'No night over 24 h' })).toContainText('✕');
+  await expect(page.getByTestId('status-chip')).toHaveText("⊗ Not suitable");
+  await expect(page.getByLabel('Requirements', { exact: true }).getByRole('listitem').filter({ hasText: 'No night over 24 h' })).toContainText('⊗');
 });
 
 test(`B2: Blue Ghost 1 works again 29.5 days later (one synodic month) (${ui})`, async ({ page }) => {

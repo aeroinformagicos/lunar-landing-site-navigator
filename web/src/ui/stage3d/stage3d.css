@@ -207,6 +207,10 @@
   font-size: 13px;
   font-weight: 500;
   text-shadow: 0 1px 3px #000, 0 0 8px #000;
+  /* D-154: long names («Nearest mesh point: …, 500 m grid») wrap instead of running off the screen. */
+  max-width: min(200px, 28vw);
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .stage3d__pin-status {
   display: flex;
@@ -239,6 +243,7 @@
 }
 .stage3d__row {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
 }

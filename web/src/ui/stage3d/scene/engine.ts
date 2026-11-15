@@ -17,7 +17,7 @@ import { FpsMonitor, TIER_SETTINGS, type Tier } from '../quality';
 import { RAMP_STEPS } from '../overlay';
 import type { RadialTerrain } from '../radial';
 import { BIN_LUT_SIZE, RADIAL_SHADOW_FRAG, SHADOW_FRAG, SHADOW_VERT, binLut } from '../shadow';
-import { EARTH_FRAG, SKY_VERT, STAR_FRAG, STAR_VERT, SUN_FRAG, TERRAIN_FRAG, TERRAIN_VERT } from './shaders';
+import { EARTH_FRAG, EARTH_VERT, SKY_VERT, STAR_FRAG, STAR_VERT, SUN_FRAG, TERRAIN_FRAG, TERRAIN_VERT } from './shaders';
 
 export interface SkyInput {
   /** Unit directions in MOON_ME, from `skyAt` at the site (16 §5.1). */
@@ -166,6 +166,9 @@ export class Engine {
       frameU: { value: new THREE.Vector3() },
       clipCos: { value: 1 },
       R: { value: R_M },
+      exag: { value: 1 },
+      exagRefH: { value: 0 },
+      moonC: { value: new THREE.Vector3(0, -R_M, 0) },
       useOverlay: { value: 0 },
       overlayTex: { value: null as THREE.Texture | null },
       overlayLut: { value: Array.from({ length: RAMP_STEPS }, () => new THREE.Vector3()) },
@@ -183,24 +186,45 @@ export class Engine {
     this.scene.add(this.masts);
 
     // Sky: stars (decorative, fixed seed), Sun, Earth (§5.2).
+    // T-74 (D-136): magnitudes with the counts rising toward faint stars, a colour per star (blue-white
+    // to orange) and a band of denser stars along a fixed great circle, like a Milky Way. Decorative.
     const rnd = mulberry32(LOOK.starSeed);
     const n = LOOK.stars;
     const pos = new Float32Array(n * 3);
     const size = new Float32Array(n);
     const bright = new Float32Array(n);
+    const tint = new Float32Array(n * 3);
+    const tints: [number, number, number][] = [
+      [0.78, 0.86, 1.0],
+      [0.92, 0.95, 1.0],
+      [1.0, 0.98, 0.94],
+      [1.0, 0.9, 0.76],
+      [1.0, 0.78, 0.6],
+    ];
+    const band = LOOK.starBand;
+    const ct = Math.cos(band.tiltRad);
+    const st = Math.sin(band.tiltRad);
     for (let i = 0; i < n; i++) {
-      const z = 2 * rnd() - 1;
+      let z = 2 * rnd() - 1;
+      // A share of the stars hug the band (small z in the band's frame, then tilted).
+      if (rnd() < band.share) z = (rnd() + rnd() + rnd() - 1.5) * band.width;
       const phi = 2 * Math.PI * rnd();
-      const r = Math.sqrt(1 - z * z);
-      pos.set([r * Math.cos(phi) * LOOK.skyRadius, z * LOOK.skyRadius, r * Math.sin(phi) * LOOK.skyRadius], 3 * i);
-      const b = Math.min(1, 0.06 + (-Math.log(1 - rnd() * 0.999) / 5) * 0.9);
+      const r = Math.sqrt(Math.max(0, 1 - z * z));
+      const x0 = r * Math.cos(phi);
+      const z0 = r * Math.sin(phi);
+      pos.set([x0 * LOOK.skyRadius, (z * ct - z0 * st) * LOOK.skyRadius, (z * st + z0 * ct) * LOOK.skyRadius], 3 * i);
+      // Magnitude 1 to 6.5 with N(m) rising as 10^(0.45 m), brightness as 10^(-0.4 m), scaled to 0..1.
+      const m = 6.5 - Math.log10(1 + rnd() * (10 ** (0.45 * 5.5) - 1)) / 0.45;
+      const b = Math.min(1, 0.05 + 2.2 * 10 ** (-0.4 * (m - 1)));
       bright[i] = b;
-      size[i] = b > 0.55 ? 2 : 1.2;
+      size[i] = b > 0.5 ? 2.4 : b > 0.15 ? 1.7 : 1.2;
+      tint.set(tints[Math.floor(rnd() * tints.length)], 3 * i);
     }
     const sg = new THREE.BufferGeometry();
     sg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     sg.setAttribute('size', new THREE.BufferAttribute(size, 1));
     sg.setAttribute('bright', new THREE.BufferAttribute(bright, 1));
+    sg.setAttribute('tint', new THREE.BufferAttribute(tint, 3));
     this.stars = new THREE.Points(
       sg,
       new THREE.ShaderMaterial({
@@ -228,6 +252,7 @@ export class Engine {
           haloScale: { value: LOOK.haloScaleDeg * DEG },
           haloStrength: { value: LOOK.haloStrength },
           dim: { value: 1 },
+          spikes: { value: TIER_SETTINGS[o.tier].halo ? LOOK.sunSpikes : 0 },
         },
         transparent: true,
         blending: THREE.AdditiveBlending,
@@ -239,7 +264,7 @@ export class Engine {
     this.earth = new THREE.Mesh(
       new THREE.SphereGeometry(1, 64, 32),
       new THREE.ShaderMaterial({
-        vertexShader: SKY_VERT,
+        vertexShader: EARTH_VERT,
         fragmentShader: EARTH_FRAG,
         uniforms: {
           sunDir: { value: new THREE.Vector3(0, 1, 0) },
@@ -273,6 +298,18 @@ export class Engine {
     u.frameU.value.set(...f.u);
     this.sphere.position.set(0, -(R_M + f.hM), 0);
     this.sphere.visible = true;
+    // Exaggeration about the anchor (D-131); the smooth sphere beyond the terrain keeps exag = 1.
+    for (const m of [this.terrainMat, this.sphereMat]) {
+      m.uniforms.exagRefH.value = f.hM;
+      m.uniforms.moonC.value.set(0, -(R_M + f.hM), 0);
+    }
+  }
+
+  /** Vertical exaggeration of the drawn terrain (T-74, D-131); 1 in Ground. Shadows keep the real relief. */
+  setExaggeration(k: number) {
+    if (this.terrainMat.uniforms.exag.value === k) return;
+    this.terrainMat.uniforms.exag.value = k;
+    this.dirty = true;
   }
 
   private clearTerrain() {
@@ -494,6 +531,11 @@ export class Engine {
     this.dirty = true;
   }
 
+  /** The frame of the scene on screen. */
+  sceneFrame(): SceneFrame {
+    return this.frame;
+  }
+
   setGround(g: Ground | null) {
     this.ground = g;
   }
@@ -530,11 +572,13 @@ export class Engine {
     // Sun disc and halo.
     const halo = TIER_SETTINGS[this.tier].halo;
     const rho = s.sunRadiusDeg * DEG;
-    const half = halo ? LOOK.haloRadiusDeg * DEG : rho * 1.6;
+    // Without halo the quad is 4 disc radii: the core glow has faded to ~5 % there (D-154).
+    const half = halo ? LOOK.haloRadiusDeg * DEG : rho * 4;
     const um = this.sun.material.uniforms;
     um.halfAngle.value = half;
     um.rho.value = rho;
     um.haloStrength.value = halo ? LOOK.haloStrength : 0;
+    um.spikes.value = halo ? LOOK.sunSpikes : 0;
     um.dim.value = 1 - s.covered;
     this.sun.position.copy(v3(sd).multiplyScalar(LOOK.skyRadius));
     this.sun.scale.setScalar(LOOK.skyRadius * Math.tan(half));

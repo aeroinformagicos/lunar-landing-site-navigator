@@ -1,7 +1,7 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // T-23 end to end (F9, 10_interfaz.md §6.7) on the example report (e2e/fixtures, T-82): three headline
 // cards (JPL Horizons, the Blue Ghost 1 eclipse and the NASA maps; decision D-95) with prediction,
-// fact, tolerance, linked source and state; the retired A3 stays in the full table; the full table
+// fact, tolerance, linked source and state; A3 is listed as an open discrepancy (D-151); the full table
 // unfolds and each row expands; a mismatch is shown; without a report, the message.
 import { exampleReport, expect, v1Test as test, type Page } from './example';
 
@@ -24,7 +24,7 @@ test('three headline cards with prediction, fact, tolerance, source and state', 
   await expect(b3.getByRole('row', { name: /Eclipse starts/ })).toContainText('05:01 UTC');
   await expect(b3).toContainText('5 min');
   await expect(b3.getByRole('link', { name: 'Firefly Aerospace, Blue Ghost Mission 1 updates' })).toHaveAttribute('href', 'https://fireflyspace.com/?p=3379');
-  // A3 is retired (decision D-95): no card.
+  // A3 is not a headline card (D-95); it is an open discrepancy in the full table (D-151).
   await expect(page.getByRole('article', { name: /Sunset seen by Blue Ghost 1/ })).toHaveCount(0);
   const a7 = page.getByRole('article', { name: /south pole maps vs NASA/ });
   await expect(a7).toContainText('Pending');
@@ -35,7 +35,7 @@ test('three headline cards with prediction, fact, tolerance, source and state', 
   await expect(page.getByText(/^Generated from the automated test report · commit \w+$/)).toBeVisible();
 });
 
-test('the full table unfolds, each row expands, and the retired A3 says why', async ({ page }) => {
+test('the full table unfolds, each row expands, and A3 shows its open discrepancy (D-151)', async ({ page }) => {
   await openValidation(page);
   await page.getByRole('button', { name: /^Show all checks \(\d+\)$/ }).click();
   const table = page.locator('#all-checks');
@@ -47,9 +47,9 @@ test('the full table unfolds, each row expands, and the retired A3 says why', as
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expect(page.locator('#case-A1')).toContainText('apollo-11 sun el 2025-03-14T06:00Z');
-  await expect(table.getByRole('row').filter({ has: page.getByRole('button', { name: 'Details of A3', exact: true }) })).toContainText('Skipped');
+  await expect(table.getByRole('row').filter({ has: page.getByRole('button', { name: 'Details of A3', exact: true }) })).toContainText('Manual');
   await page.getByRole('button', { name: 'Details of A3', exact: true }).click();
-  await expect(page.locator('#case-A3')).toContainText('Retired (decision D-95)');
+  await expect(page.locator('#case-A3')).toContainText('Open discrepancy (decision D-151)');
   await page.getByRole('button', { name: 'Hide all checks' }).click();
   await expect(table).toHaveCount(0);
 });

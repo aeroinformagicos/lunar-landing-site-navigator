@@ -493,6 +493,13 @@ input[aria-invalid='true'] {
   fill: rgb(255 255 255 / 4%);
 }
 
+/* P-09 (D-157): outline of the whole plot (time axis before, during and after the mission). */
+.timeline__frame {
+  fill: none;
+  stroke: var(--c-border-strong);
+  stroke-width: 1;
+}
+
 .timeline__zero {
   stroke: var(--c-text-muted);
   stroke-width: 1;
@@ -530,6 +537,72 @@ input[aria-invalid='true'] {
   line-height: 14px;
   color: var(--c-text);
   text-shadow: 0 0 2px var(--c-bg), 0 0 2px var(--c-bg);
+}
+
+.timeline__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--c-text);
+}
+
+.timeline__key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.timeline__key i {
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  border-top: 2px solid var(--c-text-muted);
+}
+
+.timeline__key--sun i {
+  border-top-color: var(--c-sun);
+}
+
+.timeline__key--earth i {
+  border-top-color: var(--c-earth);
+}
+
+.timeline__key--horizon i {
+  border-top: 2px dashed var(--c-text-muted);
+}
+
+.timeline__key--bars i {
+  height: 10px;
+  border: 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--c-sun) 0 33%, var(--c-earth) 33% 66%, var(--c-both) 66%);
+}
+
+.timeline__now {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline__now-day {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.timeline__now-utc {
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.timeline__label--bar {
+  font-weight: 600;
+  fill: var(--c-text);
 }
 
 .timeline__readout {
@@ -1061,6 +1134,15 @@ input[aria-invalid='true'] {
 }
 
 .compare__status--no_go {
+  color: var(--c-warn-text);
+}
+
+/* Sun / Earth now against the real horizon (T-92): icon and words, colour only as a second cue. */
+.compare__now--in > span {
+  color: var(--c-go);
+}
+
+.compare__now--out > span {
   color: var(--c-warn-text);
 }
 
@@ -1919,7 +2001,7 @@ select {
 
 .welcome__title {
   margin: 0 0 var(--s2);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 650;
   line-height: 1.2;
   letter-spacing: -0.015em;
@@ -2043,4 +2125,79 @@ input[type='datetime-local']:focus-within {
   .figure__value {
     font-size: 16px;
   }
+}
+
+/* D-152: the map opacity control always has its own row under the layer buttons; the fill follows the
+   value (empty at 0 %, full at 100 %) and the value has a fixed width so nothing moves. */
+.map__opacity-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: 6px;
+}
+
+.map__opacity {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map__opacity-value {
+  display: inline-block;
+  min-width: 5ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.map__opacity-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 160px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.map__opacity-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--c-accent) var(--fill, 0%), var(--c-border-strong) var(--fill, 0%));
+}
+
+.map__opacity-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--c-accent) var(--fill, 0%), var(--c-border-strong) var(--fill, 0%));
+}
+
+.map__opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  border: 2px solid var(--c-bg);
+}
+
+.map__opacity-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  border: 2px solid var(--c-bg);
+}
+
+.map__opacity-slider:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.map__opacity-slider:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }

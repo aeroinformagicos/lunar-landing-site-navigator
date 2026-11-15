@@ -27,7 +27,7 @@ test('the seven steps with Next, then Try it yourself', async ({ page, request }
   // Whether B has a profile depends on the data: the Terrain profile tab with B active is what matters.
   await expect(page.getByRole('tab', { name: 'Terrain profile' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('article', { name: 'Scenario B' })).toHaveAttribute('aria-current', 'true');
-  await expect(text).toHaveText(/^Here is why: a ridge \d+ (m|km) away blocks the Sun\./);
+  await expect(text).toHaveText(/^Here is why: (a ridge \d+ (m|km) away|the ground right around the lander) hides the Earth, so there is no direct radio link\./);
 
   await next();
   await expect(count).toHaveText('4 / 7');

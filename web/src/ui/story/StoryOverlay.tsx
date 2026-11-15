@@ -13,6 +13,7 @@ import { useBoot } from '../common/data';
 import { Button } from '../common/Button';
 import { useScenarioModel } from '../common/model';
 import { exploreState, STORY_LENGTH, storySteps, type StoryContext } from './storySteps';
+import './storySpot.css';
 
 /** The map view (T-29) is not integrated yet: step 6 uses its variant without map (§11). */
 export const HAS_MAP_VIEW = false;
@@ -34,7 +35,7 @@ function useBlockerDist(): number | null {
     if (model.status !== 'ready' || model.data.smooth) return null;
     const { table, frame, mask } = model.data;
     if (!findSegment(table, scenarioB.landingUnix)) return null;
-    const b = blockerAt(mask, skyAt(table, frame, scenarioB.landingUnix).sun.azDeg);
+    const b = blockerAt(mask, skyAt(table, frame, scenarioB.landingUnix).earth.azDeg);
     return Number.isFinite(b.distM) ? b.distM : null;
   }, [model, scenarioB]);
 }
@@ -68,14 +69,23 @@ export function StoryOverlay() {
     if (mode !== 'learn') applied.current = null;
   }, [mode, step, go]);
 
-  // Step 1 plays at 6 h/s for 4 s and pauses.
+  // Step 1 plays at 6 h/s for 4 s and then starts its cycle again from the landing (T-90, proposal 1;
+  // D-138), until the step changes or someone presses Pause. Nothing moves with reduced motion.
   useEffect(() => {
     if (mode !== 'learn' || step === null) return;
     const play = storySteps[step].view(ctx).playForS;
     if (!play || reducedMotion()) return;
-    const id = setTimeout(() => useAppStore.getState().setPlaying(false), play * 1000);
-    return () => clearTimeout(id);
-    // ctx changes with the data only; the timer belongs to the step.
+    const start = useAppStore.getState().cursorUnix;
+    const id = setInterval(() => {
+      const s = useAppStore.getState();
+      if (!s.playing) {
+        clearInterval(id); // paused by hand: the loop stops
+        return;
+      }
+      s.setCursor(start);
+    }, play * 1000);
+    return () => clearInterval(id);
+    // ctx changes with the data only; the loop belongs to the step.
   }, [mode, step]);
 
   const next = useCallback(() => {
@@ -104,6 +114,31 @@ export function StoryOverlay() {
     return () => window.removeEventListener('keydown', onKey);
   }, [mode, next, back]);
 
+  // P-11 (D-153): the card's height goes to `--story-h`, so the view above it ends where the card starts
+  // and scrolls inside instead of hiding its last rows (styles in v2.css).
+  const storyObs = useRef<ResizeObserver | null>(null);
+  const cardRef = useCallback((el: HTMLDivElement | null) => {
+    storyObs.current?.disconnect();
+    storyObs.current = null;
+    const root = document.documentElement;
+    if (!el) {
+      root.style.removeProperty('--story-h');
+      root.style.removeProperty('--time-h');
+      return;
+    }
+    const set = () => {
+      root.style.setProperty('--story-h', `${Math.ceil(el.getBoundingClientRect().height)}px`);
+      // Phones: the time bar is fixed at the bottom; the card sits right above it (v2.css).
+      const bar = document.querySelector('.v2-time');
+      root.style.setProperty('--time-h', `${bar ? Math.ceil(bar.getBoundingClientRect().height) : 0}px`);
+    };
+    set();
+    if (typeof ResizeObserver !== 'undefined') {
+      storyObs.current = new ResizeObserver(set);
+      storyObs.current.observe(el);
+    }
+  }, []);
+
   if (mode !== 'learn' || step === null) return null;
 
   function explore() {
@@ -122,7 +157,7 @@ export function StoryOverlay() {
   const last = step === STORY_LENGTH - 1;
 
   return (
-    <div className="story" role="region" aria-label={t('story.label')}>
+    <div ref={cardRef} className="story" role="region" aria-label={t('story.label')}>
       <p className="story__text" aria-live="polite" data-testid="story-text">
         {storySteps[step].text(ctx)}
       </p>

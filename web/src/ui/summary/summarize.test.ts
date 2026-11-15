@@ -52,7 +52,7 @@ function input(over: Partial<SummaryInput> = {}): SummaryInput {
 describe('sentence 1: now', () => {
   it('Sun and Earth visible', () => {
     expect(sentenceNow(input())).toBe(
-      'The Sun is 1.21° above the horizon and the Earth is in view: power and a direct link to Earth are both available.',
+      'The Sun is in view at 1.21° elevation and the Earth is in view: power and a direct link to Earth are both available.',
     );
   });
 

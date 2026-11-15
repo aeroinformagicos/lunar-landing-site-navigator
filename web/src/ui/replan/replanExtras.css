@@ -1,0 +1,152 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* T-90 (proposal 5): «When can I land here?» stays in view while the 31-column matrix scrolls. */
+.replan__matrix .replan__window,
+.replan__matrix .replan__window-head {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--c-bg-1, #162032);
+  box-shadow: -8px 0 8px -6px rgba(0, 0, 0, 0.6);
+}
+
+.replan__matrix .replan__window-head {
+  text-align: left;
+  padding-left: 8px;
+}
+
+.replan__intro {
+  max-width: 72em;
+  margin: 0 0 8px;
+  line-height: 1.45;
+}
+
+.replan__legend {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+/* Mentor feedback (D-173): every day column has the same width, like a date picker, so "+1 d" and
+   "+10 d" columns are spaced evenly; labels use tabular figures. */
+.replan__matrix th.replan__day,
+.replan__matrix td.replan__day {
+  width: 44px;
+  min-width: 44px;
+  max-width: 44px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mentor feedback (D-179): booking-calendar look. Works / tight days touch and form one bar per run
+   (rounded at its ends); days that do not work are quiet — a small red ⊗ on the dark background — so
+   the eye goes to the bars. Icons stay in every cell, so colour is never the only cue. */
+.replan__matrix td.replan__day {
+  padding: 2px 0;
+}
+
+.replan__matrix .replan__cell {
+  width: 100%;
+  border-radius: 0;
+}
+
+.replan__matrix .replan__cell--run-start {
+  border-top-left-radius: 11px;
+  border-bottom-left-radius: 11px;
+}
+
+.replan__matrix .replan__cell--run-end {
+  border-top-right-radius: 11px;
+  border-bottom-right-radius: 11px;
+}
+
+.replan__matrix .replan__cell--no_go {
+  background: transparent;
+  color: var(--c-nogo);
+}
+
+.replan__matrix .replan__cell--none {
+  background: transparent;
+}
+
+.replan__matrix .replan__cell--no_go:hover,
+.replan__matrix .replan__cell--no_go:focus-visible {
+  background: rgba(248, 113, 113, 0.14);
+}
+
+/* Team UI feedback (D-180): delay slider, like a date picker. */
+.replan-slider {
+  margin: 4px 0 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg, 12px);
+  background: rgba(10, 14, 23, 0.45);
+}
+
+.replan-slider__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+}
+
+.replan-slider__title {
+  font-weight: 600;
+}
+
+.replan-slider__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+
+.replan-slider__input {
+  width: 100%;
+  min-height: 44px;
+  margin: 2px 0 0;
+  accent-color: var(--c-accent, #38bdf8);
+  cursor: pointer;
+}
+
+.replan-slider__scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--c-text-muted);
+}
+
+.replan-slider__rows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.replan-slider__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.replan-slider__site {
+  font-weight: 600;
+}
+
+.replan-slider__status {
+  font-weight: 700;
+}
+
+.replan-slider__row--go .replan-slider__status {
+  color: var(--c-go);
+}
+
+.replan-slider__row--marginal .replan-slider__status {
+  color: var(--c-marginal);
+}
+
+.replan-slider__row--no_go .replan-slider__status {
+  color: var(--c-nogo);
+}
+
+.replan-slider__use {
+  min-height: 44px;
+}

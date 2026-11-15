@@ -13,8 +13,8 @@ export const DELAY_STEPS = [
   { label: '2 days', s: 2 * 86_400 },
 ] as const;
 
-export const STATUS_TEXT: Record<Status, string> = { go: 'Works', marginal: 'Tight', no_go: "Doesn't work" };
-export const STATUS_ICON: Record<Status, string> = { go: '✓', marginal: '!', no_go: '✕' };
+export const STATUS_TEXT: Record<Status, string> = { go: 'Works', marginal: 'Tight', no_go: 'Not suitable' };
+export const STATUS_ICON: Record<Status, string> = { go: '✓', marginal: '!', no_go: '⊗' };
 
 /** `12 d 7 h`, `6 h`, `3 d` (durations in sentences, 10 §7). */
 export function durationWords(seconds: number): string {
@@ -39,7 +39,7 @@ export function windowText(w: LandingWindow | null): string {
 /** `Landing 2027-08-13 06:00 UTC · Sun ✓ · Earth ✓ · Longest night 31 h ✕` (§6.5). */
 export function cellDetail(c: Cell, maxNightHours: number): string {
   if (c.status === null) return `Landing ${formatUtc(c.landingUnix)} · outside the ephemeris table`;
-  const mark = (ok: boolean) => (ok ? '✓' : '✕');
+  const mark = (ok: boolean) => (ok ? '✓' : '⊗');
   const night = Math.round(c.longestNightH * 10) / 10;
   return `Landing ${formatUtc(c.landingUnix)} · Sun ${mark(c.sunAtLanding)} · Earth ${mark(c.earthAtLanding)} · Longest night ${night} h ${mark(c.longestNightH <= maxNightHours)}`;
 }

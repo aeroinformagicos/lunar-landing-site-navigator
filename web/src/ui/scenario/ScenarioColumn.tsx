@@ -16,6 +16,7 @@ import { meshPointLabel } from '../map/mapData';
 import { MESH_RELIEF } from '../common/model';
 import { SitePicker } from './SitePicker';
 import { Button } from '../common/Button';
+import { ScenarioStatus } from './ScenarioStatus';
 
 /** What the picker is choosing for: a new scenario or the site of an existing one. */
 type PickerTarget = { kind: 'add' } | { kind: 'change'; id: ScenarioId };
@@ -119,6 +120,7 @@ export function ScenarioCard({ scenario, sites, onChangeSite }: CardProps) {
         <ScenarioMarker id={scenario.id} />
         <span className="scenario-card__letter">{scenario.id}</span>
         <span className="scenario-card__name">{name}</span>
+        <ScenarioStatus scenario={scenario} />
       </button>
       {coords && <p className="scenario-card__coords">{coords}</p>}
       <p className={smooth ? 'scenario-card__relief warn' : 'scenario-card__relief'}>

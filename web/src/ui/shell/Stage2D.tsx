@@ -1,9 +1,11 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Full-width 2D view of the v2 (15_interfaz_v2.md §4.2, §4.3): the 40° panorama of 10 §6.1 drawn
-// under the whole shell, with the horizon at 58 % of the height, both mission traces, the Sun's glow,
-// the Earth with its phase, labels on the canvas («Sun · behind the ridge») and the 360° strip on top.
+// under the whole shell, with the horizon at 50 % of the height, both mission traces (the part already
+// flown solid), the Sun's glow, the Earth with its phase and labels on the canvas («Sun · behind the
+// ridge»). While the mission plays, the view stays still and the body moves across it (T-64, D-120 a);
+// the direction of the view is shown and changed by the heading indicator next to the time bar (D-120 c).
 // Same projection and data as the v1 panorama: only the presentation changes.
-import { useContext, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { findSegment } from '../../core/ephemeris';
 import { blockerAt, horizonAt, smoothHorizon } from '../../core/horizon';
 import { evaluate } from '../../core/visibility';
@@ -11,12 +13,14 @@ import { t } from '../../i18n/t';
 import { missionEnd, useAppStore } from '../../state/store';
 import { formatDeg, formatMargin, formatPct } from '../common/format';
 import { CHART_DESCRIBEDBY } from '../metrics/ChartData';
-import { azDelta, flatLine, gridLines, horizonLine, pathOf, project, pxPerDeg, skyPath, stripAzAt, stripBracket, stripHorizon, stripProject, terrainPath, unproject, VIEW_WIDTH_DEG } from '../panorama/geometry';
+import { azDelta, flatLine, gridLines, horizonLine, pathOf, project, pxPerDeg, skyPath, terrainPath, unproject, viewCentre, VIEW_WIDTH_DEG } from '../panorama/geometry';
 import { bodyTrace, pointerReadout, ridgeLabel } from '../panorama/texts';
-import { earthPhase, horizonFracFor, phasePath, placeLabels, stageView, type LabelBox } from './horizon2d';
+import { earthPhase, followAz, horizonFracFor, phasePath, placeLabels, stageView, type LabelBox } from './horizon2d';
 import { BottomStripContext, useActive, type ActiveReady } from './useActive';
+import { useView2d } from './view2d';
 
-const STRIP_H = 30;
+/** Top of the azimuth ruler (the 360° strip that sat here became the heading indicator, D-120 c). */
+const STRIP_H = 6;
 const COLOR = { sun: 'var(--c-sun)', earth: 'var(--c-earth)' } as const;
 
 function useSize(): [React.RefObject<HTMLDivElement | null>, { w: number; h: number }] {
@@ -53,6 +57,8 @@ function contourPaths(w: number, h: number, horizonY: number): string[] {
 export function Stage2D() {
   const { resource } = useActive();
   const [box, size] = useSize();
+  // No 2D scene, no heading indicator.
+  useEffect(() => () => useView2d.getState().publish({ viewAz: null, sunAz: null, earthAz: null }), []);
   return (
     <div className="v2-stage2d" ref={box} data-view="2d">
       {resource.status === 'ready' ? (
@@ -72,6 +78,7 @@ function Scene({ data, w, h }: { data: ActiveReady; w: number; h: number }) {
   const cursor = useAppStore((s) => s.cursorUnix);
   const focus = useAppStore((s) => s.focusBody);
   const showSmooth = useAppStore((s) => s.showSmooth);
+  const playing = useAppStore((s) => s.playing);
   const bottomStrip = useContext(BottomStripContext);
   const [panAz, setPanAz] = useState<number | null>(null);
   const [hover, setHover] = useState<{ x: number; y: number; text: string } | null>(null);
@@ -84,6 +91,21 @@ function Scene({ data, w, h }: { data: ActiveReady; w: number; h: number }) {
     lastFocus.current = focus;
     if (panAz !== null) setPanAz(null);
   }
+  // The heading indicator next to the time bar turns the view (D-120 c).
+  const turn = useView2d((s) => s.turn);
+  const lastTurn = useRef(turn?.seq ?? 0);
+  if (turn && turn.seq !== lastTurn.current) {
+    lastTurn.current = turn.seq;
+    setPanAz(turn.az);
+  }
+  // While playing, the view only turns when the body nears an edge (D-120 a); on pause it stays where
+  // it was (no jump) until `Centre on …` or the indicator turns it.
+  const follow = useRef<number | null>(null);
+  const wasPlaying = useRef(playing);
+  if (wasPlaying.current !== playing) {
+    wasPlaying.current = playing;
+    if (!playing && follow.current !== null && panAz === null) setPanAz(follow.current);
+  }
 
   const sky = useMemo(() => (findSegment(model.table, cursor) ? evaluate(model.table, model.frame, model.mask, cursor) : null), [model, cursor]);
   const traces = useMemo(
@@ -93,17 +115,31 @@ function Scene({ data, w, h }: { data: ActiveReady; w: number; h: number }) {
     }),
     [model, scenario],
   );
-  if (!sky) return <p className="v2-stage__loading">{t('error.range')}</p>;
+  const body = sky?.[focus];
+  let autoAz: number | null = null;
+  if (body && playing && panAz === null && !viewCentre(model.mask.elDeg, body, null).arrow) {
+    follow.current = followAz(follow.current, body.azDeg);
+    autoAz = follow.current;
+  } else {
+    follow.current = null;
+  }
+  const viewAzNow = body ? (panAz ?? autoAz ?? body.azDeg) : null;
+  const publish = useView2d((s) => s.publish);
+  useEffect(() => {
+    publish({ viewAz: viewAzNow, sunAz: sky?.sun.azDeg ?? null, earthAz: sky?.earth.azDeg ?? null });
+  }, [publish, viewAzNow, sky]);
+  if (!sky || !body) return <p className="v2-stage__loading">{t('error.range')}</p>;
 
-  const body = sky[focus];
   // The bottom strip's measured height keeps the horizon clear of it.
   const stripPx = w < 768 ? 0 : bottomStrip || 0.4 * h; // phones: the strip is below the scene, not over it
-  const { view: v, arrow } = stageView(w, h, model.mask.elDeg, body, panAz, horizonFracFor(h, stripPx));
+  const { view: v, arrow } = stageView(w, h, model.mask.elDeg, body, panAz ?? autoAz, horizonFracFor(h, stripPx));
   const k = pxPerDeg(v);
   const line = horizonLine(v, model.mask.elDeg);
   const grid = gridLines(v, 5);
   const inView = (az: number, pad = 2) => Math.abs(azDelta(az, v.az)) < VIEW_WIDTH_DEG / 2 + pad;
-  const tracePath = (b: 'sun' | 'earth') => pathOf(traces[b].filter((p) => inView(p.azDeg)).map((p) => project(v, p.azDeg, p.elDeg)));
+  // The part of each trace already flown (landing → cursor) is drawn solid, the rest as planned.
+  const tracePath = (b: 'sun' | 'earth', past: boolean) =>
+    pathOf(traces[b].filter((p) => (past ? p.t <= cursor : p.t >= cursor - 3600) && inView(p.azDeg)).map((p) => project(v, p.azDeg, p.elDeg)));
   const smoothEl = smoothHorizon(model.mask.observerHeightM).elDeg;
 
   const sunP = project(v, sky.sun.azDeg, sky.sun.elDeg);
@@ -157,12 +193,6 @@ function Scene({ data, w, h }: { data: ActiveReady; w: number; h: number }) {
     e.preventDefault();
     setPanAz(v.az + d);
   }
-  function onStrip(e: React.PointerEvent<SVGSVGElement>) {
-    if (e.type === 'pointermove' && e.buttons === 0) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    setPanAz(stripAzAt(w, e.clientX - r.left));
-  }
-
   const bodyName = focus === 'sun' ? 'Sun' : 'Earth';
   const glowRx = 260 * (w / 1440);
   const glowRy = 70 * (w / 1440);
@@ -199,9 +229,9 @@ function Scene({ data, w, h }: { data: ActiveReady; w: number; h: number }) {
           </clipPath>
         </defs>
 
-        {/* Elevation ruler on the left (every 5°). */}
+        {/* Elevation ruler on the left (every 5°), below the header and the folded panel tabs. */}
         <g aria-hidden="true">
-          {grid.el.filter((g) => g.y > STRIP_H + 36).map((g) => (
+          {grid.el.filter((g) => g.y > (w < 768 ? STRIP_H + 36 : 150)).map((g) => (
             <g key={`e${g.label}`}>
               <line x1={0} x2={10} y1={g.y} y2={g.y} className="v2-scene__tick" />
               <text x={16} y={g.y + 4} className="v2-scene__axis">
@@ -212,8 +242,10 @@ function Scene({ data, w, h }: { data: ActiveReady; w: number; h: number }) {
         </g>
 
         {inView(sky.sun.azDeg, 20) && <ellipse cx={sunP.x} cy={Math.max(sunP.y, ground - 10)} rx={glowRx} ry={glowRy} fill={`url(#${idp}-glow)`} aria-hidden="true" />}
-        <path d={tracePath('earth')} className="v2-scene__trace v2-scene__trace--earth" aria-hidden="true" />
-        <path d={tracePath('sun')} className="v2-scene__trace v2-scene__trace--sun" aria-hidden="true" />
+        <path d={tracePath('earth', false)} className="v2-scene__trace v2-scene__trace--earth" aria-hidden="true" />
+        <path d={tracePath('sun', false)} className="v2-scene__trace v2-scene__trace--sun" aria-hidden="true" />
+        <path d={tracePath('earth', true)} className="v2-scene__trace v2-scene__trace--past v2-scene__trace--earth-past" aria-hidden="true" />
+        <path d={tracePath('sun', true)} className="v2-scene__trace v2-scene__trace--past v2-scene__trace--sun-past" aria-hidden="true" />
         {traces[focus]
           .filter((p) => p.daily && inView(p.azDeg, 0))
           .map((p) => {
@@ -281,7 +313,7 @@ function Scene({ data, w, h }: { data: ActiveReady; w: number; h: number }) {
           </text>
         )}
 
-        {/* Azimuth ruler on top, under the 360° strip (mockup). */}
+        {/* Azimuth ruler on top (mockup). */}
         <g aria-hidden="true">
           {grid.az.map((g) => (
             <g key={`a${g.label}`}>
@@ -309,36 +341,6 @@ function Scene({ data, w, h }: { data: ActiveReady; w: number; h: number }) {
         {hover?.text ?? ''} {!body.visible ? t('pano.below', { body: bodyName }) : ''}
       </p>
 
-      {/* 360° strip across the top: drag or arrows move the 40° window (10 §6.1). */}
-      <svg
-        className="v2-strip"
-        width={w}
-        height={STRIP_H}
-        role="slider"
-        tabIndex={0}
-        aria-label={t('pano.strip_label')}
-        aria-valuemin={0}
-        aria-valuemax={360}
-        aria-valuenow={Math.round(v.az)}
-        aria-valuetext={`${Math.round(v.az)}°`}
-        onPointerDown={onStrip}
-        onPointerMove={onStrip}
-        onKeyDown={onKeyDown}
-      >
-        <path d={`${pathOf(stripHorizon(w, STRIP_H, model.mask.elDeg))}L${w} ${STRIP_H}L0 ${STRIP_H}Z`} className="v2-strip__ground" />
-        {stripBracket(w, v.az).map((b, i) => (
-          <rect key={i} x={b.x} y={1} width={b.w} height={STRIP_H - 2} className="v2-strip__bracket" />
-        ))}
-        {(['sun', 'earth'] as const).map((b) => {
-          const p = stripProject(w, STRIP_H, sky[b].azDeg, sky[b].elDeg);
-          return <circle key={b} cx={p.x} cy={p.y} r={3} fill={COLOR[b]} />;
-        })}
-        {['N', 'E', 'S', 'W'].map((c, i) => (
-          <text key={c} x={(i * w) / 4 + 4} y={STRIP_H - 9} className="v2-scene__axis">
-            {c}
-          </text>
-        ))}
-      </svg>
     </>
   );
 }

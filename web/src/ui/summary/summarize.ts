@@ -81,7 +81,8 @@ export function sentenceNow(input: SummaryInput): string {
   const { sun, earth, eclipse } = input.state;
   let s: string;
   if (sun.visible && earth.visible) {
-    s = `The Sun is ${deg2(sun.elDeg)}° above the horizon and the Earth is in view: power and a direct link to Earth are both available.`;
+    // P-05 (D-156, wording of D-119 j): a visible Sun can have a negative elevation over the flat horizon.
+    s = `The Sun is in view at ${deg2(sun.elDeg)}° elevation and the Earth is in view: power and a direct link to Earth are both available.`;
   } else if (sun.visible) {
     s = `The Sun is up, but the Earth is ${hiddenPhrase(earth.elDeg, input.blockerEarth, input, false)}: no direct link to Earth.`;
   } else if (earth.visible) {

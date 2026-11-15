@@ -4,7 +4,7 @@
 // opacity controls; legend, scale and orientation; pointer readout; click (or Enter on the centre
 // cross) creates the mesh-point scenario of 08 §7. Loaded on demand (`import()`), 02 §7.
 import { CHART_DESCRIBEDBY } from '../metrics/ChartData';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { GRID, gridRef, inGrid, xyOfLatLon } from '../../core/grid';
 import { loader } from '../../core/loaders';
 import { t, type TextKey } from '../../i18n/t';
@@ -147,24 +147,35 @@ function MapCanvas({ data }: { data: MapData }) {
       g.globalAlpha = 1;
     }
     g.restore();
-    g.lineWidth = 1.5;
-    g.font = '12px system-ui, sans-serif';
+    // Regions and markers with a dark halo, so they read on the bright hillshade too (layer None; T-90).
+    g.font = '600 13px system-ui, sans-serif';
+    g.lineJoin = 'round';
     for (const r of data.regions) {
       const a = worldOfXY(r.box_m[0], r.box_m[3]);
       const b = worldOfXY(r.box_m[2], r.box_m[1]);
       const p = toScreen(a.wx, a.wy);
       const q = toScreen(b.wx, b.wy);
-      g.strokeStyle = '#e8eaed';
+      g.strokeStyle = 'rgba(5, 7, 11, 0.85)';
+      g.lineWidth = 4;
       g.strokeRect(p.x, p.y, q.x - p.x, q.y - p.y);
-      g.fillStyle = '#e8eaed';
-      g.fillText(r.name, p.x + 2, p.y - 3);
+      g.strokeStyle = '#e8eaed';
+      g.lineWidth = 1.5;
+      g.strokeRect(p.x, p.y, q.x - p.x, q.y - p.y);
+      g.strokeStyle = 'rgba(5, 7, 11, 0.9)';
+      g.lineWidth = 4;
+      g.strokeText(r.name, p.x + 2, p.y - 4);
+      g.fillStyle = '#f8fafc';
+      g.fillText(r.name, p.x + 2, p.y - 4);
     }
+    g.lineWidth = 1.5;
     for (const m of markers) {
       const p = toScreen(m.wx, m.wy);
       g.beginPath();
       g.arc(p.x, p.y, 4, 0, 2 * Math.PI);
       g.fillStyle = '#e8eaed';
       g.fill();
+      g.strokeStyle = 'rgba(5, 7, 11, 0.85)';
+      g.stroke();
     }
     if (activeWorld) {
       const p = toScreen(activeWorld.wx, activeWorld.wy);
@@ -328,9 +339,25 @@ function MapCanvas({ data }: { data: MapData }) {
             </select>
           </label>
         </div>
-        <label className="field">
+      </div>
+      {/* T-90 (proposal 2): the value is shown and the slider is off without a layer. D-152: own row under the
+          layer buttons, fill drawn from the value (empty at 0 %, full at 100 %), fixed-width tabular value. */}
+      <div className="map__opacity-row">
+        <label className="field map__opacity">
           <span>{t('map.opacity')}</span>
-          <input type="range" min={0} max={1} step={0.05} value={opacity} onChange={(e) => setOpacity(Number(e.target.value))} />
+          <input
+            type="range"
+            className="map__opacity-slider"
+            min={0}
+            max={100}
+            step={5}
+            value={Math.round(opacity * 100)}
+            disabled={layer === 'none'}
+            style={{ '--fill': `${Math.round(opacity * 100)}%` } as CSSProperties}
+            aria-valuetext={`${Math.round(opacity * 100)} %`}
+            onChange={(e) => setOpacity(Number(e.target.value) / 100)}
+          />
+          <span className="map__opacity-value">{Math.round(opacity * 100)} %</span>
         </label>
         <button type="button" aria-label={t('map.zoom_in')} onClick={() => setView((v) => zoomAt(v, 2, w / 2, h / 2))}>
           +

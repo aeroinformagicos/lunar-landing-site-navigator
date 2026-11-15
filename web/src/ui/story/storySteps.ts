@@ -110,15 +110,21 @@ export const storySteps: StoryStep[] = [
     text: (ctx) => {
       const [a, b] = ctx.defaults.demo_pair.map((id) => siteById(ctx, id));
       const d = a && b ? storyDistance(siteDistanceM(a, b)) : 'a short distance';
-      return `These two sites are ${d} apart. One has sunlight and a direct radio link to Earth. The other has neither.`;
+      // True for any pair of D-108 (A ≥ 60 % of the mission with both, B ≤ 10 % and no_go); the former
+      // «The other has neither» was false for the published pair: B has the Sun at landing (T-92).
+      return `These two sites are ${d} apart. At one, the Sun (power) and the Earth (radio link) are both in view for most of the mission. At the other, almost never, and the mission fails.`;
     },
   },
   {
     seconds: [18, 27],
-    apply: (ctx) => ({ ...base(ctx, 2), activeScenarioId: 'B', tab: 'section', focusBody: 'sun' }),
+    // P-02 (D-150): at the published B the Sun is up at landing; what is missing is the Earth, hidden by
+    // the slope the lander stands on (blocking point 0.0 km). The step shows the profile toward Earth.
+    apply: (ctx) => ({ ...base(ctx, 2), activeScenarioId: 'B', tab: 'section', focusBody: 'earth' }),
     view: main,
     text: (ctx) =>
-      `Here is why: a ridge ${ctx.blockerDistM !== null ? storyDistance(ctx.blockerDistM) : 'nearby'} away blocks the Sun. Every answer comes with its reason.`,
+      ctx.blockerDistM !== null && ctx.blockerDistM >= 1000
+        ? `Here is why: a ridge ${storyDistance(ctx.blockerDistM)} away hides the Earth, so there is no direct radio link. Every answer comes with its reason.`
+        : 'Here is why: the ground right around the lander hides the Earth, so there is no direct radio link. Every answer comes with its reason.',
   },
   {
     seconds: [27, 37],

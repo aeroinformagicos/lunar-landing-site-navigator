@@ -58,6 +58,37 @@ export function fillProfile(raw: Int16Array, nAz = PROFILE_AZ, nb = PROFILE_BINS
   return { heights: out, filled };
 }
 
+/**
+ * Near-site smoothing across azimuth of the profile scene (T-74, D-134). Each bin keeps the height of
+ * its highest-elevation sample (06 §8), so near the site neighbouring azimuths, a few metres apart,
+ * jump by tens of metres and the mesh shows radial streaks. Each bin is averaged over a circular
+ * window of about `arcM` of arc (at most ±`maxHalf` azimuths); from a few km on the window is one
+ * azimuth and the profile is untouched, so the far silhouette (the horizon) does not change. Visual only.
+ */
+export function smoothNearAzimuths(t: RadialTerrain, arcM: number, maxHalf: number): RadialTerrain {
+  const nb = t.dist.length;
+  const n = t.nAz;
+  const heights = new Float32Array(t.heights);
+  const sums = new Float64Array(n + 1);
+  for (let b = 0; b < nb; b++) {
+    const spacing = (t.dist[b] * 2 * Math.PI) / n;
+    const half = Math.min(maxHalf, Math.floor(arcM / spacing / 2), Math.floor((n - 1) / 2));
+    if (half < 1) continue;
+    for (let j = 0; j < n; j++) sums[j + 1] = sums[j] + t.heights[j * nb + b];
+    const total = sums[n];
+    for (let j = 0; j < n; j++) {
+      const lo = j - half;
+      const hi = j + half + 1;
+      let s: number;
+      if (lo < 0) s = sums[hi] + (total - sums[n + lo]);
+      else if (hi > n) s = sums[n] - sums[lo] + sums[hi - n];
+      else s = sums[hi] - sums[lo];
+      heights[j * nb + b] = s / (2 * half + 1);
+    }
+  }
+  return { nAz: n, dist: t.dist, heights, centreH: t.centreH };
+}
+
 /** Every `step`-th azimuth (the medium and low tiers draw one of every two, §4.2). */
 export function everyNthAzimuth(t: RadialTerrain, step: number): RadialTerrain {
   if (step <= 1) return t;

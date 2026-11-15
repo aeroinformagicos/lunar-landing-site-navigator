@@ -6,10 +6,14 @@
 export const LOOK = Object.freeze({
   /** Directional sunlight before tone mapping. */
   sunIntensity: 8.0,
-  /** Earthshine relative to sunlight (about 1/750), times the Earth's lit fraction. */
-  earthshine: 0.004,
+  /**
+   * Earthshine relative to sunlight, times the Earth's lit fraction. T-74 (D-132): 0.03 (was 0.004),
+   * like a camera exposed for the shadows, so relief in shadow reads faintly blue from the Earth's side.
+   */
+  earthshine: 0.03,
   earthshineColour: [0.686, 0.776, 0.91] as [number, number, number], // #AFC6E8
-  ambient: 0.002,
+  /** Faint neutral fill (T-74, D-132: 0.004, was 0.002). */
+  ambient: 0.004,
   /** Grey regolith albedo and its low-frequency variation. */
   albedo: 0.12,
   albedoVariation: 0.15,
@@ -19,7 +23,9 @@ export const LOOK = Object.freeze({
   detailAmount: 0.1,
   /** Lighting while the ephemeris is not ready: a neutral light from above, so the view is never empty. */
   neutralIntensity: 0.6,
-  stars: 4000,
+  /** T-74 (D-136): 6,000 stars, 35 % of them in a band about 12° wide tilted 60° (a decorative Milky Way). */
+  stars: 6000,
+  starBand: { share: 0.35, width: 0.2, tiltRad: (60 * Math.PI) / 180 },
   starSeed: 20261114,
   /** Star brightness when the Sun is in the field of view (glare). */
   starGlareDim: 0.3,
@@ -28,13 +34,20 @@ export const LOOK = Object.freeze({
   haloRadiusDeg: 8,
   haloScaleDeg: 1.2,
   haloStrength: 0.6,
+  /** Strength of the Sun's four glare spikes (T-74, D-136); none on the low tier. */
+  sunSpikes: 0.5,
   /** Earth: ocean, night side, cloud cover. No images (CLAUDE.md §10 bis). */
   earthOcean: [0.118, 0.306, 0.549] as [number, number, number], // #1E4E8C
   earthNight: [0.02, 0.027, 0.047] as [number, number, number], // #05070C
   earthClouds: 0.35,
-  earthIntensity: 2.2,
+  earthIntensity: 2.6,
   /** Sky objects live on a sphere of this radius around the sky camera. */
   skyRadius: 1000,
+  /** Profile scene: near-site smoothing across azimuth (D-134): arc of the window (m) and its cap (azimuths each side). */
+  profileSmoothArcM: 150,
+  profileSmoothMaxHalf: 24,
+  /** First framing and Recenter with the Sun in focus: heading this many degrees off the Sun (side light, D-132). */
+  crossLightDeg: -65,
   /** Scenario pin mast (m). */
   mastM: 300,
   exposure: 1.0,

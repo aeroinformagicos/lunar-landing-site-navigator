@@ -11,6 +11,7 @@ test('Blue Ghost 1, 14 March 2025: band, events, notice and Earth in front', asy
   await page.getByRole('article', { name: 'Scenario A' }).getByRole('button', { name: 'Change site' }).click();
   await page.getByRole('dialog').getByRole('button', { name: /Blue Ghost Mission 1/ }).click();
   await page.getByLabel('Landing (UTC)').fill('2025-03-14T00:00');
+  await page.getByLabel('Landing (UTC)').press('Enter');
   await page.getByLabel('Mission', { exact: true }).fill('1');
   await page.getByLabel('Mission', { exact: true }).press('Enter');
   await page.getByRole('tab', { name: 'Timeline' }).click();
