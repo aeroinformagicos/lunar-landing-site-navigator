@@ -50,7 +50,11 @@ in which it is first used. Content owner: A2.
 | Vitest | 5.1.0 | Web tests | MIT |
 | Playwright | 1.65.0 | End-to-end tests | Apache-2.0 |
 | Zustand | 5.1.0 | Web state | MIT |
-| d3-array, d3-scale, d3-shape, d3-selection, d3-zoom | 3.2.5, 4.0.3, 3.2.1, 3.0.1, 3.0.1 | Charts and map zoom | ISC |
+| d3-array, d3-scale, d3-shape, d3-selection, d3-zoom | 3.2.5, 4.0.3, 3.2.1, 3.0.1, 3.0.1 | Declared in `web/package.json` for charts and map zoom; on 2026-11-15 (T-94) no file in `web/src` imports them, so they are not in the published build | ISC |
 | three.js (`three`, `@types/three`), https://threejs.org | 0.187.0 | 3D view: WebGL 2 renderer, shader materials, geometry (loaded on demand) | MIT |
 | Wrangler | 4.160.0 | Cloudflare Pages deployment | MIT OR Apache-2.0 |
 | @fontsource/inter, @fontsource/jetbrains-mono | 5.3.0, 5.3.0 | Fonts of the v2 interface (Inter, JetBrains Mono), bundled, latin subset only | OFL-1.1 (fonts); MIT (package) |
+| NAIF CSPICE toolkit (bundled inside the SpiceyPy wheels) | N0067, as shipped with SpiceyPy 8.3.0 | SPICE routines called through SpiceyPy (`str2et`, `spkcpo`, frames) | NAIF rules: free to use and redistribute, no warranty (https://naif.jpl.nasa.gov/naif/rules.html) |
+| DefinitelyTyped type packages (`@types/react`, `@types/react-dom`, `@types/d3-*`) | 19.3.0, 19.3.0, see `web/package.json` | Type checking only, not in the build | MIT |
+| Lighthouse | 12.6.0 | Accessibility audit B9 (T-63; reports in `docs/handoff/T-63-lighthouse-a11y-*.json`), run by hand, not a project dependency | Apache-2.0 |
+| Microsoft Edge (Chromium) driven by Playwright | 157 | Review of the published site and the slide screenshots script `ops/slides_screenshots.mjs` (T-94) | Proprietary browser, used as a tool only |
