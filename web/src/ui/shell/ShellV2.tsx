@@ -150,7 +150,7 @@ export default function ShellV2() {
         <section ref={bottomRef} className="v2-bottom" aria-label={t('panel.label')}>
           <div className="v2-mission">
             <Verdict />
-            {/* T-93 (D-124): the same mission read as visibility or as power and comms. */}
+            {/* T-93 (D-123): the same mission read as visibility or as power and comms. */}
             {!learning && <FiguresSwitch />}
             {!learning && (figView === 'power' ? <PowerFigures /> : <Figures />)}
             {!learning && figView === 'power' && <PowerAssumptionsBlock />}

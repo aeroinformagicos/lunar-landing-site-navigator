@@ -1,5 +1,5 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
-// «Power & comms» view of the bottom strip (T-93, D-124): the visibility of the mission read as energy
+// «Power & comms» view of the bottom strip (T-93, D-123): the visibility of the mission read as energy
 // from a reference panel, a battery for the longest night and hours of direct link with the Earth. A
 // labelled, simplified estimate with its assumptions in sight and editable; it reuses the visibility
 // results (core/power.ts) and changes no figure of the «Sun & Earth visibility» view.

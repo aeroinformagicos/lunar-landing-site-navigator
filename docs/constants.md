@@ -109,6 +109,12 @@ fuente (CLAUDE.md §2).
 | Vista 3D: escena de anillo (suelo llano, rampa hasta la esfera, hundimiento de los paneles) | 30.000; 6.000; 50 | m; m; m | `16_vista_3d.md` §4.3; D-119 d. Solo dibujo | `web/src/ui/stage3d/radial.ts` (`RING_FLAT_M`, `RING_RAMP_M`) |
 | Vista 3D: presupuestos de tamaño comprobados en `make check` (JavaScript principal; 3D: trozo + three.js + trabajador), gzip | 350; 1.500 | kB | `02_arquitectura.md` §7; `16_vista_3d.md` §12.1; D-119 e | `ops/tasks.mjs` (`check-size`) |
 | Vista 2D: margen del borde antes de girar la vista mientras se reproduce | 6 | ° | D-120 a (presentación, sin efecto en ninguna cifra) | `web/src/ui/shell/horizon2d.ts` (`FOLLOW_EDGE_DEG`) |
+| Energía (T-93): irradiancia solar total a 1 UA | 1361 | W/m² | Kopp, G., Lean, J. L. (2011), GRL 38, L01706: 1360,8 ± 0,5 W/m² (SORCE/TIM, mínimo de 2008), redondeado; D-123 | `web/src/core/power.ts` (`SOLAR_CONSTANT_W_M2`) |
+| Energía (T-93): unidad astronómica | 149 597 870,7 | km | IAU 2012, Resolución B2 | `web/src/core/power.ts` (`AU_KM`) |
+| Energía (T-93): eficiencia del panel por defecto (editable) | 30,7 | % | Spectrolab, ficha de la célula XTJ Prime: media de producción al inicio de vida, AM0 (135,3 mW/cm²), 28 °C; D-123 | `web/src/core/power.ts` (`DEFAULT_POWER.efficiency`) |
+| Energía (T-93): área del panel, consumo nocturno y elevación mínima de la Tierra por defecto (editables) | 1; 100; 0 | m²; W; ° | Unidades de referencia (los resultados escalan con ellas) y la definición de «hay enlace» de CLAUDE.md §2; D-123 | `web/src/core/power.ts` (`DEFAULT_POWER`) |
+| Energía (T-93): paso de muestreo de la estimación | 600 | s | Paso del cursor de la interfaz (`10` §4); D-123 | `web/src/core/power.ts` (`POWER_STEP_S`) |
+
 ## Valores medidos
 
 Medidos al ejecutar cada tarjeta en el portátil de I1 (Windows 11, SSD) con los ficheros de `$LLSN_DATA_DIR`.

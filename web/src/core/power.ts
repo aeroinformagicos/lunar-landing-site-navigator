@@ -1,5 +1,5 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
-// Power and communications estimate (T-93, D-124): a simplified, labelled reading of the visibility
+// Power and communications estimate (T-93, D-123): a simplified, labelled reading of the visibility
 // results, not a new visibility algorithm (07 §12 is untouched, so it has no Python twin). Pure.
 //
 // Power of a reference flat panel: P = S0 · (1 AU / r)² · lit · η · A · cos(i), where S0 is the solar

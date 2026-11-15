@@ -1,5 +1,5 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
-// T-93 (D-124): power and communications estimate. Expected values are worked out by hand from the
+// T-93 (D-123): power and communications estimate. Expected values are worked out by hand from the
 // formulas in power.ts (S0 = 1361 W/m², 1 AU = 149 597 870.7 km), not taken from the code.
 import { describe, expect, it } from 'vitest';
 import { formulaMask } from '../horizon';
