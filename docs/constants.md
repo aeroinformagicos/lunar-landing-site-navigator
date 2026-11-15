@@ -108,6 +108,7 @@ fuente (CLAUDE.md §2).
 | Vista 3D: sombras de la escena de perfil (primer paso, razón, número máximo de pasos, entradas de la tabla distancia → intervalo) | 50; 1,05; 200; 1.024 | m; —; —; — | `16_vista_3d.md` §6.3 (malla de perfil); D-119 b. Solo dibujo: no cambian ninguna cifra | `web/src/ui/stage3d/shadow.ts` (`RADIAL_SHADOW_D0_M`, `RADIAL_SHADOW_RATIO`, `RADIAL_SHADOW_STEPS`, `BIN_LUT_SIZE`) |
 | Vista 3D: escena de anillo (suelo llano, rampa hasta la esfera, hundimiento de los paneles) | 30.000; 6.000; 50 | m; m; m | `16_vista_3d.md` §4.3; D-119 d. Solo dibujo | `web/src/ui/stage3d/radial.ts` (`RING_FLAT_M`, `RING_RAMP_M`) |
 | Vista 3D: presupuestos de tamaño comprobados en `make check` (JavaScript principal; 3D: trozo + three.js + trabajador), gzip | 350; 1.500 | kB | `02_arquitectura.md` §7; `16_vista_3d.md` §12.1; D-119 e | `ops/tasks.mjs` (`check-size`) |
+| Vista 2D: margen del borde antes de girar la vista mientras se reproduce | 6 | ° | D-120 a (presentación, sin efecto en ninguna cifra) | `web/src/ui/shell/horizon2d.ts` (`FOLLOW_EDGE_DEG`) |
 ## Valores medidos
 
 Medidos al ejecutar cada tarjeta en el portátil de I1 (Windows 11, SSD) con los ficheros de `$LLSN_DATA_DIR`.
