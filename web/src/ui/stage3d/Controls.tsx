@@ -74,16 +74,13 @@ export interface ControlsProps {
 const OPEN_KEY = 'llsn.stage3d.controls';
 const MODE_TEXT: Record<CameraMode, TextKey> = { orbit: 'stage3d.orbit', fly: 'stage3d.fly', ground: 'stage3d.ground' };
 
-/** Below this width (tablets) the controls start folded so they do not cover the summary (T-74). */
-const FOLDED_BELOW_PX = 1024;
-
 function readOpen(): boolean {
-  const byWidth = typeof window === 'undefined' || window.innerWidth >= FOLDED_BELOW_PX;
+  // Mentor feedback (D-177): the first 3D screen is the one we present, so the controls start folded
+  // everywhere (one "3D controls" button) unless the user opened them before.
   try {
-    const v = localStorage.getItem(OPEN_KEY);
-    return v === null ? byWidth : v !== '0';
+    return localStorage.getItem(OPEN_KEY) === '1';
   } catch {
-    return byWidth;
+    return false;
   }
 }
 

@@ -10,7 +10,8 @@ export default defineConfig({
     // WebGL 2 by software in headless Chromium, for the 3D view (16_vista_3d.md §15.2).
     launchOptions: { args: ['--enable-unsafe-swiftshader'] },
     // The welcome card (T-53) counts as closed in every test except `ux.spec.ts`, which clears it.
-    storageState: { cookies: [], origins: [{ origin: baseURL, localStorage: [{ name: 'llsn.welcome.closed', value: '1' }] }] },
+    storageState: { cookies: [], origins: [{ origin: baseURL, localStorage: [{ name: 'llsn.welcome.closed', value: '1' }, { name: 'llsn.stage3d.controls', value: '1' }] }] },
+    // ↑ the 3D controls start folded for users (D-177); the 3D tests drive them, so they start open here.
   },
   webServer: { command: 'npx vite preview --port 4173', port: 4173, reuseExistingServer: true },
 });

@@ -1242,6 +1242,10 @@
 
 .ui-v2 .v2-credits {
   font-family: var(--font-v2-sans);
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(10, 14, 23, 0.78);
 }
 
 /* Data views open: a compact strip (figures at 28 px, no summary) so the sheet has room (D-111). */

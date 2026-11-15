@@ -289,11 +289,11 @@ export function TimeBar() {
 }
 
 export function Provenance() {
-  const { resource } = useActive();
-  const relief = resource.status === 'ready' ? resource.data.model.reliefLabel : null;
+  // Mentor feedback (D-178): the technical provenance line (terrain model, ephemeris) left the first
+  // screen — it is in the 3D controls, the More text and the Validation page. The credits and the AI
+  // note stay, on one line with a backdrop so they read over lit 3D terrain.
   return (
     <p className="v2-provenance">
-      {relief && <span>{t('metrics.provenance', { terrain: relief })}</span>}
       <span className="v2-credits">
         {t('footer.credit')} · {t('about.ai')}
       </span>
