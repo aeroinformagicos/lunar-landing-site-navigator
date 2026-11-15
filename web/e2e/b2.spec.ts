@@ -62,7 +62,7 @@ test(`B2: Blue Ghost 1 works at the real landing and fails 14 days later (night 
   // The click set that landing in the scenario: the panel's full chip agrees with the matrix.
   await expect(await scenarioCard(page, ui)).toContainText('Landing 2025-03-16 08:34 UTC');
   await expect(page.getByTestId('status-chip')).toHaveText("⊗ Not suitable");
-  await expect(page.getByRole('list', { name: 'Requirements' }).getByRole('listitem').filter({ hasText: 'No night over 24 h' })).toContainText('⊗');
+  await expect(page.getByLabel('Requirements', { exact: true }).getByRole('listitem').filter({ hasText: 'No night over 24 h' })).toContainText('⊗');
 });
 
 test(`B2: Blue Ghost 1 works again 29.5 days later (one synodic month) (${ui})`, async ({ page }) => {
