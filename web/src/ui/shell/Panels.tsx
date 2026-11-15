@@ -14,6 +14,8 @@ import { countdownText, requirementChecks } from '../metrics/derive';
 import { ScenarioCard } from '../scenario/ScenarioColumn';
 import { FloatingPanel } from './FloatingPanel';
 import { HorizonDetail } from './HorizonDetail';
+import { openLeftPanel, REQUIREMENTS_FOCUS } from './openPanel';
+import { requestBestSite } from '../optimal/request';
 import { useActive } from './useActive';
 import { useView2d } from './view2d';
 
@@ -74,6 +76,10 @@ export function SitesPanel({ onPick, open, onOpenChange }: LeftProps & { onPick:
             {t('scenario.compare')}
           </Button>
         )}
+        {/* T-90 (proposal 9): the best-site search, reachable from the main view. */}
+        <Button variant="secondary" onClick={requestBestSite}>
+          {t('best.find_best')}
+        </Button>
       </div>
       {full && (
         <p id="v2-max-scenarios" className="v2-note">
@@ -99,6 +105,7 @@ export function SetupPanel({ open, onOpenChange }: LeftProps) {
         <h3 id="v2-req-title" className="v2-section__title">
           {t('panel.requirements')}
         </h3>
+        <p className="v2-note">{t('panel.requirements_help')}</p>
         <label className="field__check">
           <input type="checkbox" checked={req.needSunAtLanding} onChange={(e) => setRequirements({ needSunAtLanding: e.target.checked })} />
           {t('req.sun')}
@@ -175,6 +182,8 @@ export function NowPanel() {
       ) : (
         <p className="v2-note">{resource.status === 'ready' ? t('metrics.outside') : t('metrics.loading')}</p>
       )}
+      {/* T-90 (proposal 3): what the elevations and the margin are measured from. */}
+      {!detail && now && <p className="v2-note">{t('now.reference')}</p>}
 
       {!detail && checks.length > 0 && (
         <ul className="v2-checks" aria-label={t('metrics.status')}>
@@ -187,6 +196,11 @@ export function NowPanel() {
             </li>
           ))}
         </ul>
+      )}
+      {!detail && checks.length > 0 && (
+        <Button variant="ghost" onClick={() => openLeftPanel({ which: 'setup', focus: REQUIREMENTS_FOCUS })}>
+          {t('panel.requirements_change')}
+        </Button>
       )}
 
       {now && now.sky.eclipse.kind !== 'none' && (

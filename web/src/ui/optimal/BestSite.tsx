@@ -18,6 +18,7 @@ import { loadCellMask, type MapData } from '../map/mapData';
 import { durationWords } from '../replan/texts';
 import { exactBothHours } from './refine';
 import { Button } from '../common/Button';
+import { takeBestSiteRequest } from './request';
 
 export interface BestSiteProps {
   data: MapData;
@@ -39,7 +40,13 @@ export function BestSite({ data, layer, periodLabel, onFocus }: BestSiteProps) {
   const scenario = useAppStore(activeScenario);
   const count = useAppStore((s) => s.scenarios.length);
   const addScenario = useAppStore((s) => s.addScenario);
-  const [open, setOpen] = useState(false);
+  // Opened from the Sites panel (T-90, proposal 9): unfolded, with the focus on its toggle.
+  const [requested] = useState(takeBestSiteRequest);
+  const [open, setOpen] = useState(requested);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (requested) toggleRef.current?.focus();
+  }, [requested]);
   const [region, setRegion] = useState<number | null>(null);
   const [periodHits, setPeriodHits] = useState<PeriodHit[] | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
@@ -138,7 +145,7 @@ export function BestSite({ data, layer, periodLabel, onFocus }: BestSiteProps) {
 
   return (
     <section className="best" aria-label={t('best.title')}>
-      <button type="button" aria-expanded={open} onClick={() => setOpen(!open)}>
+      <button ref={toggleRef} type="button" aria-expanded={open} onClick={() => setOpen(!open)}>
         {mode === 'plan' ? t('best.title') : t('best.find_best')}
       </button>
       {open && (

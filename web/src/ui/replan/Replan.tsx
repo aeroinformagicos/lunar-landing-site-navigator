@@ -14,6 +14,7 @@ import { useBoot } from '../common/data';
 import { formatHours, formatPct, formatUtc } from '../common/format';
 import { useScenarioModel } from '../common/model';
 import { computeMission } from '../metrics/useMission';
+import './replanExtras.css';
 import { alternativeText, cellDetail, cellLabel, DELAY_STEPS, offsetLabel, STATUS_ICON, STATUS_TEXT, windowText } from './texts';
 
 interface RowSpec {
@@ -84,6 +85,7 @@ function MatrixRow(props: {
         : Array.from({ length: columns }, (_, c) => (
             <td key={c} className="replan__cell--loading" aria-hidden="true" />
           ))}
+      {/* T-90 (proposal 5): the answer column stays visible (sticky) while the matrix scrolls. */}
       <td className="replan__window" data-testid="next-window">
         {result ? windowText(result.window) : model.status === 'error' ? t('scenario.error') : t('common.loading')}
       </td>
@@ -209,6 +211,10 @@ export function Replan({ story }: { story?: ReplanStoryProps } = {}) {
         <CandidateRank key={s.id} site={s} base={base} onRow={onRow} />
       ))}
       {!story && (
+        // T-90 (proposal 5): what to set, what the columns and icons mean, before the controls.
+        <p className="replan__intro">{t('replan.intro', { date: formatUtc(base.landingUnix) })}</p>
+      )}
+      {!story && (
       <div className="replan__controls">
         <div className="segmented" role="group" aria-label={t('replan.delay')}>
           <span className="replan__label">{t('replan.delay')}</span>
@@ -256,7 +262,10 @@ export function Replan({ story }: { story?: ReplanStoryProps } = {}) {
                   {offsetLabel(k * deltaS)}
                 </th>
               ))}
-              <th scope="col">{t('replan.window')}</th>
+              <th scope="col" className="replan__window-head" title={t('replan.window_help')}>
+                {t('replan.window')}
+                <span className="visually-hidden"> — {t('replan.window_help')}</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -266,6 +275,9 @@ export function Replan({ story }: { story?: ReplanStoryProps } = {}) {
           </tbody>
         </table>
       </div>
+      <p className="replan__legend muted">
+        {t('replan.legend')} · {t('replan.window_help')}.
+      </p>
       <p className="replan__detail" role="status" data-testid="cell-detail">
         {detail ?? t('replan.pick')}
       </p>

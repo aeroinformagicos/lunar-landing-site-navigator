@@ -1,0 +1,48 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* Guided story (T-90, proposal 1): everything the step does not talk about is dimmed, so the eye goes
+   to the scene or the sheet of the step and to the story card. Opacity for text and pills; a scrim over
+   the floating panels (a filter or opacity there would break their backdrop blur). Still usable. */
+.ui-v2 .v2--learn .v2-brand,
+.ui-v2 .v2--learn .v2-pills,
+.ui-v2 .v2--learn .v2-modes,
+.ui-v2 .v2--learn .v2-toggle,
+.ui-v2 .v2--learn .fp-tab,
+.ui-v2 .v2--learn .v2-tabs,
+.ui-v2 .v2--learn .v2-provenance,
+.ui-v2 .v2--learn .v2-minimap {
+  opacity: 0.3;
+  transition: opacity 250ms ease;
+}
+
+.ui-v2 .v2--learn .fp {
+  position: relative;
+}
+
+.ui-v2 .v2--learn .fp::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(5, 7, 11, 0.68);
+  pointer-events: none;
+}
+
+/* Step 1 is about the Sun moving over the scene: the time bar stays lit. From step 2 on the steps talk
+   about a sheet (comparison, terrain profile, Replan, timeline), and the time bar is dimmed too. */
+.ui-v2 .v2--learn:not([data-story-step='0']) .v2-time {
+  opacity: 0.3;
+  transition: opacity 250ms ease;
+}
+
+.ui-v2 .v2--learn .v2-tabs:focus-within,
+.ui-v2 .v2--learn .v2-modes:focus-within,
+.ui-v2 .v2--learn .v2-pills:focus-within,
+.ui-v2 .v2--learn .v2-time:focus-within {
+  opacity: 1; /* a keyboard user who goes there sees it */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-v2 .v2--learn * {
+    transition: none !important;
+  }
+}

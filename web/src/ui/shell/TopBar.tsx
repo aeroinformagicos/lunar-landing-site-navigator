@@ -3,6 +3,7 @@
 // (M) and the 3D / 2D switch (T).
 import { useEffect, useState } from 'react';
 import './viewToggle.css';
+import './modeHelp.css';
 import { MAX_SCENARIOS } from '../../core/constants';
 import { t, type TextKey } from '../../i18n/t';
 import { parseSiteRef } from '../../state/selectors';
@@ -118,6 +119,7 @@ export function ModeNav() {
             role="tab"
             className="tab tab--mode"
             aria-selected={mode === m}
+            aria-describedby={`mode-help-${m}`}
             tabIndex={mode === m ? 0 : -1}
             onClick={() => setMode(m)}
             onKeyDown={(e) => onKey(e, i)}
@@ -131,6 +133,15 @@ export function ModeNav() {
         {t('header.validation')}
       </a>
       {mode === 'plan' && <ShareButton />}
+      {/* T-90 (proposal 8): what the active mode is for, in one line; each tab carries its own as a description. */}
+      <p className="v2-modes__help" aria-hidden="true">
+        {t(`mode.${mode}_help` as TextKey)}
+      </p>
+      {MODES.map((m) => (
+        <span key={m} id={`mode-help-${m}`} className="visually-hidden">
+          {t(`mode.${m}_help` as TextKey)}
+        </span>
+      ))}
     </nav>
   );
 }
