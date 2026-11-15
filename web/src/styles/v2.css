@@ -1277,6 +1277,15 @@
   background: rgba(17, 24, 39, 0.96);
 }
 
+/* Dialogs (site picker, shortcuts) above every floating layer of the shell: header and pills (20), panels
+   (15), minimap (12) and the phone time bar (30); below the banners (60) and the skip link (70). The
+   backdrop kept the v1 value (10) and the pills, the 3D/2D switch, the panels and the minimap were drawn
+   over the site picker (T-64 e). */
+.ui-v2 .dialog-backdrop {
+  z-index: 50;
+  background: rgba(10, 14, 23, 0.6);
+}
+
 /* Shorter windows: smaller figures and the first sentence only (D-101). */
 @media (max-height: 800px) {
   .ui-v2 .v2-fig__value {
