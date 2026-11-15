@@ -41,8 +41,10 @@ export function Summary({ model, mission, scenario, now, assessment }: SummaryPr
   });
   return (
     <section id="plain-summary" className="summary" aria-label={t('summary.label')}>
-      {sentences.map((s) => (
-        <p key={s}>{s}</p>
+      {/* Keyed by position, not by text: the text changes on every frame while playing and a text key
+          rebuilt the paragraph each time (T-64 b). */}
+      {sentences.map((s, i) => (
+        <p key={i}>{s}</p>
       ))}
     </section>
   );

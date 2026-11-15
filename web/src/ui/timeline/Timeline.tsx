@@ -2,6 +2,7 @@
 // Timeline (10_interfaz.md §6.2, F5): Sun and Earth elevation curves and the horizon at their
 // azimuth (Canvas: > 2,000 points, 02 §8), 0° line, day ticks, mission zone, three bars with their
 // patterns, event markers and a draggable cursor (SVG). Pointer readout; arrows ±10 min with focus.
+// A legend row names every line and bar and shows the cursor's mission day and time in large type (T-64 d).
 import { CHART_DESCRIBEDBY } from '../metrics/ChartData';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { evaluate } from '../../core/visibility';
@@ -9,7 +10,7 @@ import { findSegment } from '../../core/ephemeris';
 import { t } from '../../i18n/t';
 import { SLIDER_STEP_S } from '../../state/selectors';
 import { missionEnd, useAppStore, type Scenario } from '../../state/store';
-import { formatDeg, formatMargin, formatUtc } from '../common/format';
+import { formatDeg, formatMargin, formatMissionDay, formatUtc } from '../common/format';
 import type { ScenarioModel } from '../common/model';
 import type { MissionResult } from '../metrics/useMission';
 import { barSegments, cursorFromX, dayTicks, elevationDomain, eventLabel, timeScale } from './scale';
@@ -143,6 +144,28 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
 
   return (
     <figure className="timeline">
+      <div className="timeline__legend">
+        <span className="timeline__key timeline__key--sun">
+          <i aria-hidden="true" />
+          {t('timeline.legend_sun_el')}
+        </span>
+        <span className="timeline__key timeline__key--earth">
+          <i aria-hidden="true" />
+          {t('timeline.legend_earth_el')}
+        </span>
+        <span className="timeline__key timeline__key--horizon">
+          <i aria-hidden="true" />
+          {t('timeline.legend_horizon')}
+        </span>
+        <span className="timeline__key timeline__key--bars">
+          <i aria-hidden="true" />
+          {t('timeline.legend_bars')}
+        </span>
+        <span className="timeline__now" data-testid="timeline-now">
+          <span className="timeline__now-day">{formatMissionDay(cursor - scenario.landingUnix)}</span>
+          <span className="timeline__now-utc">{formatUtc(cursor)}</span>
+        </span>
+      </div>
       <div
         ref={box}
         className="timeline__plot"
@@ -225,7 +248,7 @@ export function Timeline({ model, mission, scenario }: { model: ScenarioModel; m
             const top = BARS_TOP + i * (BAR_H + BAR_GAP);
             return (
               <g key={b.key}>
-                <text x={PAD_L - 6} y={top + BAR_H - 4} textAnchor="end" className="timeline__label">
+                <text x={PAD_L - 6} y={top + BAR_H - 4} textAnchor="end" className={`timeline__label timeline__label--bar timeline__label--${b.key}`}>
                   {b.label.replace('Sun + Earth', 'Both')}
                 </text>
                 <rect x={x.x(scenario.landingUnix)} y={top} width={x.x(end) - x.x(scenario.landingUnix)} height={BAR_H} className="timeline__bar-bg" />

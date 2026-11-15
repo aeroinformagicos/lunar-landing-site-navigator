@@ -15,6 +15,16 @@ import { ScenarioCard } from '../scenario/ScenarioColumn';
 import { FloatingPanel } from './FloatingPanel';
 import { HorizonDetail } from './HorizonDetail';
 import { useActive } from './useActive';
+import { useView2d } from './view2d';
+
+/** Between 768 and 1279 px wide, Now at site opens folded (15 §3.2). */
+function tabletWidth(): boolean {
+  try {
+    return window.matchMedia('(min-width: 768px) and (max-width: 1279px)').matches;
+  } catch {
+    return false;
+  }
+}
 
 const SitesIcon = (
   <svg className="fp-icon" width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
@@ -147,7 +157,7 @@ export function NowPanel() {
   );
 
   return (
-    <FloatingPanel id="now" title={t('panel.now_at', { id: scenario.id })} side="right" defaultOpen={true} className="fp--now">
+    <FloatingPanel id="now" title={t('panel.now_at', { id: scenario.id })} side="right" defaultOpen={!tabletWidth()} className="fp--now">
       {detail && now ? (
         <p className="v2-now-line">
           <span className="v2-dl__v--sun">☀ {formatDeg(now.sky.sun.elDeg)}</span>
@@ -190,7 +200,10 @@ export function NowPanel() {
       <div className="v2-focus">
         <div className="v2-focus__pills" role="group" aria-label={t('pano.centre_on')}>
           {(['sun', 'earth'] as const).map((b) => (
-            <button key={b} type="button" className={`pill pill--small pill--${b}`} aria-pressed={focus === b} onClick={() => setFocus(b)}>
+            <button key={b} type="button" className={`pill pill--small pill--${b}`} aria-pressed={focus === b} onClick={() => {
+                setFocus(b);
+                useView2d.getState().recentre(); // the 2D view centres on it again (D-120 a)
+              }}>
               {t(b === 'sun' ? 'pano.centre_sun' : 'pano.centre_earth')}
             </button>
           ))}

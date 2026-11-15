@@ -1,6 +1,6 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
-// T-62 (15_interfaz_v2.md §4.2–§5, §9): the full-width 2D scene with labels on the canvas and the 360°
-// strip; Horizon detail; the minimap opens the Map view; the data views in the central sheet; the story,
+// T-62 (15_interfaz_v2.md §4.2–§5, §9): the full-width 2D scene with labels on the canvas and the
+// heading indicator next to the time bar (T-64, D-120 c: it replaced the 360° strip); Horizon detail; the minimap opens the Map view; the data views in the central sheet; the story,
 // the welcome card and the validation page in the v2; phones without horizontal scroll.
 import { expect, test, type Page } from '@playwright/test';
 
@@ -9,7 +9,7 @@ async function openV2(page: Page, query = '?ui=v2&vm=2d') {
   await expect(page.locator('.v2')).toBeVisible({ timeout: 20_000 });
 }
 
-test('full-width scene: labels on the canvas, both traces, the strip on top, drag and arrows', async ({ page }) => {
+test('full-width scene: labels on the canvas, both traces, the heading indicator, drag and arrows', async ({ page }) => {
   await openV2(page);
   const scene = page.getByRole('img', { name: '40° view of the horizon centred on the Sun' });
   await expect(scene).toBeVisible({ timeout: 20_000 });
@@ -21,16 +21,44 @@ test('full-width scene: labels on the canvas, both traces, the strip on top, dra
   await expect(page.locator('.v2-scene__trace--sun')).toHaveCount(1);
   await expect(page.locator('.v2-scene__trace--earth')).toHaveCount(1);
 
-  const strip = page.getByRole('slider', { name: /360° horizon strip/ });
-  await expect(strip).toBeVisible();
-  const before = Number(await strip.getAttribute('aria-valuenow'));
+  const heading = page.getByRole('slider', { name: 'Direction of the 2D view' });
+  await expect(heading).toBeVisible();
+  await expect(heading).toHaveAttribute('aria-valuetext', /^Facing (N|NE|E|SE|S|SW|W|NW) · \d+°$/);
+  const before = Number(await heading.getAttribute('aria-valuenow'));
   await scene.focus();
   await page.keyboard.press('ArrowRight');
-  await expect(strip).toHaveAttribute('aria-valuenow', String((Math.round(before + 1) + 360) % 360));
+  await expect(heading).toHaveAttribute('aria-valuenow', String((Math.round(before + 1) + 360) % 360));
+  // The indicator turns the view too (arrows ±1°, Shift ±10°).
+  await heading.focus();
+  await page.keyboard.press('Shift+ArrowRight');
+  await expect(heading).toHaveAttribute('aria-valuenow', String((Math.round(before + 11) + 360) % 360));
   // Centre on Earth (right panel) follows the Earth again.
   await page.getByRole('button', { name: 'Centre on Earth' }).click();
   await expect(page.getByRole('img', { name: '40° view of the horizon centred on the Earth' })).toBeVisible();
   await expect(page.locator('[data-label="earth"]')).toContainText(/^Earth/);
+});
+
+test('T-64: while playing, the Sun moves across a still view and the time bar fills up to the cursor', async ({ page }) => {
+  await openV2(page);
+  const sun = page.getByTestId('disc-sun');
+  await expect(sun).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('.v2-track__legend')).toContainText('Sun up');
+  await expect(page.locator('.v2-track__legend')).toContainText('Earth in view');
+  const x0 = Number(await sun.getAttribute('cx'));
+  const fill0 = (await page.locator('.v2-track__elapsed').boundingBox())!.width;
+  // 1 d/s: 12° of azimuth per second, so the Sun crosses the view within a second or two.
+  await page.getByRole('button', { name: /^Playback speed/ }).click();
+  await page.getByRole('button', { name: /^Playback speed/ }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.waitForTimeout(700);
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  const x1 = Number(await sun.getAttribute('cx'));
+  expect(Math.abs(x1 - x0)).toBeGreaterThan(5); // the disc moved on screen (the view did not follow it)
+  expect((await page.locator('.v2-track__elapsed').boundingBox())!.width).toBeGreaterThan(fill0);
+  // After pausing, the view stays where it was; Centre on Sun centres it again.
+  await page.getByRole('button', { name: 'Centre on Sun' }).click();
+  const vw = page.viewportSize()!.width;
+  await expect.poll(async () => Math.abs(Number(await sun.getAttribute('cx')) - vw / 2)).toBeLessThan(2);
 });
 
 test('Horizon detail: zoom, disc, margin and Terrain effect; telemetry folds while open', async ({ page }) => {

@@ -70,10 +70,17 @@ export default function ShellV2() {
     const set = () => {
       const px = Math.ceil(bottom.getBoundingClientRect().height) + 24;
       root.style.setProperty('--bottom-h', `${px}px`);
+      // Below the figures: view tabs, time bar and credits. Open left panels end above this when the
+      // figures move aside for them (T-64 e).
+      const mission = bottom.querySelector<HTMLElement>('.v2-mission');
+      const low = px - (mission ? Math.ceil(mission.getBoundingClientRect().height) + 16 : 0);
+      root.style.setProperty('--bottom-low-h', `${low}px`);
       setBottomH(px);
     };
     const ro = new ResizeObserver(set);
     ro.observe(bottom);
+    const mission = bottom.querySelector('.v2-mission');
+    if (mission) ro.observe(mission);
     set();
     return () => ro.disconnect();
   }, []);

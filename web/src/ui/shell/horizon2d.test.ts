@@ -2,7 +2,8 @@
 // T-62: full-width 2D view helpers (15_interfaz_v2.md §4.2, §4.3, §7.5).
 import { describe, expect, it } from 'vitest';
 import { project } from '../panorama/geometry';
-import { earthPhase, HORIZON_AT, horizonFracFor, oklabRamp, oklabToRgb, phasePath, placeLabels, rgbToOklab, stageView } from './horizon2d';
+import { compassPoint } from './view2d';
+import { earthPhase, followAz, HORIZON_AT, horizonFracFor, oklabRamp, oklabToRgb, phasePath, placeLabels, rgbToOklab, stageView } from './horizon2d';
 
 const flat = (deg: number) => new Float64Array(720).fill(deg);
 
@@ -79,5 +80,32 @@ describe('OKLab map ramps', () => {
       expect(L).toBeGreaterThan(last);
       last = L;
     }
+  });
+});
+
+// T-64 (D-120 a): while playing, the 2D view stays still and turns only near an edge.
+describe('followAz', () => {
+  it('starts centred on the body', () => {
+    expect(followAz(null, 123.5)).toBe(123.5);
+    expect(followAz(null, -10)).toBe(350);
+  });
+  it('keeps the view still while the body is inside the band (20° − 6° = 14° from the centre)', () => {
+    expect(followAz(100, 100)).toBe(100);
+    expect(followAz(100, 113.9)).toBe(100);
+    expect(followAz(100, 86.1)).toBe(100);
+    expect(followAz(355, 8)).toBe(355); // 13° across north
+  });
+  it('turns past the band so the body sits 8° (20 − 2·6) on the other side of the centre', () => {
+    expect(followAz(100, 114.5)).toBeCloseTo(122.5, 9); // body now 8° left of the centre
+    expect(followAz(100, 85)).toBeCloseTo(77, 9);
+    expect(followAz(350, 5)).toBeCloseTo(13, 9); // across north
+    // The new centre keeps the body inside the band: no turn on the next frame.
+    expect(followAz(followAz(100, 114.5), 114.6)).toBeCloseTo(122.5, 9);
+  });
+});
+
+describe('compassPoint', () => {
+  it('eight sectors of 45°', () => {
+    expect([0, 22, 23, 90, 180, 200, 270, 337, 338, 359.9].map(compassPoint)).toEqual(['N', 'N', 'NE', 'E', 'S', 'S', 'W', 'NW', 'N', 'N']);
   });
 });
