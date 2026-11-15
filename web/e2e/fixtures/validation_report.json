@@ -6,8 +6,8 @@
     "total": 21,
     "passed": 4,
     "failed": 0,
-    "manual": 0,
-    "skipped": 17,
+    "manual": 1,
+    "skipped": 16,
     "horizons_comparisons": 256,
     "horizons_max_abs_err_deg": 2.5398885904692747e-05
   },
@@ -2240,16 +2240,16 @@
       "id": "A3",
       "group": "A",
       "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
-      "expected": "Sunset between 18:00 and 18:15 UTC (last data 23:15 UTC, 5 hours into the lunar night)",
+      "expected": "Sunset around 18:00-18:15 UTC (last data about 23:15 UTC, \"just over 5 hours into the lunar night\")",
       "tolerance": "30 min",
       "source": {
         "label": "Firefly Aerospace, end of Blue Ghost Mission 1 surface operations",
         "url": "https://fireflyspace.com/news/firefly-aerospace-successfully-completes-14-days-of-surface-operations-on-the-moon"
       },
-      "status": "skipped",
-      "obtained": "Sun starts to set 18:20 UTC, centre on the horizon 18:54 UTC, fully set 19:28 UTC",
+      "status": "manual",
+      "obtained": "Centre of the Sun on the horizon 18:54 UTC (starts to set 18:20 UTC, fully set 19:28 UTC; smooth Moon 20:11 UTC)",
       "details": [],
-      "note": "Retired (decision D-95): the check was badly posed, not failed. Firefly published no sunset time, only that the final data arrived around 23:15 UTC, \"just over 5 hours into the lunar night\"; the 18:00-18:15 UTC window was our own deduction. With real terrain (SLDEM2015, observer 2 m) our model has the Sun start to set at 18:20 UTC, its centre on the horizon at 18:54 UTC and fully set at 19:28 UTC, against 20:11 UTC on a smooth Moon. The horizon there is an 11 m rise 800 m away: moving the site by one terrain pixel (59 m) moves the sunset by up to 51 minutes, more than any useful tolerance. The model is unchanged."
+      "note": "Open discrepancy (decision D-151): not passed and not hidden. Firefly gives no exact sunset time, only that the final data arrived around 23:15 UTC, \"just over 5 hours into the lunar night\", which puts sunset around 18:00-18:15 UTC. Our sunset (centre of the Sun) is 18:54 UTC, about 40 minutes later. The exact time depends on terrain near the lander smaller than our 59 m map: the horizon there is an 11 m rise 800 m away, and moving the site by one 59 m pixel moves our sunset by up to 51 minutes."
     },
     {
       "id": "A4",
