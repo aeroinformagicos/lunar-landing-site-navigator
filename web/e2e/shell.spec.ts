@@ -101,8 +101,13 @@ test('date validation messages', async ({ page }) => {
   await input.fill('1990-05-01T00:00');
   await expect(page.getByText('Date outside the supported range (1969–1972 and 2024–2044).')).toBeVisible();
   await input.fill('2044-12-25T00:00');
+  await input.press('Enter');
   await expect(page.locator('#landing-msg')).toHaveText('Mission extends beyond available ephemeris; results truncated.');
+  // D-155: a typed or picked date waits for Apply (here the button) or Enter.
   await input.fill('2027-09-01T06:30');
+  await expect(page.locator('#landing-applied')).toContainText('Not applied yet');
+  await page.getByRole('button', { name: 'Apply', exact: true }).click();
+  await expect(page.locator('#landing-applied')).toHaveText('Applied: 2027-09-01 06:30 UTC');
   await expect(page.getByText('Day 0, 00:00 · 2027-09-01 06:30 UTC')).toBeVisible();
   await expect(page.getByRole('article', { name: 'Scenario B' })).toContainText('Landing 2027-09-01 06:30 UTC');
 });

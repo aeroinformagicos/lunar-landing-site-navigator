@@ -4,7 +4,7 @@
 // opacity controls; legend, scale and orientation; pointer readout; click (or Enter on the centre
 // cross) creates the mesh-point scenario of 08 §7. Loaded on demand (`import()`), 02 §7.
 import { CHART_DESCRIBEDBY } from '../metrics/ChartData';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { GRID, gridRef, inGrid, xyOfLatLon } from '../../core/grid';
 import { loader } from '../../core/loaders';
 import { t, type TextKey } from '../../i18n/t';
@@ -339,18 +339,23 @@ function MapCanvas({ data }: { data: MapData }) {
             </select>
           </label>
         </div>
-        {/* T-90 (proposal 2): the value is shown (it does reach 100 %), and the slider is off without a layer. */}
-        <label className="field">
+      </div>
+      {/* T-90 (proposal 2): the value is shown and the slider is off without a layer. D-152: own row under the
+          layer buttons, fill drawn from the value (empty at 0 %, full at 100 %), fixed-width tabular value. */}
+      <div className="map__opacity-row">
+        <label className="field map__opacity">
           <span>{t('map.opacity')}</span>
           <input
             type="range"
+            className="map__opacity-slider"
             min={0}
-            max={1}
-            step={0.05}
-            value={opacity}
+            max={100}
+            step={5}
+            value={Math.round(opacity * 100)}
             disabled={layer === 'none'}
+            style={{ '--fill': `${Math.round(opacity * 100)}%` } as CSSProperties}
             aria-valuetext={`${Math.round(opacity * 100)} %`}
-            onChange={(e) => setOpacity(Number(e.target.value))}
+            onChange={(e) => setOpacity(Number(e.target.value) / 100)}
           />
           <span className="map__opacity-value">{Math.round(opacity * 100)} %</span>
         </label>

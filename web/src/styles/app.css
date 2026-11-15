@@ -493,6 +493,13 @@ input[aria-invalid='true'] {
   fill: rgb(255 255 255 / 4%);
 }
 
+/* P-09 (D-157): outline of the whole plot (time axis before, during and after the mission). */
+.timeline__frame {
+  fill: none;
+  stroke: var(--c-border-strong);
+  stroke-width: 1;
+}
+
 .timeline__zero {
   stroke: var(--c-text-muted);
   stroke-width: 1;
@@ -2118,4 +2125,79 @@ input[type='datetime-local']:focus-within {
   .figure__value {
     font-size: 16px;
   }
+}
+
+/* D-152: the map opacity control always has its own row under the layer buttons; the fill follows the
+   value (empty at 0 %, full at 100 %) and the value has a fixed width so nothing moves. */
+.map__opacity-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: 6px;
+}
+
+.map__opacity {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map__opacity-value {
+  display: inline-block;
+  min-width: 5ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.map__opacity-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 160px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.map__opacity-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--c-accent) var(--fill, 0%), var(--c-border-strong) var(--fill, 0%));
+}
+
+.map__opacity-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--c-accent) var(--fill, 0%), var(--c-border-strong) var(--fill, 0%));
+}
+
+.map__opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  border: 2px solid var(--c-bg);
+}
+
+.map__opacity-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  border: 2px solid var(--c-bg);
+}
+
+.map__opacity-slider:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.map__opacity-slider:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }

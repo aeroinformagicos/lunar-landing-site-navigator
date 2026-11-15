@@ -572,7 +572,8 @@ export class Engine {
     // Sun disc and halo.
     const halo = TIER_SETTINGS[this.tier].halo;
     const rho = s.sunRadiusDeg * DEG;
-    const half = halo ? LOOK.haloRadiusDeg * DEG : rho * 1.6;
+    // Without halo the quad is 4 disc radii: the core glow has faded to ~5 % there (D-154).
+    const half = halo ? LOOK.haloRadiusDeg * DEG : rho * 4;
     const um = this.sun.material.uniforms;
     um.halfAngle.value = half;
     um.rho.value = rho;

@@ -44,6 +44,7 @@ test('smooth Moon draws only the sphere', async ({ page }) => {
   await page.getByRole('article', { name: 'Scenario A' }).getByRole('button', { name: 'Change site' }).click();
   await page.getByRole('dialog').getByRole('button', { name: /Apollo 11/ }).click();
   await page.getByLabel('Landing (UTC)').fill('1969-07-21T00:00');
+  await page.getByLabel('Landing (UTC)').press('Enter');
   await expect(page.getByText('Smooth Moon: the horizon is the lunar sphere, 2.6 km away.')).toBeVisible({ timeout: 20_000 });
   await expect(page.getByTestId('sphere')).toBeAttached();
   await expect(page.getByTestId('terrain')).toHaveCount(0);

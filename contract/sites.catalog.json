@@ -1187,8 +1187,8 @@
     },
     {
       "id": "demo-a",
-      "name": "Demo site A (Malapert massif)",
-      "short_name": "Demo site A",
+      "name": "Malapert Massif · site A",
+      "short_name": "Malapert A",
       "type": "demo",
       "lat_deg": -85.96708,
       "lon_deg": -2.2251,
@@ -1211,8 +1211,8 @@
     },
     {
       "id": "demo-b",
-      "name": "Demo site B (Malapert massif)",
-      "short_name": "Demo site B",
+      "name": "Malapert Massif · site B",
+      "short_name": "Malapert B",
       "type": "demo",
       "lat_deg": -85.98286,
       "lon_deg": -2.46913,
