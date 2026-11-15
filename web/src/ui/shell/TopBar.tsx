@@ -1,6 +1,8 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Top of the v2 shell (15_interfaz_v2.md §3.1): brand (H), scenario pills (P), mode and Validation
 // (M) and the 3D / 2D switch (T).
+import { useEffect, useState } from 'react';
+import './viewToggle.css';
 import { MAX_SCENARIOS } from '../../core/constants';
 import { t, type TextKey } from '../../i18n/t';
 import { parseSiteRef } from '../../state/selectors';
@@ -133,28 +135,47 @@ export function ModeNav() {
   );
 }
 
-/** 3D / 2D switch over the stage (15 §4.1): text, not only icons; shortcut V. */
+/**
+ * 3D / 2D switch over the stage (15 §4.1): text, not only icons; shortcut V. When the 3D view is not
+ * possible its option stays focusable (`aria-disabled`, not `disabled`) and a tap, click or Enter shows
+ * why in a visible line, also given as its description, so the reason never depends on hovering (T-74).
+ */
 export function ViewToggle() {
   const viewMode = useAppStore((s) => s.viewMode);
   const setViewMode = useAppStore((s) => s.setViewMode);
   const possible = can3d();
   const why = HAS_STAGE3D ? t('view.3d_disabled') : t('view.3d_missing');
+  const [showWhy, setShowWhy] = useState(false);
+  useEffect(() => {
+    if (!showWhy) return;
+    const id = window.setTimeout(() => setShowWhy(false), 8000);
+    return () => window.clearTimeout(id);
+  }, [showWhy]);
   return (
     <div className="v2-toggle" role="radiogroup" aria-label={t('view.mode')}>
-      {(['3d', '2d'] as const).map((m) => (
-        <button
-          key={m}
-          type="button"
-          role="radio"
-          className="v2-toggle__opt"
-          aria-checked={viewMode === m}
-          disabled={m === '3d' && !possible}
-          title={m === '3d' && !possible ? why : undefined}
-          onClick={() => setViewMode(m)}
-        >
-          {m === '3d' ? t('view.3d') : t('view.2d')}
-        </button>
-      ))}
+      {(['3d', '2d'] as const).map((m) => {
+        const off = m === '3d' && !possible;
+        return (
+          <button
+            key={m}
+            type="button"
+            role="radio"
+            className="v2-toggle__opt"
+            aria-checked={viewMode === m}
+            aria-disabled={off || undefined}
+            aria-describedby={off ? 'v2-3d-why' : undefined}
+            title={off ? why : undefined}
+            onClick={() => (off ? setShowWhy((v) => !v) : setViewMode(m))}
+          >
+            {m === '3d' ? t('view.3d') : t('view.2d')}
+          </button>
+        );
+      })}
+      {!possible && (
+        <p id="v2-3d-why" className="v2-toggle__why" role="status" hidden={!showWhy}>
+          {why}
+        </p>
+      )}
     </div>
   );
 }

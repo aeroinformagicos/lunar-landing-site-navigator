@@ -74,16 +74,30 @@ export interface ControlsProps {
 const OPEN_KEY = 'llsn.stage3d.controls';
 const MODE_TEXT: Record<CameraMode, TextKey> = { orbit: 'stage3d.orbit', fly: 'stage3d.fly', ground: 'stage3d.ground' };
 
+/** Below this width (tablets) the controls start folded so they do not cover the summary (T-74). */
+const FOLDED_BELOW_PX = 1024;
+
 function readOpen(): boolean {
+  const byWidth = typeof window === 'undefined' || window.innerWidth >= FOLDED_BELOW_PX;
   try {
-    return localStorage.getItem(OPEN_KEY) !== '0';
+    const v = localStorage.getItem(OPEN_KEY);
+    return v === null ? byWidth : v !== '0';
   } catch {
-    return true;
+    return byWidth;
   }
 }
 
 export function Controls(p: ControlsProps) {
-  const [open, setOpen] = useState(readOpen);
+  const [open, setOpenState] = useState(readOpen);
+  /** Only a choice of the user is remembered (not the width-based default). */
+  const setOpen = (v: boolean) => {
+    setOpenState(v);
+    try {
+      localStorage.setItem(OPEN_KEY, v ? '1' : '0');
+    } catch {
+      /* private mode: the choice is not remembered */
+    }
+  };
   const [help, setHelp] = useState(false);
   const [menu, setMenu] = useState(false);
   const [layerMenu, setLayerMenu] = useState(false);
@@ -91,13 +105,6 @@ export function Controls(p: ControlsProps) {
   const exagRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    try {
-      localStorage.setItem(OPEN_KEY, open ? '1' : '0');
-    } catch {
-      /* private mode: the choice is not remembered */
-    }
-  }, [open]);
   useEffect(() => {
     if (!help && !menu && !layerMenu && !exagMenu) return;
     const onKey = (e: KeyboardEvent) => {

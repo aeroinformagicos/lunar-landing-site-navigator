@@ -52,3 +52,23 @@ test('exaggeration: no control on a smooth Moon (nothing to exaggerate)', async 
   await expect(page.getByRole('button', { name: /Vertical exaggeration/ })).toHaveCount(0);
   await expect(note(page)).toHaveCount(0);
 });
+
+test('phone: the 3D option says why it is off, on tap and to screen readers, without hovering', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?ui=v2');
+  const toggle = page.getByRole('radiogroup', { name: /view/i });
+  const three = toggle.getByRole('radio', { name: '3D' });
+  await expect(three).toBeVisible();
+  await expect(three).toBeDisabled(); // aria-disabled: still focusable and tappable
+  await expect(three).toHaveAccessibleDescription('3D needs WebGL 2 and a wider screen');
+  const why = page.locator('#v2-3d-why');
+  await expect(why).toBeHidden();
+  await three.dispatchEvent('click');
+  await expect(why).toBeVisible();
+  await expect(why).toHaveText('3D needs WebGL 2 and a wider screen');
+  await expect(toggle.getByRole('radio', { name: '2D' })).toHaveAttribute('aria-checked', 'true');
+  // Keyboard: focus and Enter toggle the same line.
+  await three.focus();
+  await page.keyboard.press('Enter');
+  await expect(why).toBeHidden();
+});
