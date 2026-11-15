@@ -2426,3 +2426,19 @@
     flex-shrink: 0;
   }
 }
+
+/* P-04 (D-163), tablets: with a data view open, the «Works» line and the figures no longer share one row
+   (their labels broke into three lines and «1.1 h» ran off the screen): the figures take a row of their own. */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .ui-v2 .v2--sheet .v2-mission {
+    flex-wrap: wrap;
+    gap: 6px 24px;
+  }
+  .ui-v2 .v2--sheet .v2-figs {
+    flex: 1 1 100%;
+    gap: 24px;
+  }
+  .ui-v2 .v2--sheet .v2-fig__label {
+    white-space: nowrap;
+  }
+}
