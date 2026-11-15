@@ -59,3 +59,4 @@ Sol cuadrado en 3D, botón Apply de la fecha y P-04, P-05, P-06, P-07, P-08, P-0
 | ¿Contraste aplicado? | Comprobado | Medido en 2D: AA sin fallos. En 3D el problema era el pie sobre el terreno iluminado: resuelto con D-178. | — |
 
 *Decidido por Claude Code por delegación de I2* (D-177, D-178, D-179).
+| Deslizador de retraso tipo date picker (diseñadora de UI) | Hecho | En Replan, «Slide the delay»: se arrastra de +0 a +30 d hora a hora, muestra la fecha de aterrizaje y, para cada sitio, ✓ Works / ! Tight / ⊗ Not suitable con ese retraso; «Use this date» lleva el escenario a esa fecha. Mismas reglas que la matriz (`visibilityGrid` + `cellAt`), así que siempre coinciden. Teclado y lector de pantalla por el `input range` nativo. | D-180 |
