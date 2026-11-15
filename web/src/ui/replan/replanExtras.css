@@ -70,3 +70,83 @@
 .replan__matrix .replan__cell--no_go:focus-visible {
   background: rgba(248, 113, 113, 0.14);
 }
+
+/* Team UI feedback (D-180): delay slider, like a date picker. */
+.replan-slider {
+  margin: 4px 0 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg, 12px);
+  background: rgba(10, 14, 23, 0.45);
+}
+
+.replan-slider__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+}
+
+.replan-slider__title {
+  font-weight: 600;
+}
+
+.replan-slider__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+
+.replan-slider__input {
+  width: 100%;
+  min-height: 44px;
+  margin: 2px 0 0;
+  accent-color: var(--c-accent, #38bdf8);
+  cursor: pointer;
+}
+
+.replan-slider__scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--c-text-muted);
+}
+
+.replan-slider__rows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.replan-slider__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.replan-slider__site {
+  font-weight: 600;
+}
+
+.replan-slider__status {
+  font-weight: 700;
+}
+
+.replan-slider__row--go .replan-slider__status {
+  color: var(--c-go);
+}
+
+.replan-slider__row--marginal .replan-slider__status {
+  color: var(--c-marginal);
+}
+
+.replan-slider__row--no_go .replan-slider__status {
+  color: var(--c-nogo);
+}
+
+.replan-slider__use {
+  min-height: 44px;
+}

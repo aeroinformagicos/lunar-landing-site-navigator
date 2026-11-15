@@ -2,10 +2,10 @@
 // Replanning (10_interfaz.md §6.5, F10, `Replan` tab in Plan): controls (delay step, rows, editable
 // requirements), the site × date matrix with the next valid window per row, and the ranking of the
 // candidate regions for the base landing with the best alternative.
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { MAX_SCENARIOS } from '../../core/constants';
 import { bestAlternative, rankCandidates, type RankRow } from '../../core/ranking';
-import { assess, MATRIX_COLUMNS, nextValidLanding, replanRow, type Cell } from '../../core/requirements';
+import { assess, cellAt, GRID_S, MATRIX_COLUMNS, nextValidLanding, replanRow, visibilityGrid, type Cell } from '../../core/requirements';
 import type { Site } from '../../core/types';
 import { t } from '../../i18n/t';
 import { activeScenario, parseSiteRef } from '../../state/selectors';
@@ -98,6 +98,82 @@ function MatrixRow(props: {
         {result ? windowText(result.window) : model.status === 'error' ? t('scenario.error') : t('common.loading')}
       </td>
     </tr>
+  );
+}
+
+/** Hours the delay slider reaches (30 days, the same span as the 1-day matrix). */
+const SLIDER_MAX_H = 30 * 24;
+
+/**
+ * Team UI feedback (D-180): a delay slider like a date picker. Dragging it tries every delay hour by hour
+ * and each site says at once whether it still works; «Use this date» moves the scenario there. Same
+ * rules as the matrix (`cellAt` on the 10-min grid, 07 §8.3), so both always agree.
+ */
+function SliderRow({ spec, base, delayH, onUse }: { spec: RowSpec; base: Scenario; delayH: number; onUse: (spec: RowSpec, cell: Cell) => void }) {
+  const req = useAppStore((s) => s.requirements);
+  const [model] = useScenarioModel(asScenario(spec.siteRef, base));
+  const grid = useMemo(() => {
+    if (model.status !== 'ready') return null;
+    const { table, frame, mask } = model.data;
+    return { g: visibilityGrid(table, frame, mask, base.landingUnix, (SLIDER_MAX_H * 3600) + base.missionDays * 86_400), table, frame, mask };
+  }, [model, base.landingUnix, base.missionDays]);
+  const cell = useMemo(() => {
+    if (!grid) return null;
+    const missionSteps = Math.round((base.missionDays * 86_400) / GRID_S);
+    return cellAt(grid.g, Math.round((delayH * 3600) / GRID_S), missionSteps, req, grid.table, grid.frame, grid.mask);
+  }, [grid, delayH, base.missionDays, req]);
+  const status = cell?.status ?? null;
+  return (
+    <li className={`replan-slider__row replan-slider__row--${status ?? 'none'}`}>
+      <span className="replan-slider__site">{spec.name}</span>
+      <span className="replan-slider__status">
+        <span aria-hidden="true">{status ? STATUS_ICON[status] : '–'}</span> {status ? STATUS_TEXT[status] : cell ? t('replan.slider_nodata') : t('common.loading')}
+      </span>
+      {spec.scenarioId && cell && status && (
+        <button type="button" className="replan-slider__use" onClick={() => onUse(spec, cell)}>
+          {t('replan.slider_use')}
+        </button>
+      )}
+    </li>
+  );
+}
+
+function DelaySlider({ rows, base, onUse }: { rows: RowSpec[]; base: Scenario; onUse: (spec: RowSpec, cell: Cell) => void }) {
+  const [hours, setHours] = useState(0);
+  const delayH = useDeferredValue(hours);
+  return (
+    <section className="replan-slider" aria-labelledby="replan-slider-title">
+      <div className="replan-slider__head">
+        <label id="replan-slider-title" htmlFor="replan-slider-input" className="replan-slider__title">
+          {t('replan.slider')}
+        </label>
+        <output htmlFor="replan-slider-input" className="replan-slider__value">
+          {t('replan.slider_value', { delay: offsetLabel(hours * 3600), date: formatUtc(base.landingUnix + hours * 3600) })}
+        </output>
+      </div>
+      <input
+        id="replan-slider-input"
+        className="replan-slider__input"
+        type="range"
+        min={0}
+        max={SLIDER_MAX_H}
+        step={1}
+        value={hours}
+        onChange={(e) => setHours(Number(e.target.value))}
+        aria-valuetext={t('replan.slider_value', { delay: offsetLabel(hours * 3600), date: formatUtc(base.landingUnix + hours * 3600) })}
+      />
+      <div className="replan-slider__scale" aria-hidden="true">
+        <span>+0</span>
+        <span>+10 d</span>
+        <span>+20 d</span>
+        <span>+30 d</span>
+      </div>
+      <ul className="replan-slider__rows" aria-live="polite">
+        {rows.map((spec) => (
+          <SliderRow key={spec.key} spec={spec} base={base} delayH={delayH} onUse={onUse} />
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -256,6 +332,20 @@ export function Replan({ story }: { story?: ReplanStoryProps } = {}) {
           {t('replan.reset')}
         </button>
       </div>
+      )}
+
+      {!story && (
+        <DelaySlider
+          rows={rows}
+          base={base}
+          onUse={(spec, cell) => {
+            setDetail(`${spec.name} · ${cellDetail(cell, req.maxNightHours)}`);
+            if (spec.scenarioId) {
+              updateScenario(spec.scenarioId, { landingUnix: cell.landingUnix });
+              setActive(spec.scenarioId);
+            }
+          }}
+        />
       )}
 
       <div className="table-scroll">
