@@ -46,6 +46,8 @@ in which it is first used. Content owner: A2.
 | SpiceyPy | 8.3.0 | SPICE toolkit wrapper | MIT |
 | Pillow | 13.0.0 | Images | MIT-CMU (HPND) |
 | pytest | 9.2.0 | Tests | MIT |
+| FFmpeg (static build shipped by imageio-ffmpeg 0.8.1) | 9.0.2 | Encoding the README timelapse (`docs/media/sun-timelapse.mp4`, `.gif`) from browser captures; not part of the build | LGPL-2.1+ / GPL (FFmpeg); imageio-ffmpeg BSD-2-Clause |
+| Shields.io | service | Badges at the top of `README.md` (images loaded from img.shields.io) | CC0 (service, badges) |
 | jsonschema | 4.26.0 | Contract validation | MIT |
 | Ruff | 0.17.4 | Lint | MIT |
 | PyTorch | 2.15.0 | Horizon cube (GPU/CPU) | BSD-3-Clause |
