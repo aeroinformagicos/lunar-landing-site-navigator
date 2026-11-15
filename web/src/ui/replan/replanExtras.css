@@ -34,3 +34,39 @@
   max-width: 44px;
   font-variant-numeric: tabular-nums;
 }
+
+/* Mentor feedback (D-179): booking-calendar look. Works / tight days touch and form one bar per run
+   (rounded at its ends); days that do not work are quiet — a small red ⊗ on the dark background — so
+   the eye goes to the bars. Icons stay in every cell, so colour is never the only cue. */
+.replan__matrix td.replan__day {
+  padding: 2px 0;
+}
+
+.replan__matrix .replan__cell {
+  width: 100%;
+  border-radius: 0;
+}
+
+.replan__matrix .replan__cell--run-start {
+  border-top-left-radius: 11px;
+  border-bottom-left-radius: 11px;
+}
+
+.replan__matrix .replan__cell--run-end {
+  border-top-right-radius: 11px;
+  border-bottom-right-radius: 11px;
+}
+
+.replan__matrix .replan__cell--no_go {
+  background: transparent;
+  color: var(--c-nogo);
+}
+
+.replan__matrix .replan__cell--none {
+  background: transparent;
+}
+
+.replan__matrix .replan__cell--no_go:hover,
+.replan__matrix .replan__cell--no_go:focus-visible {
+  background: rgba(248, 113, 113, 0.14);
+}

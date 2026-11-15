@@ -36,6 +36,14 @@ function colClass(c: number, active: number | null): string {
   return ['replan__day', c === 0 ? 'replan__base' : '', c === active ? 'replan__active' : ''].filter(Boolean).join(' ');
 }
 
+/** Mentor feedback (D-179): landable days (works or tight) next to each other join into one bar, like the
+ *  available nights of a booking calendar; the bar is rounded only where the run starts and ends. */
+function runClass(row: Cell[], c: number): string {
+  const ok = (k: number) => k >= 0 && k < row.length && (row[k].status === 'go' || row[k].status === 'marginal');
+  if (!ok(c)) return '';
+  return `${ok(c - 1) ? '' : ' replan__cell--run-start'}${ok(c + 1) ? '' : ' replan__cell--run-end'}`;
+}
+
 /** The story's reduced matrix (§6.5: 2 rows, 13 columns). */
 const COMPACT_ROWS = 2;
 const COMPACT_COLUMNS = 13;
@@ -68,11 +76,11 @@ function MatrixRow(props: {
         {spec.name}
       </th>
       {result
-        ? result.cells.slice(0, columns).map((cell, c) => (
+        ? result.cells.slice(0, columns).map((cell, c, row) => (
             <td key={c} className={colClass(c, activeColumn)}>
               <button
                 type="button"
-                className={`replan__cell replan__cell--${cell.status ?? 'none'}`}
+                className={`replan__cell replan__cell--${cell.status ?? 'none'}${runClass(row, c)}`}
                 data-cell={`${r}-${c}`}
                 tabIndex={focus.r === r && focus.c === c ? 0 : -1}
                 aria-label={cellLabel(spec.name, cell)}
