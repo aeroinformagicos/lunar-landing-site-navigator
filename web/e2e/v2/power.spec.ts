@@ -31,7 +31,8 @@ test('T-93 · Power & comms: switch, notice, assumptions and figures that follow
   await dialog.getByLabel('Load at night (W)').fill('400');
   await expect(page.getByTestId('power-battery')).toContainText('at 400 W');
   const b400 = await battery();
-  if (b100 > 0) expect(b400 / b100).toBeCloseTo(4, 1);
+  // Shown in kWh to 2 decimals: 4 × b100 within the rounding of both figures (4 × 0.005 + 0.005).
+  expect(Math.abs(b400 - 4 * b100)).toBeLessThanOrEqual(0.025 + 1e-9);
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole('note').filter({ hasText: '400 W load at night' })).toBeVisible();
