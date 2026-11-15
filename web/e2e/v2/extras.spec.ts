@@ -55,3 +55,17 @@ test('(5) Replan says what to set, what the columns and icons mean, and answers 
   await expect(page.getByRole('columnheader', { name: /^When can I land here\?/ })).toBeVisible();
   await expect(page.getByTestId('next-window').first()).toHaveText(/^(Next valid landing window: .* UTC \(.*\)|No valid landing window in the next 90 days\.)$/, { timeout: 30_000 });
 });
+
+test('(2) map: the opacity shows its value up to 100 % and is off with the None layer', async ({ page }) => {
+  await openV2(page);
+  await page.getByRole('tab', { name: 'Map' }).click();
+  const slider = page.getByRole('slider', { name: 'Opacity' });
+  await expect(slider).toBeEnabled({ timeout: 20_000 });
+  await slider.focus();
+  await page.keyboard.press('End');
+  await expect(slider).toHaveValue('1');
+  await expect(slider).toHaveAttribute('aria-valuetext', '100 %');
+  await expect(page.locator('.map__opacity-value')).toHaveText('100 %');
+  await page.getByRole('button', { name: 'None', exact: true }).click();
+  await expect(slider).toBeDisabled();
+});

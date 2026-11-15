@@ -147,24 +147,35 @@ function MapCanvas({ data }: { data: MapData }) {
       g.globalAlpha = 1;
     }
     g.restore();
-    g.lineWidth = 1.5;
-    g.font = '12px system-ui, sans-serif';
+    // Regions and markers with a dark halo, so they read on the bright hillshade too (layer None; T-90).
+    g.font = '600 13px system-ui, sans-serif';
+    g.lineJoin = 'round';
     for (const r of data.regions) {
       const a = worldOfXY(r.box_m[0], r.box_m[3]);
       const b = worldOfXY(r.box_m[2], r.box_m[1]);
       const p = toScreen(a.wx, a.wy);
       const q = toScreen(b.wx, b.wy);
-      g.strokeStyle = '#e8eaed';
+      g.strokeStyle = 'rgba(5, 7, 11, 0.85)';
+      g.lineWidth = 4;
       g.strokeRect(p.x, p.y, q.x - p.x, q.y - p.y);
-      g.fillStyle = '#e8eaed';
-      g.fillText(r.name, p.x + 2, p.y - 3);
+      g.strokeStyle = '#e8eaed';
+      g.lineWidth = 1.5;
+      g.strokeRect(p.x, p.y, q.x - p.x, q.y - p.y);
+      g.strokeStyle = 'rgba(5, 7, 11, 0.9)';
+      g.lineWidth = 4;
+      g.strokeText(r.name, p.x + 2, p.y - 4);
+      g.fillStyle = '#f8fafc';
+      g.fillText(r.name, p.x + 2, p.y - 4);
     }
+    g.lineWidth = 1.5;
     for (const m of markers) {
       const p = toScreen(m.wx, m.wy);
       g.beginPath();
       g.arc(p.x, p.y, 4, 0, 2 * Math.PI);
       g.fillStyle = '#e8eaed';
       g.fill();
+      g.strokeStyle = 'rgba(5, 7, 11, 0.85)';
+      g.stroke();
     }
     if (activeWorld) {
       const p = toScreen(activeWorld.wx, activeWorld.wy);
@@ -328,9 +339,20 @@ function MapCanvas({ data }: { data: MapData }) {
             </select>
           </label>
         </div>
+        {/* T-90 (proposal 2): the value is shown (it does reach 100 %), and the slider is off without a layer. */}
         <label className="field">
           <span>{t('map.opacity')}</span>
-          <input type="range" min={0} max={1} step={0.05} value={opacity} onChange={(e) => setOpacity(Number(e.target.value))} />
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={opacity}
+            disabled={layer === 'none'}
+            aria-valuetext={`${Math.round(opacity * 100)} %`}
+            onChange={(e) => setOpacity(Number(e.target.value))}
+          />
+          <span className="map__opacity-value">{Math.round(opacity * 100)} %</span>
         </label>
         <button type="button" aria-label={t('map.zoom_in')} onClick={() => setView((v) => zoomAt(v, 2, w / 2, h / 2))}>
           +
