@@ -11,7 +11,7 @@ test('(3) Now at site says what the elevations and the margin are measured from'
   await openV2(page);
   const now = page.getByRole('region', { name: 'Now at site A' });
   await expect(now.getByText('Elevation: angle above the flat horizon of a smooth Moon. Margin: angle above the real horizon, with the terrain.')).toBeVisible({ timeout: 20_000 });
-  await expect(now.locator('.v2-dl__sub')).toHaveText(/^real horizon margin [+−-]\d+\.\d\d°$/);
+  await expect(now.locator('.v2-dl__sub')).toHaveText(/^margin [+−-]\d+\.\d\d°$/);
 });
 
 test('(7) Link dates explains that it moves every scenario to the same date', async ({ page }) => {
@@ -23,4 +23,13 @@ test('(7) Link dates explains that it moves every scenario to the same date', as
   await box.uncheck();
   await expect(box).toHaveAccessibleDescription(/applies only to the active scenario/);
   await expect(page.locator('#link-dates-help')).toBeVisible();
+});
+
+test('(8) one line says what the active mode is for, and each mode tab carries it as a description', async ({ page }) => {
+  await openV2(page);
+  await expect(page.locator('.v2-modes__help')).toHaveText(/^Explore: one site and date\./);
+  await expect(page.getByRole('tab', { name: 'Plan' })).toHaveAccessibleDescription(/^Plan: change sites, dates and mission requirements/);
+  await page.getByRole('tab', { name: 'Plan' }).click();
+  await expect(page.locator('.v2-modes__help')).toHaveText(/^Plan: /);
+  await expect(page.getByRole('tab', { name: 'Learn' })).toHaveAccessibleDescription(/^Learn: a 60-second guided tour/);
 });
