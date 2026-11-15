@@ -110,7 +110,9 @@ export const storySteps: StoryStep[] = [
     text: (ctx) => {
       const [a, b] = ctx.defaults.demo_pair.map((id) => siteById(ctx, id));
       const d = a && b ? storyDistance(siteDistanceM(a, b)) : 'a short distance';
-      return `These two sites are ${d} apart. One has sunlight and a direct radio link to Earth. The other has neither.`;
+      // True for any pair of D-108 (A ≥ 60 % of the mission with both, B ≤ 10 % and no_go); the former
+      // «The other has neither» was false for the published pair: B has the Sun at landing (T-92).
+      return `These two sites are ${d} apart. At one, the Sun (power) and the Earth (radio link) are both in view for most of the mission. At the other, almost never, and the mission fails.`;
     },
   },
   {

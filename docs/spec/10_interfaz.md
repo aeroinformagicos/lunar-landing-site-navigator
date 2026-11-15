@@ -257,7 +257,7 @@ Modo `Learn`. Superposición inferior con el texto del paso, `Back`, `Next` (tam
 | Paso | Segundos | Estado de la aplicación | Texto en pantalla (y voz) |
 | --- | --- | --- | --- |
 | 1 | 0–8 | Escenario A; pestaña Panorama centrada en el Sol; cursor en `T`; reproducción a `6 h/s` durante 4 s y pausa | `At the Moon's south pole the Sun never climbs more than a few degrees. Here it skims the horizon — and the terrain decides who gets light.` |
-| 2 | 8–18 | Escenarios A y B; vista `Compare` | `These two sites are {distance} apart. One has sunlight and a direct radio link to Earth. The other has neither.` |
+| 2 | 8–18 | Escenarios A y B; vista `Compare` | `These two sites are {distance} apart. At one, the Sun (power) and the Earth (radio link) are both in view for most of the mission. At the other, almost never, and the mission fails.` (T-92, D-121) |
 | 3 | 18–27 | Escenario B activo; pestaña Terrain profile hacia el Sol | `Here is why: a ridge {blockerDist} away blocks the Sun. Every answer comes with its reason.` |
 | 4 | 27–37 | Escenario A; pestaña Replan reducida; la columna activa pasa de `+0` a `+12 d` con una animación de 1 s | `Now the launch slips 12 days. Same site, new date — and it no longer works.` |
 | 5 | 37–46 | Ranking de regiones para `T + 12 d`; la primera fila resaltada | `The tool ranks NASA's candidate regions for the new date and proposes an alternative in seconds.` |

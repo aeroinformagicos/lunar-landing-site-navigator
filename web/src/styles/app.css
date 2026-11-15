@@ -1064,6 +1064,15 @@ input[aria-invalid='true'] {
   color: var(--c-warn-text);
 }
 
+/* Sun / Earth now against the real horizon (T-92): icon and words, colour only as a second cue. */
+.compare__now--in > span {
+  color: var(--c-go);
+}
+
+.compare__now--out > span {
+  color: var(--c-warn-text);
+}
+
 .compare__verdict {
   font-size: 13px;
   min-width: 160px;

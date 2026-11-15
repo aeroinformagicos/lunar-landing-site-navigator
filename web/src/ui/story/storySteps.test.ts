@@ -114,7 +114,7 @@ describe('texts with numbers from the data', () => {
     const [a, b] = sites.defaults.demo_pair.map((id) => sites.sites.find((s) => s.id === id)!);
     const d = siteDistanceM(a, b);
     expect(d).toBeGreaterThan(20_000);
-    expect(storySteps[1].text(ctx())).toBe(`These two sites are ${storyDistance(d)} apart. One has sunlight and a direct radio link to Earth. The other has neither.`);
+    expect(storySteps[1].text(ctx())).toBe(`These two sites are ${storyDistance(d)} apart. At one, the Sun (power) and the Earth (radio link) are both in view for most of the mission. At the other, almost never, and the mission fails.`);
     expect(storySteps[2].text(ctx({ blockerDistM: 41_230 }))).toBe('Here is why: a ridge 41 km away blocks the Sun. Every answer comes with its reason.');
   });
 

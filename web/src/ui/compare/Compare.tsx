@@ -62,6 +62,17 @@ function MiniTimeline({ c, t0, t1 }: { c: ColumnResult; t0: number; t1: number }
   );
 }
 
+/** `✓ In view · 1.31° above the real horizon` or `✕ Hidden · 2.10° below the real horizon`. */
+function NowCell({ now }: { now: ColumnResult['sunNow'] }) {
+  if (!now) return <td>—</td>;
+  const margin = formatDeg(Math.abs(now.marginDeg));
+  return (
+    <td className={now.visible ? 'compare__now compare__now--in' : 'compare__now compare__now--out'}>
+      <span aria-hidden="true">{now.visible ? '✓' : '✕'}</span> {t(now.visible ? 'compare.in_view' : 'compare.hidden', { margin })}
+    </td>
+  );
+}
+
 export function Compare({ onClose }: { onClose: () => void }) {
   const scenarios = useAppStore((s) => s.scenarios);
   const [slots, setSlots] = useState<Partial<Record<ScenarioId, SlotState>>>({});
@@ -168,6 +179,10 @@ export function Compare({ onClose }: { onClose: () => void }) {
                 )}
               </td>
             ))}
+            {/* The state now against the real horizon, next to the mission verdict (T-92): a negative
+                elevation can still be in view when the horizon dips below 0°. */}
+            {row('compare.sun_now', (c) => <NowCell now={c.sunNow} />)}
+            {row('compare.earth_now', (c) => <NowCell now={c.earthNow} />)}
             {row('metrics.sunlight', (c, i) => cell(i, 'sunlight', `${formatHours(c.sunHours)} · ${formatPct(c.sunPct)}`))}
             {row('metrics.earth_link', (c, i) => cell(i, 'earth_link', `${formatHours(c.earthHours)} · ${formatPct(c.earthPct)}`))}
             {row('timeline.both', (c, i) => cell(i, 'both', `${formatHours(c.bothHours)} · ${formatPct(c.bothPct)}`))}

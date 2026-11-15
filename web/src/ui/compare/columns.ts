@@ -25,6 +25,9 @@ export interface ColumnResult {
   longestNightH: number;
   /** At the cursor; null when the cursor is outside this scenario's table. */
   sunElNow: number | null;
+  /** At the cursor, against the real horizon (T-92): centre in view and margin (degrees). */
+  sunNow: { visible: boolean; marginDeg: number } | null;
+  earthNow: { visible: boolean; marginDeg: number } | null;
   discNowPct: number | null;
   nextSun: string;
   nextEarth: string;
@@ -61,6 +64,8 @@ export function computeColumn(
     bothPct: m.bothPct,
     longestNightH: m.longestNightH,
     sunElNow: now ? now.sky.sun.elDeg : null,
+    sunNow: now ? { visible: now.sky.sun.visible, marginDeg: now.sky.sun.marginDeg } : null,
+    earthNow: now ? { visible: now.sky.earth.visible, marginDeg: now.sky.earth.marginDeg } : null,
     discNowPct: now ? now.sky.sun.discFraction * 100 : null,
     nextSun: now?.nextSun ? countdownText(now.nextSun, cursorUnix) : '—',
     nextEarth: now?.nextEarth ? countdownText(now.nextEarth, cursorUnix) : '—',
