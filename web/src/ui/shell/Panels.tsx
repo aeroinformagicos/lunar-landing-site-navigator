@@ -165,6 +165,8 @@ export function NowPanel() {
       ) : (
         <p className="v2-note">{resource.status === 'ready' ? t('metrics.outside') : t('metrics.loading')}</p>
       )}
+      {/* T-90 (proposal 3): what the elevations and the margin are measured from. */}
+      {!detail && now && <p className="v2-note">{t('now.reference')}</p>}
 
       {!detail && checks.length > 0 && (
         <ul className="v2-checks" aria-label={t('metrics.status')}>
