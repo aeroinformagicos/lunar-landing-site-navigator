@@ -18,7 +18,7 @@ import { loadCellMask, type MapData } from '../map/mapData';
 import { durationWords } from '../replan/texts';
 import { exactBothHours } from './refine';
 import { Button } from '../common/Button';
-import { takeBestSiteRequest } from './request';
+import { consumeBestSiteRequest, takeBestSiteRequest } from './request';
 
 export interface BestSiteProps {
   data: MapData;
@@ -45,7 +45,9 @@ export function BestSite({ data, layer, periodLabel, onFocus }: BestSiteProps) {
   const [open, setOpen] = useState(requested);
   const toggleRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    if (requested) toggleRef.current?.focus();
+    if (!requested) return;
+    consumeBestSiteRequest();
+    toggleRef.current?.focus();
   }, [requested]);
   const [region, setRegion] = useState<number | null>(null);
   const [periodHits, setPeriodHits] = useState<PeriodHit[] | null>(null);
