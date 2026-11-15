@@ -19,9 +19,10 @@ import { useBoot } from '../common/data';
 import { useResource } from '../common/DataState';
 import { formatDeg, formatInt, formatLatLon, formatMargin } from '../common/format';
 import { useScenarioModel } from '../common/model';
+import { useView2d } from '../shell/view2d';
 import { loadCellMask, loadLayer, meshPointLabel, NotComputed, type Band, type LayersInfo, type LayerPeriod } from '../map/mapData';
 import { bodyTrace, pointerReadout, ridgeLabel } from '../panorama/texts';
-import { startOrbit, wrapDeg } from './camera';
+import { followTurn, startOrbit, wrapDeg } from './camera';
 import { LOOK } from './look';
 import { Controls, type GoToItem, type LiveRefs, type OverlayControl } from './Controls';
 import {
@@ -592,6 +593,8 @@ export default function Stage3D() {
   // ---- Cameras (§7) -----------------------------------------------------------------------------
   const skyRef = useRef(sky);
   skyRef.current = sky;
+  /** The camera follows the focus body while playing (D-183); false once the user turns the view. */
+  const following = useRef(true);
   const focusAz = useCallback(() => {
     const s = skyRef.current;
     return s ? (focusBody === 'sun' ? s.sun.azDeg : s.earth.azDeg) : 0;
@@ -631,6 +634,7 @@ export default function Stage3D() {
   const recenter = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
+    following.current = true;
     if (engine.getMode() === 'ground') {
       const g = groundLook();
       if (g) engine.setLook(g);
@@ -663,12 +667,11 @@ export default function Stage3D() {
   }, [frame, loc, built, active.id, active.siteRef, sky, startFor, groundLook]);
 
   // Centre on Sun / Earth turns the camera toward that body.
-  const lastFocus = useRef(focusBody);
-  useEffect(() => {
+  const turnToFocus = useCallback(() => {
     const engine = engineRef.current;
-    if (!engine || lastFocus.current === focusBody || !sky) return;
-    lastFocus.current = focusBody;
-    const az = focusBody === 'sun' ? sky.sun.azDeg : sky.earth.azDeg;
+    const s = skyRef.current;
+    if (!engine || !s) return;
+    const az = focusBody === 'sun' ? s.sun.azDeg : s.earth.azDeg;
     if (engine.getMode() === 'ground') {
       const g = groundLook();
       if (g) engine.setLook(g);
@@ -676,7 +679,47 @@ export default function Stage3D() {
       const goal = engine.getOrbit();
       if (goal) engine.setOrbit({ ...goal, headingDeg: az }, false);
     }
-  }, [focusBody, sky, groundLook]);
+  }, [focusBody, groundLook]);
+
+  // While the mission plays the camera follows the focus body (D-183): it turns by the body's own
+  // azimuth step, so the framing is kept (straight at it after Centre on…, or the side light of the
+  // first view). Turning the view by hand stops it; Centre on Sun / Earth or Recenter starts it again.
+  const lastFocus = useRef(focusBody);
+  useEffect(() => {
+    if (lastFocus.current === focusBody || !sky) return;
+    lastFocus.current = focusBody;
+    following.current = true;
+    turnToFocus();
+  }, [focusBody, sky, turnToFocus]);
+  // Pressing the Centre on… button that is already on (the 2D view gets the same request).
+  const turnReq = useView2d((s) => s.turn);
+  const lastTurnSeq = useRef(turnReq?.seq ?? 0);
+  useEffect(() => {
+    if (!turnReq || turnReq.seq === lastTurnSeq.current) return;
+    lastTurnSeq.current = turnReq.seq;
+    if (turnReq.az !== null) return; // the 2D heading indicator, not a Centre on…
+    following.current = true;
+    turnToFocus();
+  }, [turnReq, turnToFocus]);
+  const followedAz = useRef<{ body: string; az: number } | null>(null);
+  useEffect(() => {
+    const engine = engineRef.current;
+    const az = sky ? (focusBody === 'sun' ? sky.sun.azDeg : sky.earth.azDeg) : null;
+    const prev = followedAz.current;
+    followedAz.current = az === null ? null : { body: focusBody, az };
+    if (!engine || az === null || !prev || prev.body !== focusBody) return;
+    // The guided story keeps its fixed framing per step (§7.7); the free flight is the user's.
+    if (!playing || !following.current || mode === 'learn' || engine.isFlying()) return;
+    const d = followTurn(prev.az, az);
+    if (d === 0) return;
+    if (engine.getMode() === 'orbit') {
+      const goal = engine.getOrbit();
+      if (goal) engine.setOrbit({ ...goal, headingDeg: wrapDeg(goal.headingDeg + d) }, false);
+    } else if (engine.getMode() === 'ground') {
+      const l = engine.getLook();
+      if (l) engine.setLook({ ...l, yawDeg: wrapDeg(l.yawDeg + d) });
+    }
+  }, [sky, focusBody, playing, mode]);
 
   // Guided story, step 1 (§7.7): a fixed orbit over A, looking toward the Sun.
   useEffect(() => {
@@ -930,6 +973,7 @@ export default function Stage3D() {
   // ---- Go to (§7.4) ---------------------------------------------------------------------------------
   const goToRegionRef = useRef<(r: RegionRow) => void>(() => {});
   goToRegionRef.current = (r: RegionRow) => {
+    following.current = false; // a view of the region, not of the sky (D-183)
     const engine = engineRef.current;
     if (!engine || !frame?.polar) return;
     const cx = (r.box_m[0] + r.box_m[2]) / 2;
@@ -955,6 +999,7 @@ export default function Stage3D() {
           const engine = engineRef.current;
           if (!engine) return;
           if (engine.getMode() === 'ground') changeMode('orbit');
+          following.current = false; // a view of the pole, not of the sky (D-183)
           engine.goTo({ target: mapToScene(0, 0, polarH(0, 0)), headingDeg: 0, pitchDeg: 40, distM: 60_000 });
         },
       });
@@ -965,6 +1010,7 @@ export default function Stage3D() {
   const northUp = useCallback(() => {
     const engine = engineRef.current;
     if (!engine) return;
+    following.current = false; // north stays up (D-183)
     if (engine.getMode() === 'orbit') {
       const goal = engine.getOrbit();
       if (goal) engine.setOrbit({ ...goal, headingDeg: 0 }, false);
@@ -1163,6 +1209,7 @@ export default function Stage3D() {
         const h = heightsRef.current ? polarHeightAt(heightsRef.current, x, y) : 0;
         engine.setMode('orbit');
         setCamMode('orbit');
+        following.current = false;
         engine.setOrbit({ target: mapToScene(x, y, h), headingDeg: 0, pitchDeg: 89, distM: 3000 }, true);
         return true;
       },
@@ -1269,9 +1316,13 @@ export default function Stage3D() {
       // Grab the view, as the 2D panorama: the terrain follows the finger.
       const k = engine.viewInfo().fovDeg / Math.max(1, sizeRef.current.h);
       engine.lookBy(-dx * k, dy * k);
+      if (dx !== 0) following.current = false; // turned by hand (D-183)
     } else if (m === 'fly') engine.lookBy(dx * 0.15, -dy * 0.15);
     else if (p.pan) engine.panBy(dx, dy);
-    else engine.orbitBy(-dx * 0.3, dy * 0.2);
+    else {
+      engine.orbitBy(-dx * 0.3, dy * 0.2);
+      if (dx !== 0) following.current = false; // turned by hand (D-183)
+    }
     pointers.current.set(e.pointerId, { ...p, x: e.clientX, y: e.clientY });
   };
   const onPointerUp = (e: React.PointerEvent) => {
@@ -1307,8 +1358,14 @@ export default function Stage3D() {
     }
     const step = m === 'ground' ? 1 : 5;
     const act: Record<string, () => void> = {
-      ArrowLeft: () => engine.orbitBy(-step, 0),
-      ArrowRight: () => engine.orbitBy(step, 0),
+      ArrowLeft: () => {
+        following.current = false; // turned by hand (D-183)
+        engine.orbitBy(-step, 0);
+      },
+      ArrowRight: () => {
+        following.current = false;
+        engine.orbitBy(step, 0);
+      },
       ArrowUp: () => engine.orbitBy(0, step),
       ArrowDown: () => engine.orbitBy(0, -step),
       '+': () => engine.zoomBy(m === 'ground' ? 0.9 : 0.8),

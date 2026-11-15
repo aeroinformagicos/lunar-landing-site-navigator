@@ -221,6 +221,7 @@ Tres modos con un selector de texto (`Orbit`, `Fly`, `Ground`) en el grupo de co
 - **Encuadre inicial** (y de `Recenter`): distancia 45 km, 22° sobre el horizonte (D-110 a; antes 18 km y 14°), rumbo de la cámara = acimut del astro de enfoque (`focusBody`) + 180°, de modo que la cámara mira hacia ese astro y su luz rasante cruza el terreno hacia el espectador. Si el escenario B está a menos de 25 km de A, la distancia se ajusta para que entren los dos.
 - Teclado: flechas giran 5°; `+` / `−` (o `PageUp` / `PageDown`) acercan y alejan ×1,25; `Enter` equivale a un clic en el centro (§10.2); `Home` = `Recenter`.
 - Al cambiar `focusBody` (botones `Centre on Sun` / `Centre on Earth` del armazón), la cámara gira (vuelo suave de 1 s) al rumbo del nuevo astro.
+- Mientras se reproduce la misión (D-183), la cámara (órbita y a ras de suelo) sigue al astro en foco: gira cada fotograma lo mismo que su acimut, así que conserva el encuadre. Girar la vista a mano (arrastre, flechas ←/→, `North up`, `Go to`) lo detiene; `Centre on …` (también el botón ya activo) o `Recenter` lo reanudan. En Learn no sigue (encuadre fijo por paso, §7.7).
 
 ### 7.2 Vuelo
 

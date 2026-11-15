@@ -97,8 +97,15 @@ export function ScenarioPills({ onAdd }: { onAdd: () => void }) {
 export function ModeNav() {
   const mode = useAppStore((s) => s.mode);
   const setMode = useAppStore((s) => s.setMode);
+  // D-184: what a mode is for shows only while the pointer rests on its tab (or the keyboard focus is
+  // on it), as a floating note; screen readers always get it as the tab's description.
+  const [hint, setHint] = useState<Mode | null>(null);
 
   function onKey(e: React.KeyboardEvent, i: number) {
+    if (e.key === 'Escape') {
+      setHint(null);
+      return;
+    }
     const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
     if (!d) return;
     e.preventDefault();
@@ -122,6 +129,10 @@ export function ModeNav() {
             tabIndex={mode === m ? 0 : -1}
             onClick={() => setMode(m)}
             onKeyDown={(e) => onKey(e, i)}
+            onPointerEnter={(e) => e.pointerType !== 'touch' && setHint(m)}
+            onPointerLeave={() => setHint((h) => (h === m ? null : h))}
+            onFocus={(e) => e.currentTarget.matches(':focus-visible') && setHint(m)}
+            onBlur={() => setHint((h) => (h === m ? null : h))}
           >
             {t(`mode.${m}` as TextKey)}
           </button>
@@ -132,10 +143,12 @@ export function ModeNav() {
         {t('header.validation')}
       </a>
       {mode === 'plan' && <ShareButton />}
-      {/* T-90 (proposal 8): what the active mode is for, in one line; each tab carries its own as a description. */}
-      <p className="v2-modes__help" aria-hidden="true">
-        {t(`mode.${mode}_help` as TextKey)}
-      </p>
+      {/* T-90 (proposal 8), D-184: what the mode under the pointer is for; each tab carries its own as a description. */}
+      {hint && (
+        <p className="v2-modes__help" aria-hidden="true">
+          {t(`mode.${hint}_help` as TextKey)}
+        </p>
+      )}
       {MODES.map((m) => (
         <span key={m} id={`mode-help-${m}`} className="visually-hidden">
           {t(`mode.${m}_help` as TextKey)}

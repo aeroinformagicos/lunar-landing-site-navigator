@@ -210,6 +210,7 @@ Dirección en palabras a partir del acimut (16 rumbos): `north`, `north-northeas
 | Ninguno | `Neither the Sun nor the Earth is visible from here right now.` |
 | Sol parcialmente visible (0 < fracción < 1), se añade | `Only {pct} % of the solar disc clears the terrain.` |
 | Luna lisa | Se sustituye «terrain … to the …» por `the lunar horizon` |
+| Mientras se reproduce la misión (D-183) | Frase 1 sin elevación, sin la fracción del disco, sin el porcentaje del eclipse y sin distancia ni cota del terreno que tapa (`The Sun and the Earth are both in view: …`, `hidden behind terrain to the {dir}`); frase 2 con la hora UTC del suceso en lugar de la cuenta atrás (`Sunset comes at {utc}.`, `Earth contact is lost at {utc}.`). En pausa, el texto completo. |
 | Astro bajo el horizonte liso (su elevación ≤ `smooth_el_deg` de la altura del observador: lo taparía también una Luna sin relieve, p. ej. la Tierra desde la cara oculta) | Para ese astro se sustituye «hidden behind terrain {dist} to the {dir}{rise}» por `below the lunar horizon` (sin distancia ni dirección): el relieve no es la causa y no se atribuye |
 | Eclipse | Se añade `The Earth is covering {pct} % of the Sun (eclipse).` |
 

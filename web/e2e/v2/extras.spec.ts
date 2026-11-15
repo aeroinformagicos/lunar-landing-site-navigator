@@ -25,13 +25,21 @@ test('(7) Link dates explains that it moves every scenario to the same date', as
   await expect(page.locator('#link-dates-help')).toBeVisible();
 });
 
-test('(8) one line says what the active mode is for, and each mode tab carries it as a description', async ({ page }) => {
+test('(8) what a mode is for shows only on hover (D-184), and each mode tab carries it as a description', async ({ page }) => {
   await openV2(page);
-  await expect(page.locator('.v2-modes__help')).toHaveText(/^Explore: one site and date\./);
-  await expect(page.getByRole('tab', { name: 'Plan' })).toHaveAccessibleDescription(/^Plan: change sites, dates and mission requirements/);
+  const help = page.locator('.v2-modes__help');
+  await expect(help).toHaveCount(0);
+  await page.getByRole('tab', { name: 'Plan' }).hover();
+  await expect(help).toHaveText('Compare sites and dates against your mission requirements.');
+  await page.getByRole('tab', { name: 'Learn' }).hover();
+  await expect(help).toHaveText(/^A 60-second guided tour/);
+  await page.mouse.move(10, 500);
+  await expect(help).toHaveCount(0);
   await page.getByRole('tab', { name: 'Plan' }).click();
-  await expect(page.locator('.v2-modes__help')).toHaveText(/^Plan: /);
-  await expect(page.getByRole('tab', { name: 'Learn' })).toHaveAccessibleDescription(/^Learn: a 60-second guided tour/);
+  await page.mouse.move(10, 500);
+  await expect(help).toHaveCount(0);
+  await expect(page.getByRole('tab', { name: 'Explore' })).toHaveAccessibleDescription(/^See when one site has sunlight and a direct line to Earth/);
+  await expect(page.getByRole('tab', { name: 'Learn' })).toHaveAccessibleDescription(/^A 60-second guided tour/);
 });
 
 test('(4) requirements: explained as editable team defaults, and reachable from the Now panel', async ({ page }) => {
