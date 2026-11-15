@@ -101,3 +101,21 @@ test('(9) the 3D polar scene says that a click on the terrain computes that poin
   await expect(page.locator('.stage3d[data-state="ready"][data-scene="polar"]')).toBeVisible({ timeout: 30_000 });
   await expect(page.getByText('Click the terrain (or press Enter on the centre cross) to compute that point as the site.')).toBeVisible();
 });
+
+test('(1) the story dims what the step does not talk about, and step 1 starts the Sun cycle again', async ({ page }) => {
+  await openV2(page);
+  await page.getByRole('tab', { name: 'Learn' }).click();
+  await expect(page.locator('.v2[data-story-step="0"]')).toHaveCount(1);
+  await expect(page.locator('.v2-brand')).toHaveCSS('opacity', '0.3');
+  await expect(page.locator('.v2-time')).toHaveCSS('opacity', '1');
+  // Elapsed hours of the cursor from the landing, read from `Day n, hh:mm`.
+  const hours = async () => {
+    const m = /Day (\d+), (\d\d):(\d\d)/.exec((await page.locator('.v2-readout').textContent()) ?? '');
+    return m ? Number(m[1]) * 24 + Number(m[2]) + Number(m[3]) / 60 : Number.NaN;
+  };
+  await expect.poll(hours, { timeout: 6_000 }).toBeGreaterThan(10);
+  await expect.poll(hours, { timeout: 6_000, intervals: [100] }).toBeLessThan(6); // back to the start
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.locator('.v2[data-story-step="1"]')).toHaveCount(1);
+  await expect(page.locator('.v2-time')).toHaveCSS('opacity', '0.3');
+});

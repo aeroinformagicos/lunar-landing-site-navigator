@@ -41,6 +41,7 @@ export default function ShellV2() {
   const comparing = useAppStore((s) => s.comparing);
   const viewNotice = useAppStore((s) => s.viewNotice);
   const viewMode = useAppStore((s) => s.viewMode);
+  const storyStep = useAppStore((s) => s.storyStep);
   const dismissViewNotice = useAppStore((s) => s.dismissViewNotice);
   const init = useAppStore((s) => s.init);
   const addScenario = useAppStore((s) => s.addScenario);
@@ -127,7 +128,12 @@ export default function ShellV2() {
   return (
     <ActiveContext.Provider value={active}>
       <BottomStripContext.Provider value={bottomH}>
-      <div ref={rootRef} className={`v2${learning ? ' v2--learn' : ''}${onHorizon ? '' : ' v2--sheet'}`}>
+      <div
+        ref={rootRef}
+        className={`v2${learning ? ' v2--learn' : ''}${onHorizon ? '' : ' v2--sheet'}`}
+        // T-90 (proposal 1): the guided story dims what each step does not talk about (ui/story/storySpot.css).
+        data-story-step={learning && storyStep !== null ? storyStep : undefined}
+      >
         <a className="v2-skip" href="#main-view">
           {t('shell.skip')}
         </a>
