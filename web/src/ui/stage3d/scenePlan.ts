@@ -66,6 +66,15 @@ export function chooseScene(latDeg: number, lonDeg: number, dem: DemStatus): Sce
   return pickScene({ latDeg, lonDeg, dem, profile: 'none', mask: 'none' }).kind;
 }
 
+/**
+ * A catalogue site drawn as a marker in the polar scene (§8.5). Candidate regions with a contour
+ * (`region_id` set) are drawn by their outline instead (§8.2); candidate points without one
+ * (`region_id` null, T-91) are markers like any other site.
+ */
+export function catalogueMarker(site: Pick<Site, 'type' | 'region_id'>): boolean {
+  return !(site.type === 'candidate_region' && site.region_id !== null);
+}
+
 export type ReliefLevel = 'ok' | 'warn' | 'red';
 
 /**

@@ -6,7 +6,8 @@ import { GRID } from '../../core/grid';
 import type { LawName } from '../../core/law';
 import { makeSceneFrame } from './frame';
 import { buildPolarTiles, buildRadialMesh, downsample2, fillHoles, type TileMesh } from './meshes';
-import { everyNthAzimuth, profileTerrain, type RadialTerrain } from './radial';
+import { everyNthAzimuth, profileTerrain, smoothNearAzimuths, type RadialTerrain } from './radial';
+import { LOOK } from './look';
 
 export interface PolarRequest {
   id: number;
@@ -76,7 +77,9 @@ export function buildPolar(req: PolarRequest): MeshAnswer {
 /** The profile scene (§4.2): holes filled, one of every two azimuths below `alto`, radial mesh. */
 export function buildProfile(req: ProfileRequest): ProfileAnswer {
   const t0 = performance.now();
-  const terrain = profileTerrain(req.raw, req.law, req.siteHeightM);
+  const raw = profileTerrain(req.raw, req.law, req.siteHeightM);
+  // Near-site radial streaks smoothed (D-134); the ground, the readout and the shadows use the same terrain.
+  const terrain = { ...smoothNearAzimuths(raw, LOOK.profileSmoothArcM, LOOK.profileSmoothMaxHalf), filled: raw.filled };
   const drawn = everyNthAzimuth(terrain, req.lod === 1 ? 1 : 2);
   const f = makeSceneFrame(req.latDeg, req.lonDeg, req.siteHeightM);
   const nb = drawn.dist.length;

@@ -1,0 +1,27 @@
+/* AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos */
+/* 3D / 2D switch: the 3D option when the device cannot show it (T-74). It stays focusable and a tap,
+   click or Enter shows why below the switch, so the reason never depends on hovering. */
+.ui-v2 .v2-toggle__opt[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.ui-v2 .v2-toggle__why {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 32px));
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  background: var(--c-panel-text, rgba(17, 24, 39, 0.88));
+  color: var(--c-text);
+  font: 400 13px/1.4 var(--font-v2-sans);
+}
+
+.ui-v2 .v2-toggle__why[hidden] {
+  display: none;
+}

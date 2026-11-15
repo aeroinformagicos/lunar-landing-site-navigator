@@ -109,6 +109,14 @@ fuente (CLAUDE.md §2).
 | Vista 3D: escena de anillo (suelo llano, rampa hasta la esfera, hundimiento de los paneles) | 30.000; 6.000; 50 | m; m; m | `16_vista_3d.md` §4.3; D-119 d. Solo dibujo | `web/src/ui/stage3d/radial.ts` (`RING_FLAT_M`, `RING_RAMP_M`) |
 | Vista 3D: presupuestos de tamaño comprobados en `make check` (JavaScript principal; 3D: trozo + three.js + trabajador), gzip | 350; 1.500 | kB | `02_arquitectura.md` §7; `16_vista_3d.md` §12.1; D-119 e | `ops/tasks.mjs` (`check-size`) |
 | Vista 2D: margen del borde antes de girar la vista mientras se reproduce | 6 | ° | D-120 a (presentación, sin efecto en ninguna cifra) | `web/src/ui/shell/horizon2d.ts` (`FOLLOW_EDGE_DEG`) |
+| Vista 3D: exageración vertical (opciones, por defecto; ×1 en `Ground`) | 1, 2, 3; 2 | — | Solo dibujo; D-131 | `web/src/ui/stage3d/index.tsx` (`EXAGGERATIONS`, `DEFAULT_EXAG`) |
+| Vista 3D: tierra clara y ambiente (relativos a la luz del Sol) | 0,03; 0,004 | — | Solo visuales (antes 0,004 y 0,002); D-132 | `web/src/ui/stage3d/look.ts` |
+| Vista 3D: encuadre inicial con el Sol de enfoque (rumbo respecto al Sol) | −65 | ° | Solo dibujo; D-132 | `web/src/ui/stage3d/look.ts` (`crossLightDeg`) |
+| Vista 3D: detalle procedural (celdas de cráteres; rugosidad; apagado entre 5 y 14 píxeles por celda) | 640, 170, 46, 12; 3 y 0,8; 5–14 | m; m; px | Inventado, solo dibujo; D-133 | `web/src/ui/stage3d/scene/shaders.ts` (`DETAIL`) |
+| Vista 3D: suavizado del perfil en acimut cerca del sitio (arco de la ventana; tope) | 150; 24 | m; acimutes | Solo dibujo; D-134 | `web/src/ui/stage3d/look.ts` (`profileSmoothArcM`, `profileSmoothMaxHalf`) |
+| Vista 3D: capa proyectada (mezcla; luz fija del mapa; sombreado) | 0,68; noroeste a 45°; 0,35 + 0,75·sombreado, × 0,7–1 en sombra | —; °; — | Solo dibujo; D-135 | `web/src/ui/stage3d/scene/shaders.ts` |
+| Vista 3D: cielo (estrellas; franja; destellos del Sol) | 6.000, magnitudes 1–6,5; 35 % en ~12° inclinada 60°; 0,5 | —; —; — | Decorativo; D-136 | `web/src/ui/stage3d/look.ts` |
+| Vista 3D: grupo de controles plegado por defecto por debajo de | 1.024 | px | D-137 a | `web/src/ui/stage3d/Controls.tsx` (`FOLDED_BELOW_PX`) |
 ## Valores medidos
 
 Medidos al ejecutar cada tarjeta en el portátil de I1 (Windows 11, SSD) con los ficheros de `$LLSN_DATA_DIR`.

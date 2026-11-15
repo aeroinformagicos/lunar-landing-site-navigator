@@ -35,6 +35,14 @@ export interface OverlayControl {
   } | null;
 }
 
+/** Vertical exaggeration of the drawn relief (T-74, D-131). */
+export interface ExaggerationControl {
+  /** The choice in the controls (kept in Ground, where the view is drawn at ×1). */
+  value: number;
+  choices: readonly number[];
+  onPick(k: number): void;
+}
+
 export interface LiveRefs {
   compass: RefObject<SVGGElement | null>;
   earthSide: RefObject<SVGGElement | null>;
@@ -59,44 +67,59 @@ export interface ControlsProps {
   fps: string | null;
   live: LiveRefs;
   polar: boolean;
+  /** Absent on a smooth Moon, which has no relief to exaggerate. */
+  exaggeration: ExaggerationControl | null;
 }
 
 const OPEN_KEY = 'llsn.stage3d.controls';
 const MODE_TEXT: Record<CameraMode, TextKey> = { orbit: 'stage3d.orbit', fly: 'stage3d.fly', ground: 'stage3d.ground' };
 
+/** Below this width (tablets) the controls start folded so they do not cover the summary (T-74). */
+const FOLDED_BELOW_PX = 1024;
+
 function readOpen(): boolean {
+  const byWidth = typeof window === 'undefined' || window.innerWidth >= FOLDED_BELOW_PX;
   try {
-    return localStorage.getItem(OPEN_KEY) !== '0';
+    const v = localStorage.getItem(OPEN_KEY);
+    return v === null ? byWidth : v !== '0';
   } catch {
-    return true;
+    return byWidth;
   }
 }
 
 export function Controls(p: ControlsProps) {
-  const [open, setOpen] = useState(readOpen);
-  const [help, setHelp] = useState(false);
-  const [menu, setMenu] = useState(false);
-  const [layerMenu, setLayerMenu] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const layerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
+  const [open, setOpenState] = useState(readOpen);
+  /** Only a choice of the user is remembered (not the width-based default). */
+  const setOpen = (v: boolean) => {
+    setOpenState(v);
     try {
-      localStorage.setItem(OPEN_KEY, open ? '1' : '0');
+      localStorage.setItem(OPEN_KEY, v ? '1' : '0');
     } catch {
       /* private mode: the choice is not remembered */
     }
-  }, [open]);
+  };
+  const [help, setHelp] = useState(false);
+  const [menu, setMenu] = useState(false);
+  const [layerMenu, setLayerMenu] = useState(false);
+  const [exagMenu, setExagMenu] = useState(false);
+  const exagRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const layerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!help && !menu && !layerMenu) return;
+    if (!help && !menu && !layerMenu && !exagMenu) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       setHelp(false);
       setMenu(false);
       setLayerMenu(false);
+      setExagMenu(false);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [help, menu, layerMenu]);
+  }, [help, menu, layerMenu, exagMenu]);
+  useEffect(() => {
+    if (exagMenu) exagRef.current?.querySelector<HTMLButtonElement>('button[aria-pressed="true"]')?.focus();
+  }, [exagMenu]);
   useEffect(() => {
     if (menu) menuRef.current?.querySelector('button')?.focus();
   }, [menu]);
@@ -187,6 +210,36 @@ export function Controls(p: ControlsProps) {
             )}
           </div>
         )}
+        {p.exaggeration && (
+          <div className="stage3d__menu-wrap">
+            <Button
+              variant="secondary"
+              aria-expanded={exagMenu}
+              aria-haspopup="true"
+              aria-label={t('stage3d.exag_label', { k: p.exaggeration!.value })}
+              onClick={() => setExagMenu((m) => !m)}
+            >
+              {t('stage3d.exag', { k: p.exaggeration!.value })}
+            </Button>
+            {exagMenu && (
+              <div ref={exagRef} className="stage3d__menu" role="group" aria-label={t('stage3d.exag_list')}>
+                {p.exaggeration!.choices.map((k) => (
+                  <Button
+                    key={k}
+                    variant="ghost"
+                    aria-pressed={p.exaggeration!.value === k}
+                    onClick={() => {
+                      setExagMenu(false);
+                      p.exaggeration!.onPick(k);
+                    }}
+                  >
+                    {k === 1 ? t('stage3d.exag_true') : t('stage3d.exag_choice', { k })}
+                  </Button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         <Button variant="secondary" aria-label={t('stage3d.help')} aria-expanded={help} onClick={() => setHelp((h) => !h)}>
           ?
         </Button>
@@ -239,6 +292,11 @@ export function Controls(p: ControlsProps) {
         {p.relief.text}
       </p>
       {p.relief.level === 'red' && <p className="stage3d__note stage3d__relief--red">{t('relief.smooth_warning')}</p>}
+      {p.exaggeration && p.exaggeration.value > 1 && (
+        <p className="stage3d__note stage3d__exag">
+          {p.mode === 'ground' ? t('stage3d.exag_ground') : t('stage3d.exag_note', { k: p.exaggeration.value })}
+        </p>
+      )}
       <p ref={p.live.beyond} className="stage3d__note" hidden>
         {t('stage3d.beyond')}
       </p>

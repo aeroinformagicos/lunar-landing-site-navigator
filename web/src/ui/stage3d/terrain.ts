@@ -144,6 +144,36 @@ export function radialGround(f: SceneFrame, heightAtPolar: (d: number, azDeg: nu
   };
 }
 
+/**
+ * Vertical exaggeration of the drawn relief (T-74, D-131): a height h above the sphere is drawn at
+ * hA + k·(h − hA), hA the anchor's height (0 at the pole, the site's height elsewhere), so the
+ * anchor stays put. Shape only: figures, the readout and the cast shadows use the real relief.
+ */
+export function shownHeight(f: SceneFrame, k: number, hM: number): number {
+  return f.hM + k * (hM - f.hM);
+}
+
+/** Inverse of `shownHeight`: the real height of a drawn height. */
+export function realHeight(f: SceneFrame, k: number, shownM: number): number {
+  return f.hM + (shownM - f.hM) / k;
+}
+
+/** The ground of a scene as drawn with exaggeration `k` (camera collision, rays, flights; §7.6). */
+export function exaggeratedGround(f: SceneFrame, g: Ground, k: number): Ground {
+  if (k === 1) return g;
+  return {
+    clearance(p) {
+      const hp = heightOf(f, p);
+      return hp - shownHeight(f, k, hp - g.clearance(p));
+    },
+    surface(p) {
+      const me = fromScene(f, g.surface(p));
+      const r = norm(me);
+      return toScene(f, scale(me, (R_M + shownHeight(f, k, r - R_M)) / r));
+    },
+  };
+}
+
 export const profileHeightFn = (t: RadialTerrain) => (d: number, azDeg: number) => radialHeightAt(t, d, azDeg);
 export const ringHeightFn = (siteHeightM: number) => (d: number) => ringGroundAt(siteHeightM, d);
 
