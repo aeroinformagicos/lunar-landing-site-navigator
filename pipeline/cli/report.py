@@ -58,7 +58,8 @@ CASES: list[dict] = [
      "expected": "0 deg crossings of the 1-minute Horizons series at 3 sites",
      "tolerance": "5 min", "source": HORIZONS},
     {"id": "A3", "title": "Sunset seen by Blue Ghost 1 (16 March 2025)",
-     "expected": "Sunset around 18:00-18:15 UTC (last data about 23:15 UTC, \"just over 5 hours into the lunar night\")",
+     "expected": "Sunset around 18:00-18:15 UTC (last data about 23:15 UTC, "
+                 "\"just over 5 hours into the lunar night\")",
      "tolerance": "30 min", "source": FIREFLY_END, "open_discrepancy": True},
     {"id": "A4", "title": "Horizon of a smooth sphere and of a 3 km mountain, by hand",
      "expected": "-0.087, -0.615, -1.943 and 2.606 deg", "tolerance": "0.005 deg",
