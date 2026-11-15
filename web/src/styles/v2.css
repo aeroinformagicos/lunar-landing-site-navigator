@@ -2177,3 +2177,91 @@
     letter-spacing: 0.02em;
   }
 }
+
+/* ---- T-93 (D-123): Power & comms ---- */
+.ui-v2 .v2-figswitch {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.ui-v2 .v2-figswitch__opt[aria-pressed='true'] {
+  border-color: var(--c-earth);
+  background: rgba(56, 189, 248, 0.14);
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+.ui-v2 .v2-power .v2-fig__value {
+  white-space: nowrap;
+}
+
+.ui-v2 .v2-power .v2-fig__unit {
+  font-size: 16px;
+}
+
+.ui-v2 .v2-power__sub {
+  margin: 0;
+  font: 400 12px var(--font-v2-mono);
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-power__assume {
+  max-width: 600px;
+  pointer-events: auto;
+}
+
+.ui-v2 .v2-power__note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-power__note > span:first-child {
+  color: var(--c-warn);
+}
+
+.ui-v2 .v2-power__form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ui-v2 .v2-power__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--c-text-2);
+}
+
+.ui-v2 .v2-power__field input,
+.ui-v2 .v2-power__field select {
+  min-height: 36px;
+  font-family: var(--font-v2-mono);
+}
+
+.ui-v2 .v2-power__sources {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+@media (pointer: coarse), (max-width: 767px) {
+  .ui-v2 .v2-power__field input,
+  .ui-v2 .v2-power__field select {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 767px) {
+  .ui-v2 .v2-power .v2-fig__unit {
+    display: block;
+    font-size: 12px;
+  }
+}

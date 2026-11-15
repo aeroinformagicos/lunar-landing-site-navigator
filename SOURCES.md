@@ -8,6 +8,9 @@ in which it is first used. Content owner: A2.
 
 | Source | Used for | URL | License / terms |
 | --- | --- | --- | --- |
+| Kopp, G., Lean, J. L. (2011), "A new, lower value of total solar irradiance: Evidence and climate significance", *Geophysical Research Letters* 38, L01706, doi:10.1029/2010GL045777 | Solar constant (1361 W/m²) of the Power & comms estimate (T-93) | https://doi.org/10.1029/2010GL045777 ; summary at https://espo.nasa.gov/node/30086 | Journal article; cite |
+| Spectrolab, XTJ Prime space solar cell datasheet | Default panel efficiency (30.7 %, beginning of life, AM0, 28 °C) of the Power & comms estimate (T-93) | https://www.spectrolab.com/photovoltaics/XTJ-Prime_Data_Sheet.pdf | Manufacturer datasheet, public |
+| IAU 2012 Resolution B2 (re-definition of the astronomical unit) | 1 au = 149 597 870 700 m, to scale the solar constant with the Sun's distance (T-93) | https://www.iau.org/static/resolutions/IAU2012_English.pdf | IAU, public |
 | NAIF generic SPICE kernels: `naif0012.tls`, `de440.bsp`, `moon_pa_de440_200625.bpc`, `moon_de440_250416.tf` | Ephemerides and the MOON_ME frame (CI downloads them; tests check exact sizes) | https://naif.jpl.nasa.gov/pub/naif/generic_kernels | NASA/JPL NAIF, public |
 | LOLA polar gridded data records, PDS data set `LRO-L-LOLA-4-GDR-V1.0` (LRO LOLA Team, NASA GSFC): `LDEM_80S_40M`, `LDEM_75S_120M`, `LDEM_60S_120M` (all V2.0) and their labels | Terrain near the south pole; the three labels are test fixtures | https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/ | NASA PDS, public |
 | LOLA archive projection catalogues `DSMAP_POLAR.CAT` and `DSMAP.CAT` | Polar stereographic and simple cylindrical pixel formulas | https://imbrium.mit.edu/CATALOG/ | NASA PDS, public |

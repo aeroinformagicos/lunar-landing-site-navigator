@@ -12,6 +12,7 @@ import { SitePicker } from '../scenario/SitePicker';
 import { WelcomeCard } from '../welcome/WelcomeCard';
 import { welcomePending } from '../welcome/welcome';
 import { Figures, Provenance, SummaryBlock, TimeBar, Verdict, ViewTabs } from './BottomStrip';
+import { FiguresSwitch, PowerAssumptionsBlock, PowerFigures, usePowerUi } from '../power/PowerComms';
 import { NowPanel, SetupPanel, SitesPanel } from './Panels';
 import { can3d } from '../../state/viewMode';
 import { Minimap } from './Minimap';
@@ -42,6 +43,7 @@ export default function ShellV2() {
   const viewNotice = useAppStore((s) => s.viewNotice);
   const viewMode = useAppStore((s) => s.viewMode);
   const storyStep = useAppStore((s) => s.storyStep);
+  const figView = usePowerUi((s) => s.view);
   const dismissViewNotice = useAppStore((s) => s.dismissViewNotice);
   const init = useAppStore((s) => s.init);
   const addScenario = useAppStore((s) => s.addScenario);
@@ -165,8 +167,11 @@ export default function ShellV2() {
         <section ref={bottomRef} className="v2-bottom" aria-label={t('panel.label')}>
           <div className="v2-mission">
             <Verdict />
-            {!learning && <Figures />}
-            {!learning && onHorizon && <SummaryBlock />}
+            {/* T-93 (D-123): the same mission read as visibility or as power and comms. */}
+            {!learning && <FiguresSwitch />}
+            {!learning && (figView === 'power' ? <PowerFigures /> : <Figures />)}
+            {!learning && figView === 'power' && <PowerAssumptionsBlock />}
+            {!learning && onHorizon && figView === 'visibility' && <SummaryBlock />}
           </div>
           <ViewTabs />
           <TimeBar />
