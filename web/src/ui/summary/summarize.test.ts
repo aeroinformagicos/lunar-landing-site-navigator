@@ -140,6 +140,33 @@ describe('sentence 2: what comes next', () => {
   });
 });
 
+describe('while playing (steady, D-183): no word changes on every frame', () => {
+  const steady = (over: Partial<SummaryInput> = {}) => input({ ...over, steady: true });
+
+  it('sentence 1 drops the elevation, the disc share, the eclipse percentage and the distance to the terrain', () => {
+    expect(sentenceNow(steady())).toBe('The Sun and the Earth are both in view: power and a direct link to Earth are both available.');
+    expect(sentenceNow(steady({ state: state(false, true) }))).toBe('The Earth is in view, but the Sun is hidden behind terrain to the west.');
+    expect(sentenceNow(steady({ state: state(true, false) }))).toBe('The Sun is up, but the Earth is hidden behind terrain to the east: no direct link to Earth.');
+    expect(sentenceNow(steady({ state: state(true, true, { disc: 0.62 }) }))).toBe(sentenceNow(steady()));
+    expect(sentenceNow(steady({ state: state(true, true, { covered: 0.43 }) }))).toMatch(/ The Earth is covering part of the Sun \(eclipse\)\.$/);
+  });
+
+  it('sentence 2 gives the next events as UTC times instead of countdowns', () => {
+    expect(sentenceNext(steady())).toBe('Sunset comes at 2025-03-20 22:52 UTC.');
+    const rise = steady({ state: state(false, true), nextSun: { kind: 'sunrise', tUnix: T + 3 * 86400 + 4 * 3600 + 46 * 60 } });
+    expect(sentenceNext(rise)).toBe('Sunrise comes at 2025-03-19 14:46 UTC.');
+    const lost = steady({ nextEarth: { kind: 'earthset', tUnix: T + 86400 + 12 * 3600 + 17 * 60 } });
+    expect(sentenceNext(lost)).toBe('Sunset comes at 2025-03-20 22:52 UTC. Earth contact is lost at 2025-03-17 22:17 UTC.');
+  });
+
+  it('the same text one playback step later', () => {
+    const later = (i: SummaryInput): SummaryInput => ({ ...i, state: { ...i.state, tUnix: i.state.tUnix + 600, sun: { ...i.state.sun, elDeg: i.state.sun.elDeg + 0.01 } } });
+    const a = steady({ state: state(true, true, { disc: 0.62 }) });
+    expect(summarize(later(a))).toEqual(summarize(a));
+    expect(summarize(later(input()))).not.toEqual(summarize(input())); // paused: the full, live text
+  });
+});
+
 describe('sentence 3: verdict', () => {
   it('go', () => {
     expect(sentenceVerdict(input())).toBe(

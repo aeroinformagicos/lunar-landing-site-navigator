@@ -61,12 +61,19 @@ export interface SummaryInput {
     /** Elevation of the smooth horizon for the observer height (`smooth_el_deg`). */
     smoothElDeg: number;
   };
+  /**
+   * While the mission plays (D-183): only words that hold for a while, so the paragraph does not
+   * rewrite itself on every frame. No elevation, no disc share, no eclipse percentage, no distance to the
+   * blocking terrain, and the next events as UTC times instead of countdowns. Paused, the full text.
+   */
+  steady?: boolean;
 }
 
 /** «hidden behind terrain 41 km to the west, 1,930 m higher than the site» and its variants. */
 function hiddenPhrase(bodyElDeg: number, b: Blocker, input: SummaryInput, withRise: boolean): string {
   if (bodyElDeg <= input.site.smoothElDeg) return 'below the lunar horizon';
   if (input.site.smooth) return 'hidden behind the lunar horizon';
+  if (input.steady) return `hidden behind terrain to the ${compassWord(b.azDeg)}`;
   const where = Number.isFinite(b.distM) ? `${distanceWords(b.distM)} to the ${compassWord(b.azDeg)}` : `to the ${compassWord(b.azDeg)}`;
   let rise = '';
   if (withRise) {
@@ -82,7 +89,9 @@ export function sentenceNow(input: SummaryInput): string {
   let s: string;
   if (sun.visible && earth.visible) {
     // P-05 (D-156, wording of D-119 j): a visible Sun can have a negative elevation over the flat horizon.
-    s = `The Sun is in view at ${deg2(sun.elDeg)}° elevation and the Earth is in view: power and a direct link to Earth are both available.`;
+    s = input.steady
+      ? 'The Sun and the Earth are both in view: power and a direct link to Earth are both available.'
+      : `The Sun is in view at ${deg2(sun.elDeg)}° elevation and the Earth is in view: power and a direct link to Earth are both available.`;
   } else if (sun.visible) {
     s = `The Sun is up, but the Earth is ${hiddenPhrase(earth.elDeg, input.blockerEarth, input, false)}: no direct link to Earth.`;
   } else if (earth.visible) {
@@ -90,8 +99,11 @@ export function sentenceNow(input: SummaryInput): string {
   } else {
     s = 'Neither the Sun nor the Earth is visible from here right now.';
   }
-  if (sun.discFraction > 0 && sun.discFraction < 1) s += ` Only ${formatPct(sun.discFraction * 100)} of the solar disc clears the terrain.`;
-  if (eclipse.kind !== 'none') s += ` The Earth is covering ${formatPct(eclipse.covered * 100)} of the Sun (eclipse).`;
+  // Not while playing: with the Sun skimming a ridge the disc share crosses 100 % back and forth.
+  if (!input.steady && sun.discFraction > 0 && sun.discFraction < 1) s += ` Only ${formatPct(sun.discFraction * 100)} of the solar disc clears the terrain.`;
+  if (eclipse.kind !== 'none') {
+    s += input.steady ? ' The Earth is covering part of the Sun (eclipse).' : ` The Earth is covering ${formatPct(eclipse.covered * 100)} of the Sun (eclipse).`;
+  }
   return s;
 }
 
@@ -100,19 +112,21 @@ export function sentenceNext(input: SummaryInput): string {
   const t = input.state.tUnix;
   const sunUp = input.state.sun.visible;
   const ns = input.nextSun;
+  // `in 5d 20h 10m` changes on every frame while playing; `at <UTC>` holds until the event (D-183).
+  const when = (tUnix: number) => (input.steady ? `at ${formatUtc(tUnix)}` : `in ${formatCountdown(tUnix - t)}`);
   let s: string;
   if (sunUp && ns?.tUnix != null && ns.tUnix <= input.missionEndUnix) {
-    s = `Sunset comes in ${formatCountdown(ns.tUnix - t)}, at ${formatUtc(ns.tUnix)}.`;
+    s = input.steady ? `Sunset comes at ${formatUtc(ns.tUnix)}.` : `Sunset comes in ${formatCountdown(ns.tUnix - t)}, at ${formatUtc(ns.tUnix)}.`;
   } else if (sunUp) {
     s = 'The Sun stays up for the rest of the mission.';
   } else if (ns?.tUnix != null) {
-    s = `Sunrise comes in ${formatCountdown(ns.tUnix - t)}.`;
+    s = `Sunrise comes ${when(ns.tUnix)}.`;
   } else {
     s = 'The Sun does not rise here in the next 60 days.';
   }
   const ne = input.nextEarth;
   if (ne?.tUnix != null && (ns?.tUnix == null || ne.tUnix < ns.tUnix)) {
-    s += ` Earth contact ${ne.kind === 'earthset' ? 'is lost' : 'returns'} in ${formatCountdown(ne.tUnix - t)}.`;
+    s += ` Earth contact ${ne.kind === 'earthset' ? 'is lost' : 'returns'} ${when(ne.tUnix)}.`;
   }
   return s;
 }

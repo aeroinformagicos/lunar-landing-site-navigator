@@ -20,6 +20,7 @@ export interface SummaryProps {
 
 export function Summary({ model, mission, scenario, now, assessment }: SummaryProps) {
   const req = useAppStore((s) => s.requirements);
+  const playing = useAppStore((s) => s.playing);
   const sentences = summarize({
     state: now.sky,
     nextSun: now.nextSun,
@@ -38,6 +39,7 @@ export function Summary({ model, mission, scenario, now, assessment }: SummaryPr
       smooth: model.smooth,
       smoothElDeg: smoothHorizon(model.mask.observerHeightM).elDeg,
     },
+    steady: playing,
   });
   return (
     <section id="plain-summary" className="summary" aria-label={t('summary.label')}>
