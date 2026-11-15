@@ -1,7 +1,8 @@
 // AI-assisted: written with Claude Code, reviewed by team Aeroinformágicos
 // Bottom strip of the v2 shell (15_interfaz_v2.md §2.4, §3.1): verdict line, three big figures with
-// help, plain summary, view tabs, time bar (with the Sun and Earth windows in its track) and the
-// provenance and credits line.
+// help, plain summary, view tabs, time bar (with the Sun and Earth windows in its track, their legend,
+// the elapsed part of the mission and the heading indicator of the 2D view, T-64) and the provenance and
+// credits line.
 import { useState } from 'react';
 import type { Window } from '../../core/events';
 import { DAY_S, HOUR_S } from '../../core/time';
@@ -13,7 +14,9 @@ import { togglePlay, usePlayback } from '../controls/TimeControls';
 import { STATUS_ICON, STATUS_TEXT } from '../replan/texts';
 import { Summary } from '../summary/Summary';
 import { reasonText } from '../summary/summarize';
+import { Heading } from './Heading';
 import { useActive } from './useActive';
+import { useView2d } from './view2d';
 
 /** View tabs of the v2, in the mockup's order (D-101): Horizon, Map, Timeline, Terrain profile (+ Replan). */
 export const V2_TABS: Tab[] = ['panorama', 'map', 'timeline', 'section'];
@@ -65,8 +68,8 @@ function Figure({ id, value, share, tone }: { id: 'sunlight' | 'earth_link' | 'l
       <p className="v2-fig__label">
         <span>{name}</span>
         {share && (
-          <span aria-hidden="true">
-            {' · '}
+          <span className="v2-fig__share" aria-hidden="true">
+            <span className="v2-fig__dot">{' · '}</span>
             <span className="v2-mono">{share}</span>
           </span>
         )}
@@ -182,6 +185,8 @@ export function TimeBar() {
   const cursor = useAppStore((s) => s.cursorUnix);
   const playing = useAppStore((s) => s.playing);
   const speed = useAppStore((s) => s.playSpeed);
+  // The heading indicator goes with a mounted 2D scene (also the 2D fallback of the 3D view).
+  const showHeading = useView2d((s) => s.viewAz !== null);
   const setCursor = useAppStore((s) => s.setCursor);
   const cycleSpeed = useAppStore((s) => s.cycleSpeed);
   const { min, max } = cursorBounds({ scenarios: [scenario], activeScenarioId: scenario.id });
@@ -218,14 +223,31 @@ export function TimeBar() {
       <button type="button" className="pill pill--small v2-speed" onClick={cycleSpeed} aria-label={t('time.speed', { speed: speedLabel(speed) })}>
         {speedLabel(speed)}
       </button>
+      <div className="v2-track-wrap">
+        {/* What each bar means (T-64 d): the colour is never the only cue (10 §2). */}
+        <span className="v2-track__legend" aria-hidden="true">
+          <span className="v2-legend v2-legend--sun">
+            <i />
+            {t('time.legend_sun')}
+          </span>
+          <span className="v2-legend v2-legend--earth">
+            <i />
+            {t('time.legend_earth')}
+          </span>
+        </span>
       <div className="v2-track">
+        {/* Mission already played (landing → cursor), the rest dimmed (T-64 a). */}
+        <span className="v2-track__elapsed" style={{ width: `${frac * 100}%` }} aria-hidden="true" />
         {windows && (
           <>
-            <Bar segs={segments(windows.sun, min, max)} tone="sun" top={12} />
-            <Bar segs={segments(windows.earth, min, max)} tone="earth" top={22} />
+            <Bar segs={segments(windows.sun, min, max)} tone="sun" top={9} />
+            <Bar segs={segments(windows.earth, min, max)} tone="earth" top={23} />
           </>
         )}
-        <span className="v2-track__cursor" style={{ left: `${frac * 100}%` }} aria-hidden="true" />
+        <span className="v2-track__future" style={{ left: `${frac * 100}%` }} aria-hidden="true" />
+        <span className="v2-track__cursor" style={{ left: `${frac * 100}%` }} aria-hidden="true">
+          <span className="v2-track__knob" />
+        </span>
         <input
           className="v2-track__slider"
           type="range"
@@ -246,10 +268,12 @@ export function TimeBar() {
           ))}
         </span>
       </div>
+      </div>
       <output className="v2-readout" aria-live="off">
         <span className="v2-readout__day">{day}</span>
         <span className="v2-readout__utc">{utc}</span>
       </output>
+      {showHeading && <Heading />}
     </div>
   );
 }
