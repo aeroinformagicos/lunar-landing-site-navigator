@@ -7,3 +7,18 @@
   font-size: 13px;
   line-height: 1.4;
 }
+
+/* D-155: Apply next to the landing field, and which date is applied. */
+.field__apply {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 6px;
+}
+
+.field__apply .field__hint,
+.field__apply .field__warn {
+  margin: 0;
+  flex: 1 1 12em;
+}
